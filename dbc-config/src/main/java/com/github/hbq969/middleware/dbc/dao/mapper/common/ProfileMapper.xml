@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.github.hbq969.middleware.dbc.dao.ProfileDao">
+    <insert id="saveProfile" parameterType="com.github.hbq969.middleware.dbc.dao.entity.ProfileEntity">
+        insert into h_dbc_profiles(profile_name, profile_desc, created_at)
+        values (#{profileName}, #{profileDesc}, #{createdAt})
+    </insert>
+
+    <update id="updateProfile" parameterType="com.github.hbq969.middleware.dbc.dao.entity.ProfileEntity">
+        update h_dbc_profiles
+        set profile_desc=#{profileDesc},
+            updated_at=#{updatedAt}
+        where profile_name = #{profileName}
+    </update>
+
+    <delete id="deleteProfileOnAdmin">
+        delete
+        from h_dbc_profiles
+        where profile_name = #{name}
+    </delete>
+
+    <delete id="deleteAccProfileOnAdmin">
+        delete
+        from h_dbc_acc_profiles
+        where profile_name = #{name}
+    </delete>
+
+    <select id="queryProfileList" parameterType="com.github.hbq969.middleware.dbc.dao.entity.ProfileEntity"
+            resultType="com.github.hbq969.middleware.dbc.dao.entity.ProfileEntity">
+        select a.profile_name AS "profileName",
+        a.profile_desc AS "profileDesc",
+        a.created_at AS "createdAt",
+        a.updated_at AS "updatedAt",
+        b.username AS "username"
+        from h_dbc_profiles a,h_dbc_acc_profiles b
+        where a.profile_name=b.profile_name
+        <where>
+            <if test="profileName!=null and profileName!=''">
+                <bind name="profileNameLike" value="'%' + profileName + '%'"/>
+                and a.profile_name like #{profileNameLike}
+            </if>
+            <if test="profileDesc!=null and profileDesc!=''">
+                <bind name="profileDescLike" value="'%' + profileDesc + '%'"/>
+                and a.profile_desc like #{profileDescLike}
+            </if>
+        </where>
+        order by a.profile_name
+    </select>
+
+    <select id="queryAllProfileList" resultType="com.github.hbq969.middleware.dbc.dao.entity.ProfileEntity">
+        select a.profile_name AS "profileName",
+               a.profile_desc AS "profileDesc",
+               a.created_at   AS "createdAt",
+               a.updated_at   AS "updatedAt"
+        from h_dbc_profiles a
+        order by a.profile_name
+    </select>
+
+    <select id="queryProfileConfigNum" parameterType="com.github.hbq969.middleware.dbc.model.AccountService"
+            resultType="com.github.hbq969.middleware.dbc.dao.entity.ProfileEntity">
+        select profile_name      AS "profileName",
+               count(config_key) AS "configNum"
+        from h_dbc_config
+        where app = #{app}
+          and username = #{username}
+          and service_id = #{serviceId}
+        group by profile_name
+    </select>
+
+    <insert id="saveAccProfile" parameterType="com.github.hbq969.middleware.dbc.model.AccountProfile">
+        insert into h_dbc_acc_profiles(app, username, profile_name)
+        values (#{app}, #{username}, #{profileName})
+    </insert>
+
+    <delete id="deleteProfileConfig" parameterType="com.github.hbq969.middleware.dbc.model.AccountServiceProfile">
+        delete
+        from h_dbc_config
+        where app = #{app}
+          and username = #{username}
+          and service_id = #{serviceId}
+          and profile_name = #{profileName}
+    </delete>
+
+    <delete id="deleteProfileAllConfigOnAdmin">
+        delete
+        from h_dbc_config
+        where profile_name = #{name}
+    </delete>
+
+    <select id="queryProfileByName" resultType="com.github.hbq969.middleware.dbc.dao.entity.ProfileEntity">
+        select a.profile_name AS "profileName",
+               a.profile_desc AS "profileDesc",
+               a.created_at   AS "createdAt",
+               a.updated_at   AS "updatedAt",
+               b.username     AS "username"
+        from h_dbc_profiles a,
+             h_dbc_acc_profiles b
+        where a.profile_name = b.profile_name
+          and a.profile_name = #{name}
+    </select>
+
+    <delete id="deleteProfile" parameterType="com.github.hbq969.middleware.dbc.model.AccountProfile">
+        delete
+        from h_dbc_profiles
+        where profile_name in (select profile_name
+                               from h_dbc_acc_profiles
+                               where app = #{app}
+                                 and username = #{username}
+                                 and profile_name = #{profileName})
+    </delete>
+
+    <delete id="deleteAccProfile" parameterType="com.github.hbq969.middleware.dbc.model.AccountProfile">
+        delete
+        from h_dbc_acc_profiles
+        where app = #{app}
+          and username = #{username}
+          and profile_name = #{profileName}
+    </delete>
+
+    <delete id="deleteProfileAllConfig" parameterType="com.github.hbq969.middleware.dbc.model.AccountProfile">
+        delete
+        from h_dbc_config
+        where profile_name in (select profile_name
+                               from h_dbc_acc_profiles
+                               where app = #{app}
+                                 and username = #{username}
+                                 and profile_name = #{profileName})
+    </delete>
+</mapper>

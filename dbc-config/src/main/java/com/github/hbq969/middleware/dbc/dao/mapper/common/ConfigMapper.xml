@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.github.hbq969.middleware.dbc.dao.ConfigDao">
+    <select id="queryConfigProfileList" parameterType="com.github.hbq969.middleware.dbc.view.request.ConfigProfileQuery"
+            resultType="com.github.hbq969.middleware.dbc.dao.entity.ConfigProfileEntity">
+        select d.service_id AS "serviceId",
+        d.service_name AS "serviceName",
+        a.profile_name AS "profileName",
+        a.profile_desc AS "profileDesc",
+        a.created_at AS "createdAt",
+        a.updated_at AS "updatedAt",
+        count(c.config_key) AS "configNum"
+        from h_dbc_profiles a,
+        h_dbc_acc_profiles b,
+        h_dbc_config c,
+        h_dbc_service d,
+        h_dbc_acc_service e
+        where a.profile_name = b.profile_name
+        and a.profile_name = c.profile_name
+        and b.username = c.username
+        and d.service_id = e.service_id
+        and b.username = e.username
+        and c.service_id = d.service_id
+        and c.username = #{username}
+        and c.app = #{app}
+        and c.service_id = #{serviceId}
+        <if test="profileName!=null and profileName!=''">
+            and a.profile_name = #{profileName}
+        </if>
+        <if test="profileDesc!=null and profileDesc!=''">
+            <bind name="profileDescLike" value="'%' + profileDesc + '%'"/>
+            and a.profile_desc like #{profileDescLike}
+        </if>
+        group by d.service_id,
+        d.service_name,
+        a.profile_name,
+        a.profile_desc,
+        a.created_at,
+        a.updated_at
+    </select>
+
+    <insert id="saveConfig">
+        insert into h_dbc_config(app, username, service_id, profile_name, config_key, config_value, created_at)
+        values (#{asp.app}, #{asp.username}, #{asp.serviceId}, #{asp.profileName}, #{config.configKey},
+                #{config.configValue}, #{config.createdAt})
+    </insert>
+
+    <update id="updateConfig">
+        update h_dbc_config
+        set config_value=#{config.configValue},
+            updated_at  = #{config.updatedAt}
+        where app = #{asp.app}
+          and username = #{asp.username}
+          and service_id = #{asp.serviceId}
+          and profile_name = #{asp.profileName}
+          and config_key = #{config.configKey}
+    </update>
+
+    <delete id="deleteConfig">
+        delete
+        from h_dbc_config
+        where app = #{asp.app}
+          and username = #{asp.username}
+          and service_id = #{asp.serviceId}
+          and profile_name = #{asp.profileName}
+          and config_key = #{q.configKey}
+    </delete>
+
+    <select id="queryConfigList" resultType="com.github.hbq969.middleware.dbc.dao.entity.ConfigEntity">
+        select config_key AS "configKey",
+        config_value AS "configValue",
+        created_at AS "createdAt",
+        updated_at AS "updatedAt"
+        from h_dbc_config
+        where app = #{asp.app}
+        and username = #{asp.username}
+        and service_id = #{asp.serviceId}
+        and profile_name = #{asp.profileName}
+        <if test="q.configKey!=null and q.configKey!=''">
+            <bind name="configKeyLike" value="'%' + q.configKey + '%'"/>
+            and config_key like #{configKeyLike}
+        </if>
+        <if test="q.configValue!=null and q.configValue!=''">
+            <bind name="configValueLike" value="'%' + q.configValue + '%'"/>
+            and config_value like #{configValueLike}
+        </if>
+        order by config_key
+    </select>
+</mapper>

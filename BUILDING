@@ -1,0 +1,24 @@
+Build Instructions for h-dbc
+
+====================================================
+
+(1) Prerequisites
+
+    JDK 1.8+ is required in order to compile and run this app.
+
+    h-dbc utilizes Maven as a distribution management and packaging tool. Version 3.0.3 or later is required.
+    Maven installation and configuration instructions can be found here:
+
+    http://maven.apache.org/run-maven/index.html
+
+
+(2) Build distribution packages
+
+    Execute the following command in order to build the tar.gz packages and install JAR into local repository:
+
+	# build h-dbc
+	$ cd h-dbc/dbc-config/src/main/resources/static
+	$ nvm use 16
+	$ npm i && npm run build
+	$ cd h-dbc
+    $ mvn -Dmaven.test.skip=true clean package -U

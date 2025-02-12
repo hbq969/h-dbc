@@ -1,0 +1,6 @@
+.idea
+dbc-config/target
+dbc-driver/target
+logs/
+dbc-config/src/main/resources/static/node_modules
+dbc-config/src/main/resources/static/dbc-ui

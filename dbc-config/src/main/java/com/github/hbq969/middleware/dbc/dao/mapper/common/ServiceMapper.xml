@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.github.hbq969.middleware.dbc.dao.ServiceDao">
+    <insert id="saveService" parameterType="com.github.hbq969.middleware.dbc.dao.entity.ServiceEntity">
+        insert into h_dbc_service(service_id, service_name, service_desc, created_at)
+        values (#{serviceId}, #{serviceName}, #{serviceDesc}, #{createdAt})
+    </insert>
+
+    <update id="updateService" parameterType="com.github.hbq969.middleware.dbc.dao.entity.ServiceEntity">
+        update h_dbc_service
+        set service_name=#{serviceName},
+            service_desc=#{serviceDesc},
+            updated_at=#{updatedAt}
+        where service_id = #{serviceId}
+    </update>
+
+    <delete id="deleteServiceOnAdmin" parameterType="com.github.hbq969.middleware.dbc.dao.entity.ServiceEntity">
+        delete
+        from h_dbc_service
+        where service_id = #{serviceId}
+    </delete>
+
+    <delete id="deleteAccServiceOnAdmin">
+        delete
+        from h_dbc_acc_service
+        where service_id = #{serviceId}
+    </delete>
+
+    <select id="queryServiceList" resultType="com.github.hbq969.middleware.dbc.dao.entity.ServiceEntity">
+        select a.service_id AS "serviceId",
+        a.service_name AS "serviceName",
+        a.service_desc AS "serviceDesc",
+        a.created_at AS "createdAt",
+        a.updated_at AS "updatedAt",
+        b.username AS "username"
+        from h_dbc_service a,
+        h_dbc_acc_service b
+        where a.service_id = b.service_id
+        and b.app = #{accService.app}
+        <choose>
+            <when test="accService.username=='admin'">
+                <if test="service.username!=null and service.username!=''">
+                    <bind name="usernameLike" value="'%' + service.username + '%'"/>
+                    and b.username like #{usernameLike}
+                </if>
+            </when>
+            <otherwise>
+                and b.username = #{accService.username}
+            </otherwise>
+        </choose>
+        <if test="service.serviceName!=null and service.serviceName!=''">
+            <bind name="serviceNameLike" value="'%' + service.serviceName + '%'"/>
+            and a.service_name like #{service.serviceNameLike}
+        </if>
+        <if test="service.serviceDesc!=null and service.serviceDesc!=''">
+            <bind name="serviceDescLike" value="'%' + service.serviceDesc + '%'"/>
+            and a.service_desc like #{service.serviceDescLike}
+        </if>
+    </select>
+
+    <insert id="saveAccountService" parameterType="com.github.hbq969.middleware.dbc.model.AccountService">
+        insert into h_dbc_acc_service(app, username, service_id)
+        values (#{app}, #{username}, #{serviceId})
+    </insert>
+
+    <select id="queryServiceByName" resultType="com.github.hbq969.middleware.dbc.dao.entity.ServiceEntity">
+        select a.service_id   AS "serviceId",
+               a.service_name AS "serviceName",
+               a.service_desc AS "serviceDesc",
+               a.created_at   AS "createdAt",
+               a.updated_at   AS "updatedAt",
+               b.username     AS "username"
+        from h_dbc_service a,
+             h_dbc_acc_service b
+        where a.service_id = b.service_id
+            and a.service_name = #{serviceName}
+    </select>
+
+    <delete id="deleteServiceConfigOnAdmin">
+        delete
+        from h_dbc_config
+        where service_id = #{serviceId}
+    </delete>
+
+    <delete id="deleteService" parameterType="com.github.hbq969.middleware.dbc.model.AccountService">
+        delete
+        from h_dbc_service
+        where service_id in (select service_id
+                             from h_dbc_acc_service
+                             where app = #{app}
+                               and username = #{username}
+                               and service_id = #{serviceId})
+    </delete>
+
+    <delete id="deleteAccService" parameterType="com.github.hbq969.middleware.dbc.model.AccountService">
+        delete
+        from h_dbc_acc_service
+        where app = #{app}
+          and username = #{username}
+          and service_id = #{serviceId}
+    </delete>
+
+    <delete id="deleteServiceConfig" parameterType="com.github.hbq969.middleware.dbc.model.AccountService">
+        delete
+        from h_dbc_config
+        where service_id in (select service_id
+                             from h_dbc_acc_service
+                             where app = #{app}
+                               and username = #{username}
+                               and service_id = #{serviceId})
+    </delete>
+</mapper>
