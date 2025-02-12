@@ -8,8 +8,8 @@ spring:
     hikari:
       jdbc-url: jdbc:oracle:thin:@docker.for.mac.host.internal:1521:XE
       driver-class-name: oracle.jdbc.OracleDriver
-      username: cscenter
-      password: $AqCpZ@0392
+      username: dbc
+      password: 123456
       maximum-pool-size: 10
       minimum-idle: 5
       max-lifetime: 1800000
