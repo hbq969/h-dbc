@@ -64,7 +64,7 @@ mybatis:
 ```
 
 ### 服务配置
-> bootstrap.yml
+> bootstrap.yml （db方式拉取配置）
 ```yaml
 spring:
   cloud:
@@ -79,6 +79,23 @@ spring:
         dbc-key: h-dbc
         service-name: h-example
         profile-name: dev
+```
+
+
+> bootstrap.yml （api方式拉取配置）
+```yaml
+spring:
+  cloud:
+    config:
+      h-dbc:
+        enabled: true
+        dbc-key: h-dbc
+        service-name: h-example
+        profile-name: default
+        api-url: http://localhost:30170
+        # 取至配置中心中的encrypt.config.aes.key
+        api-secret: 接口私钥
+        api-charset: utf-8
 ```
 
 > 服务依赖
