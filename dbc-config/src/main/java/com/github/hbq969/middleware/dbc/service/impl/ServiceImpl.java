@@ -3,6 +3,9 @@ package com.github.hbq969.middleware.dbc.service.impl;
 import cn.hutool.core.lang.UUID;
 import com.github.hbq969.code.common.spring.context.SpringContext;
 import com.github.hbq969.code.common.utils.FormatTime;
+import com.github.hbq969.code.common.utils.InitScriptUtils;
+import com.github.hbq969.code.dict.service.api.impl.MapDictHelperImpl;
+import com.github.hbq969.code.sm.login.service.LoginService;
 import com.github.hbq969.code.sm.login.session.UserContext;
 import com.github.hbq969.middleware.dbc.dao.ServiceDao;
 import com.github.hbq969.middleware.dbc.dao.entity.ServiceEntity;
@@ -27,8 +30,17 @@ public class ServiceImpl implements Service, InitializingBean {
     @Autowired
     private SpringContext context;
 
+    @Autowired(required = false)
+    private LoginService loginService;
+
+    @Autowired
+    private MapDictHelperImpl dict;
+
     @Override
     public void afterPropertiesSet() throws Exception {
+        if (loginService != null) {
+            loginService.finished(() -> InitScriptUtils.initial(context, "h-dbc-data.sql", () -> dict.reloadImmediately()));
+        }
         tableInitial();
     }
 

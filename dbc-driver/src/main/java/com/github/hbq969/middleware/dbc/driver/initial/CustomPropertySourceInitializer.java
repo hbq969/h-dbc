@@ -1,22 +1,42 @@
 package com.github.hbq969.middleware.dbc.driver.initial;
 
+import com.github.hbq969.middleware.dbc.driver.api.APIPropertySource;
+import com.github.hbq969.middleware.dbc.driver.db.DatabasePropertySource;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.jasypt.encryption.StringEncryptor;
+import org.jasypt.encryption.pbe.PooledPBEStringEncryptor;
+import org.jasypt.encryption.pbe.config.SimpleStringPBEConfig;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.env.MapPropertySource;
 
+/**
+ * <p></p><code>ApplicationContextInitializer</code>`的 initialize 方法通常会在 Spring 应用上下文的启动过程中被调用。
+ * 这个方法会在 <code>ConfigurableApplicationContext</code> 初始化时执行，而配置需要给每个上下文都要添加</p>
+ */
 @Slf4j
 public class CustomPropertySourceInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
 
+    private MapPropertySource customPropertySource;
+
     @Override
     public void initialize(ConfigurableApplicationContext applicationContext) {
-        log.info("初始化 CustomPropertySourceInitializer.");
+        log.info("刷新spring上下文.");
         ConfigurableEnvironment environment = applicationContext.getEnvironment();
         boolean enabled = environment.getProperty("spring.cloud.config.h-dbc.enabled", Boolean.class, false);
-        log.info("h-dbc配置中心启用标识: {}", enabled);
         if (enabled) {
-            log.info("启用h-dbc配置中心配置");
-            environment.getPropertySources().addFirst(new DatabasePropertySource("databasePropertySource", environment));
+            String apiUrl = environment.getProperty("spring.cloud.config.h-dbc.api-url");
+            if (StringUtils.isNotEmpty(apiUrl)) {
+                this.customPropertySource = new APIPropertySource("apiPropertySource", environment);
+            } else {
+                this.customPropertySource = new DatabasePropertySource("dbPropertySource", environment);
+            }
+            environment.getPropertySources().addFirst(this.customPropertySource);
         }
     }
 }

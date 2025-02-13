@@ -41,7 +41,7 @@ spring:
           - /hbq969-dict/**
           - /hbq969-tabula/**
         header-name: api-safe-token
-        header-value-regex: 8DC75E91D4E143CF94BA29C46C43B24B
+        header-value-regex: ENC(3nSTj512SWemElbk1rzkLVrcoUntPtEQCv5HCi7ZevwSYx5ik+af4tRrGQdXc/c39LrqIWff8CQSv+APj3YQ9umBRQRSLxb6autlhZYa5d4=)
       resource-handler-registry:
         entries:
           - handlers: /hbq969-common/**
@@ -56,10 +56,11 @@ spring:
             locations: classpath:/static/dbc-ui/
         enabled: true
       login:
-        enabled: false
+        enabled: true
         cookie-max-age-sec: 1800
         dialect: embedded
         include-urls:
+          - "/hbq969-common/**"
           - "/hbq969-sm/**"
           - "/hbq969-dict/**"
           - "/hbq969-tabula/**"
@@ -89,10 +90,10 @@ spring:
       base-packages: com.github.hbq969
       default-lookup-key: hikari
     hikari:
-      jdbc-url: jdbc:h2:mem:local
+      jdbc-url: jdbc:h2:~/.h2/dbc
       driver-class-name: org.h2.Driver
-      username: foo
-      password: ENC(2HRE3Jhuz6IfiD8L7orn4flpXNPTWLhH4u6lH/i0SWf8jXh3tNGQG++plhHmJN3F)
+      username: h-dbc
+      password: ENC(PQWxMysuG2mMhw2IpXF9BudyHe2cS5hL3nPx6tJBvYJLl9dZ2eSkBhU6ed7FDgQZ)
       maximum-pool-size: 20
       minimum-idle: 5
       max-lifetime: 1800000
@@ -104,7 +105,7 @@ knife4j:
   basic:
     enable: true
     username: ${spring.application.name}
-    password: 123456
+    password: ENC(PQWxMysuG2mMhw2IpXF9BudyHe2cS5hL3nPx6tJBvYJLl9dZ2eSkBhU6ed7FDgQZ)
 
 swagger:
   base-package: com
@@ -128,8 +129,11 @@ encrypt:
   restful:
     enabled: true
     aes:
-      key: DC2EE8931E434A44
+      key: ENC(OpRRNfzeB0cKPdoQ3BLEc+WoW83lR9LHmRRN9xd/6nokMnYav1QBYNBLvxMyAsbUMlNVpfbVAD4f/E6WtTLaFw==)
       show-log: true
+    advice-packages:
+      - com.github.hbq969.middleware
+      - com.github.hbq969.code.sm
 
 advice:
   log:

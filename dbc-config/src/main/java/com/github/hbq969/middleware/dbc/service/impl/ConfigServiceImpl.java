@@ -31,7 +31,7 @@ import java.util.List;
 
 @Service("dbc-ConfigServiceImpl")
 @Slf4j
-public class ConfigServiceImpl implements ConfigService, InitializingBean {
+public class ConfigServiceImpl implements ConfigService {
 
     @Autowired
     private ConfigDao configDao;
@@ -44,11 +44,6 @@ public class ConfigServiceImpl implements ConfigService, InitializingBean {
 
     @Autowired
     private FileReaderFacade fileReader;
-
-    @Override
-    public void afterPropertiesSet() throws Exception {
-        InitScriptUtils.initial(context, "h-dbc-data.sql", () -> dict.reloadImmediately());
-    }
 
     @Override
     public PageInfo<ConfigProfileEntity> queryConfigProfileList(ConfigProfileQuery q, int pageNum, int pageSize) {

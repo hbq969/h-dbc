@@ -9,7 +9,7 @@ spring:
       jdbc-url: jdbc:oracle:thin:@docker.for.mac.host.internal:1521:XE
       driver-class-name: oracle.jdbc.OracleDriver
       username: dbc
-      password: 123456
+      password: ENC(PQWxMysuG2mMhw2IpXF9BudyHe2cS5hL3nPx6tJBvYJLl9dZ2eSkBhU6ed7FDgQZ)
       maximum-pool-size: 10
       minimum-idle: 5
       max-lifetime: 1800000
