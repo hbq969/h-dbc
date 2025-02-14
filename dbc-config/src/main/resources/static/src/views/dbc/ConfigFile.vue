@@ -95,17 +95,22 @@ const initialEditor = () => {
     editor.onDidChangeModelContent(() => {
       const modifiedValue = editor.getValue();
       modifiedModel.setValue(modifiedValue);
+      let originalContent = originalModel.getValue()
+      if(!originalContent || originalContent.trim()==''){
+        originalModel.setValue(modifiedValue)
+      }
     });
   }
 }
 
 const saveConfigFile = () => {
-  if (!data.configFile.fileContent || data.configFile.fileContent.trim() == '') {
+  let content = editor?.getValue()
+  if (!content || content.trim() == '') {
     alert('配置文件内容不能为空')
     return
   }
   let form = router.currentRoute.value.query
-  form.fileContent = editor?.getValue()
+  form.fileContent = content
   axios({
     url: '/config/file',
     method: 'post',

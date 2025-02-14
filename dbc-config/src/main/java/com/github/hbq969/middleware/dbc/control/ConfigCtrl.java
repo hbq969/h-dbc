@@ -92,7 +92,7 @@ public class ConfigCtrl {
         return ReturnMessage.success(configService.queryConfigFile(asp));
     }
 
-    @ApiOperation("查询yml配置文件信息")
+    @ApiOperation("更新yml配置文件信息")
     @RequestMapping(path = "/file", method = RequestMethod.POST)
     @ResponseBody
     public ReturnMessage<?> updateConfigFile(@RequestBody ConfigFileEntity cfe) {

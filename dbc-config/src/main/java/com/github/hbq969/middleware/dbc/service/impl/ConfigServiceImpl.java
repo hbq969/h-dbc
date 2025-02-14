@@ -217,7 +217,12 @@ public class ConfigServiceImpl implements ConfigService {
     public void updateConfigFile(ConfigFileEntity cfe) {
         cfe.userInitial(context);
         cfe.setUpdatedAt(FormatTime.nowSecs());
-        configDao.updateConfigFile(cfe);
+        ConfigFileEntity result = configDao.queryConfigFile(cfe);
+        if (result == null) {
+            configDao.saveConfigFile(cfe);
+        } else {
+            configDao.updateConfigFile(cfe);
+        }
 
         // 比较和properties的差异
         List<Pair<String, Object>> yamlParis = YamlPropertiesFileConverter.yamlToProperties(cfe.getFileContent());
