@@ -32,7 +32,7 @@ public class YamlFileReader implements OptionalFacadeAware<String, FileReader>,F
 
     @Override
     public String getKey() {
-        return "yml";
+        return null;
     }
 
     @Override

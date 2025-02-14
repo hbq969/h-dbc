@@ -5,11 +5,12 @@
     <update id="createService">
         create table h_dbc_service
         (
-            service_id   varchar2(100) primary key,
+            service_id   varchar2(100) ,
             service_name varchar2(500) unique not null,
             service_desc varchar2(500),
             created_at   number(20),
-            updated_at   number(20)
+            updated_at   number(20),
+            constraint pk_dbc_service primary key (service_id)
         ) 
     </update>
 
@@ -19,28 +20,29 @@
             app        varchar2(255),
             username   varchar2(255),
             service_id varchar2(100),
-            primary key (app, username, service_id)
+            constraint pk_dbc_acc_service primary key (app, username, service_id)
         ) 
     </update>
 
     <update id="createProfiles">
         create table h_dbc_profiles
         (
-            profile_name varchar2(100) primary key,
+            profile_name varchar2(100),
             profile_desc varchar2(500),
             created_at number(20),
-            updated_at number(20)
+            updated_at number(20),
+            constraint pk_dbc_profiles primary key (profile_name)
         ) 
     </update>
 
     <update id="createAccProfiles">
         create table h_dbc_acc_profiles
         (
-            app          varchar2(255),
-            username     varchar2(255),
-            profile_name varchar2(100),
-            primary key (app, username, profile_name)
-        ) 
+            app varchar2 (255),
+            username varchar2 (255),
+            profile_name varchar2 (100),
+            constraint pk_dbc_acc_profiles primary key (app, username, profile_name)
+        )
     </update>
 
     <update id="createConfig">
@@ -54,7 +56,22 @@
             config_value clob,
             created_at   number(20),
             updated_at   number(20),
-            primary key (app, username, service_id, profile_name, config_key)
+            constraint pk_dbc_config primary key (app, username, service_id, profile_name, config_key)
         ) 
+    </update>
+
+    <update id="createConfigFile">
+        create table h_dbc_config_file
+        (
+            app varchar2 (50),
+            username varchar2 (50),
+            service_id varchar2 (50),
+            profile_name varchar2 (50),
+            file_name varchar2 (100),
+            file_content clob,
+            created_at number (20),
+            updated_at number (20),
+            constraint pk_dbc_config_file primary key (app, username, service_id, profile_name)
+        )
     </update>
 </mapper>

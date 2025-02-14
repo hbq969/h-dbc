@@ -76,6 +76,7 @@ public class ServiceImpl implements Service, InitializingBean {
             serviceDao.deleteServiceOnAdmin(service);
             serviceDao.deleteAccServiceOnAdmin(serviceId);
             serviceDao.deleteServiceConfigOnAdmin(serviceId);
+            serviceDao.deleteServiceConfigFileOnAdmin(serviceId);
         } else {
             AccountService as = new AccountService();
             as.userInitial(context);
@@ -83,6 +84,7 @@ public class ServiceImpl implements Service, InitializingBean {
             serviceDao.deleteService(as);
             serviceDao.deleteAccService(as);
             serviceDao.deleteServiceConfig(as);
+            serviceDao.deleteServiceConfigFile(as);
         }
     }
 
@@ -127,6 +129,12 @@ public class ServiceImpl implements Service, InitializingBean {
             log.info("表h_dbc_config创建成功");
         } catch (Exception e) {
             log.error("表h_dbc_config已存在");
+        }
+        try {
+            serviceDao.createConfigFile();
+            log.info("表h_dbc_config_file创建成功");
+        } catch (Exception e) {
+            log.error("表h_dbc_config_file已存在");
         }
     }
 }

@@ -2,6 +2,7 @@ package com.github.hbq969.middleware.dbc.model;
 
 import com.github.hbq969.code.common.spring.context.SpringContext;
 import com.github.hbq969.code.sm.login.session.UserContext;
+import com.github.hbq969.middleware.dbc.dao.entity.ConfigFileEntity;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 
@@ -19,5 +20,13 @@ public class AccountServiceProfile {
         } else if (StringUtils.isEmpty(username)) {
             throw new IllegalArgumentException("账号名不能为空");
         }
+    }
+
+    public AccountServiceProfile propertySet(ConfigFileEntity cfe) {
+        this.app = cfe.getApp();
+        this.username = cfe.getUsername();
+        this.serviceId = cfe.getServiceId();
+        this.profileName = cfe.getProfileName();
+        return this;
     }
 }

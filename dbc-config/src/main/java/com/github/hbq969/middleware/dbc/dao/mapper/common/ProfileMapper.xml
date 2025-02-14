@@ -127,4 +127,26 @@
                                  and username = #{username}
                                  and profile_name = #{profileName})
     </delete>
+
+    <delete id="deleteProfileConfigFileOnAdmin">
+        delete from h_dbc_config_file
+        where profile_name=#{name}
+    </delete>
+
+    <delete id="deleteProfileConfigFile" parameterType="com.github.hbq969.middleware.dbc.model.AccountProfile">
+        delete
+        from h_dbc_config_file
+        where app = #{app}
+          and username = #{username}
+          and profile_name = #{profileName}
+    </delete>
+
+    <delete id="deleteProfileConfileFile2" parameterType="com.github.hbq969.middleware.dbc.model.AccountServiceProfile">
+        delete
+        from h_dbc_config_file
+        where app = #{app}
+          and username = #{username}
+          and service_id = #{serviceId}
+          and profile_name = #{profileName}
+    </delete>
 </mapper>

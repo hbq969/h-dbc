@@ -4,7 +4,6 @@ import cn.hutool.core.lang.Pair;
 import com.github.hbq969.code.common.utils.GsonUtils;
 import com.github.hbq969.middleware.dbc.driver.config.DbcConfig;
 import lombok.extern.slf4j.Slf4j;
-import org.jasypt.encryption.StringEncryptor;
 import org.jasypt.encryption.pbe.PooledPBEStringEncryptor;
 import org.jasypt.encryption.pbe.config.SimpleStringPBEConfig;
 import org.springframework.core.env.ConfigurableEnvironment;
@@ -31,7 +30,7 @@ public class APIPropertySource extends MapPropertySource {
     private void loadConfig() {
         log.info("通过api方式从h-dbc配置中心读取配置。");
         try {
-            ConfigService api = conf.configSet(environment).apiServiceInitial();
+            ConfigService api = conf.configSet(environment).getApiProxy();
             ConfigInfo model = new ConfigInfo();
             model.setServiceName(conf.getServiceName());
             model.setProfileName(conf.getProfileName());
@@ -39,10 +38,7 @@ public class APIPropertySource extends MapPropertySource {
             this.configMap = new HashMap<>();
             for (Pair pair : pairs) {
                 String value = String.valueOf(pair.getValue());
-                if (value.startsWith("ENC(") && value.endsWith(")")) {
-                    value = stringEncryptor(environment).decrypt(value.substring(4, value.length() - 1));
-                    log.debug("解密配置中心读取的配置, 属性名: {}, 加密值: {}, 解密值: {}", pair.getKey(), pair.getValue(), value);
-                }
+                value = decode(environment, String.valueOf(pair.getKey()), value);
                 configMap.put((String) pair.getKey(), value);
             }
             if (log.isTraceEnabled()) {
@@ -74,9 +70,9 @@ public class APIPropertySource extends MapPropertySource {
         return StringUtils.toStringArray(this.configMap.keySet());
     }
 
-    public static StringEncryptor stringEncryptor(ConfigurableEnvironment environment) {
+    public static void initialStringEncryptor(ConfigurableEnvironment environment) {
         if (encryptor != null) {
-            return encryptor;
+            return;
         }
         log.info("springboot应用初始化阶段，创建自定义的 jasyptStringEncryptor.");
         encryptor = new PooledPBEStringEncryptor();
@@ -91,6 +87,18 @@ public class APIPropertySource extends MapPropertySource {
         config.setIvGeneratorClassName("org.jasypt.iv.RandomIvGenerator");
         config.setStringOutputType("base64");
         encryptor.setConfig(config);
-        return encryptor;
+    }
+
+    public static String decode(ConfigurableEnvironment environment, String key, String encode) {
+        initialStringEncryptor(environment);
+        if (encode.startsWith("ENC(") && encode.endsWith(")")) {
+            String value = encryptor.decrypt(encode.substring(4, encode.length() - 1));
+            if (log.isDebugEnabled()) {
+                log.debug("springboot初始化阶段属性解密处理, 属性名: {}, 原始值: {}, 解密后: {}", key, encode, value);
+            }
+            return value;
+        } else {
+            return encode;
+        }
     }
 }

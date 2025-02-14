@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-  Edit, ArrowLeft, Delete, Grid
+  Edit, ArrowLeft, Delete, Grid, DocumentCopy
 } from '@element-plus/icons-vue'
 import {ref, reactive, onMounted, computed, provide, inject} from 'vue'
 import axios from '@/network'
@@ -81,6 +81,16 @@ const goConfigList = (source) => {
   })
 }
 
+const goConfigFile = (source) => {
+  source.serviceId = router.currentRoute.value.query.serviceId
+  source.serviceName = router.currentRoute.value.query.serviceName
+  source.username = router.currentRoute.value.query.username
+  router.push({
+    path: '/config/file',
+    query: source
+  })
+}
+
 const debounce = (callback: (...args: any[]) => void, delay: number) => {
   let tid: any;
   return function (...args: any[]) {
@@ -126,7 +136,11 @@ const _ = (window as any).ResizeObserver;
                   <el-button type="info" size="small" circle :icon="Delete"/>
                 </template>
               </el-popconfirm>
-              <el-badge :value="source.configNum" style="margin-left: 12px" type="danger" max="500" :hidden="source.configNum==0">
+              <el-badge :value="0" style="margin-left: 12px" type="danger" max="500" :hidden="true">
+                <el-button type="primary" size="small" circle :icon="DocumentCopy" @click="goConfigFile(source)"/>
+              </el-badge>
+              <el-badge :value="source.configNum" style="margin-left: 12px" type="danger" max="500"
+                        :hidden="source.configNum==0">
                 <el-button type="success" size="small" circle :icon="Grid" @click="goConfigList(source)"/>
               </el-badge>
             </div>
@@ -136,10 +150,10 @@ const _ = (window as any).ResizeObserver;
           <el-form size="small" label-position="right" inline-message :inline="false" label-width="100px"
                    style="width:200px">
             <el-form-item label="环境名称：">
-              {{source.profileName}}
+              {{ source.profileName }}
             </el-form-item>
             <el-form-item label="环境描述：">
-              {{source.profileDesc}}
+              {{ source.profileDesc }}
             </el-form-item>
           </el-form>
         </template>

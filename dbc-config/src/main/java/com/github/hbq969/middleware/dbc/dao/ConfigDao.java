@@ -1,6 +1,7 @@
 package com.github.hbq969.middleware.dbc.dao;
 
 import com.github.hbq969.middleware.dbc.dao.entity.ConfigEntity;
+import com.github.hbq969.middleware.dbc.dao.entity.ConfigFileEntity;
 import com.github.hbq969.middleware.dbc.dao.entity.ConfigProfileEntity;
 import com.github.hbq969.middleware.dbc.model.AccountServiceProfile;
 import com.github.hbq969.middleware.dbc.view.request.ConfigProfileQuery;
@@ -20,4 +21,12 @@ public interface ConfigDao {
     void deleteConfig(@Param("asp") AccountServiceProfile asp, @Param("q") ConfigEntity config);
 
     List<ConfigEntity> queryConfigList(@Param("asp") AccountServiceProfile asp, @Param("q") ConfigEntity q);
+
+    void saveConfigFile(ConfigFileEntity file);
+
+    void updateConfigFile(ConfigFileEntity file);
+
+    void deleteConfigFile(ConfigFileEntity file);
+
+    ConfigFileEntity queryConfigFile(ConfigFileEntity file);
 }

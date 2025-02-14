@@ -58,4 +58,19 @@
             primary key (`app`, `username`, `service_id`, `profile_name`, `config_key`)
         )
     </update>
+
+    <update id="createConfigFile">
+        create table `h_dbc_config_file`
+        (
+            `app`          varchar(50),
+            `username`     VARCHAR(50),
+            `service_id`   varchar(50),
+            `profile_name` varchar(50),
+            `file_name`    varchar(100),
+            `file_content` text,
+            `created_at`   numeric(20),
+            `updated_at`   numeric(20),
+            primary key (`app`, `username`, `service_id`, `profile_name`)
+        )
+    </update>
 </mapper>

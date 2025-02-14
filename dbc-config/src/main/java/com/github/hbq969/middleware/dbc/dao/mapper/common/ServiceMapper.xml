@@ -110,4 +110,17 @@
                                and username = #{username}
                                and service_id = #{serviceId})
     </delete>
+
+    <delete id="deleteServiceConfigFileOnAdmin">
+        delete from h_dbc_config_file
+        where service_id=#{serviceId}
+    </delete>
+
+    <delete id="deleteServiceConfigFile" parameterType="com.github.hbq969.middleware.dbc.model.AccountService">
+        delete
+        from h_dbc_config_file
+        where app = #{app}
+          and username = #{username}
+          and service_id = #{serviceId}
+    </delete>
 </mapper>

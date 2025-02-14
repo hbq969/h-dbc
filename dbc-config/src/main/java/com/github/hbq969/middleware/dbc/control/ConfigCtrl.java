@@ -2,6 +2,7 @@ package com.github.hbq969.middleware.dbc.control;
 
 import com.github.hbq969.code.common.restful.ReturnMessage;
 import com.github.hbq969.middleware.dbc.dao.entity.ConfigEntity;
+import com.github.hbq969.middleware.dbc.dao.entity.ConfigFileEntity;
 import com.github.hbq969.middleware.dbc.dao.entity.ConfigProfileEntity;
 import com.github.hbq969.middleware.dbc.model.AccountServiceProfile;
 import com.github.hbq969.middleware.dbc.service.ConfigService;
@@ -29,10 +30,7 @@ public class ConfigCtrl {
     @ApiOperation("获取应用配置环境列表")
     @RequestMapping(path = "/profile/list", method = RequestMethod.POST)
     @ResponseBody
-    public ReturnMessage<PageInfo<ConfigProfileEntity>> queryConfigProfileList(
-            @RequestParam(name = "pageNum", defaultValue = "1") int pageNum,
-            @RequestParam(name = "pageSize", defaultValue = "10") int pageSize,
-            @RequestBody ConfigProfileQuery q) {
+    public ReturnMessage<PageInfo<ConfigProfileEntity>> queryConfigProfileList(@RequestParam(name = "pageNum", defaultValue = "1") int pageNum, @RequestParam(name = "pageSize", defaultValue = "10") int pageSize, @RequestBody ConfigProfileQuery q) {
         return ReturnMessage.success(configService.queryConfigProfileList(q, pageNum, pageSize));
     }
 
@@ -71,28 +69,35 @@ public class ConfigCtrl {
     @ApiOperation("分页查询配置列表")
     @RequestMapping(path = "/list", method = RequestMethod.POST)
     @ResponseBody
-    public ReturnMessage<PageInfo<ConfigEntity>> queryConfigList(
-            @RequestParam(name = "pageNum", defaultValue = "1") int pageNum,
-            @RequestParam(name = "pageSize", defaultValue = "10") int pageSize,
-            @RequestBody ConfigQuery cq) {
+    public ReturnMessage<PageInfo<ConfigEntity>> queryConfigList(@RequestParam(name = "pageNum", defaultValue = "1") int pageNum, @RequestParam(name = "pageSize", defaultValue = "10") int pageSize, @RequestBody ConfigQuery cq) {
         return ReturnMessage.success(configService.queryConfigList(cq.getAsp(), cq.getConfig(), pageNum, pageSize));
     }
 
     @ApiOperation("导入配置")
     @RequestMapping(path = "/import", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseBody
-    public ReturnMessage<?> configImport(
-            @RequestParam("username") String username,
-            @RequestParam("serviceId") String serviceId,
-            @RequestParam("profileName") String profileName,
-            @RequestParam("file") MultipartFile file,
-            @RequestParam("cover") String cover) {
+    public ReturnMessage<?> configImport(@RequestParam("username") String username, @RequestParam("serviceId") String serviceId, @RequestParam("profileName") String profileName, @RequestParam("file") MultipartFile file, @RequestParam("cover") String cover) {
         AccountServiceProfile asp = new AccountServiceProfile();
         asp.setUsername(username);
         asp.setServiceId(serviceId);
         asp.setProfileName(profileName);
         configService.configImport(asp, file, cover);
         return ReturnMessage.success("导入成功");
+    }
+
+    @ApiOperation("查询yml配置文件信息")
+    @RequestMapping(path = "/file/info", method = RequestMethod.POST)
+    @ResponseBody
+    public ReturnMessage<ConfigFileEntity> getConfigFile(@RequestBody AccountServiceProfile asp) {
+        return ReturnMessage.success(configService.queryConfigFile(asp));
+    }
+
+    @ApiOperation("查询yml配置文件信息")
+    @RequestMapping(path = "/file", method = RequestMethod.POST)
+    @ResponseBody
+    public ReturnMessage<?> updateConfigFile(@RequestBody ConfigFileEntity cfe) {
+        configService.updateConfigFile(cfe);
+        return ReturnMessage.success("更新成功");
     }
 
 }

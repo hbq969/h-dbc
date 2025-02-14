@@ -5,8 +5,11 @@ import cn.hutool.core.lang.Pair;
 import com.github.hbq969.code.common.spring.context.SpringContext;
 import com.github.hbq969.code.common.utils.*;
 import com.github.hbq969.code.dict.service.api.impl.MapDictHelperImpl;
+import com.github.hbq969.middleware.dbc.config.Config;
 import com.github.hbq969.middleware.dbc.dao.ConfigDao;
+import com.github.hbq969.middleware.dbc.dao.ProfileDao;
 import com.github.hbq969.middleware.dbc.dao.entity.ConfigEntity;
+import com.github.hbq969.middleware.dbc.dao.entity.ConfigFileEntity;
 import com.github.hbq969.middleware.dbc.dao.entity.ConfigProfileEntity;
 import com.github.hbq969.middleware.dbc.model.AccountServiceProfile;
 import com.github.hbq969.middleware.dbc.service.ConfigService;
@@ -16,7 +19,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.InitializingBean;
+import org.checkerframework.checker.units.qual.C;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
@@ -27,11 +30,18 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service("dbc-ConfigServiceImpl")
 @Slf4j
 public class ConfigServiceImpl implements ConfigService {
+
+    public final static String sqlSave = "insert into h_dbc_config(app,username,service_id,profile_name,config_key,config_value,created_at) values(?,?,?,?,?,?,?)";
+    public final static String sqlUpdate = "update h_dbc_config set config_value=?,updated_at=? where app=? and username=? and service_id=? and profile_name=? and config_key=?";
 
     @Autowired
     private ConfigDao configDao;
@@ -44,6 +54,9 @@ public class ConfigServiceImpl implements ConfigService {
 
     @Autowired
     private FileReaderFacade fileReader;
+
+    @Autowired
+    private ProfileDao profileDao;
 
     @Override
     public PageInfo<ConfigProfileEntity> queryConfigProfileList(ConfigProfileQuery q, int pageNum, int pageSize) {
@@ -59,6 +72,8 @@ public class ConfigServiceImpl implements ConfigService {
         asp.userInitial(context);
         config.setCreatedAt(FormatTime.nowSecs());
         configDao.saveConfig(asp, config);
+
+        addOrUpdateConfigFile(asp, true);
     }
 
     @Override
@@ -66,12 +81,57 @@ public class ConfigServiceImpl implements ConfigService {
         asp.userInitial(context);
         config.setUpdatedAt(FormatTime.nowSecs());
         configDao.updateConfig(asp, config);
+        addOrUpdateConfigFile(asp, false);
     }
 
     @Override
     public void deleteConfig(AccountServiceProfile asp, ConfigEntity q) {
         asp.userInitial(context);
         configDao.deleteConfig(asp, q);
+        addOrUpdateConfigFile(asp, false);
+    }
+
+    private void addOrUpdateConfigFile(AccountServiceProfile asp, boolean add) {
+        ConfigFileEntity newFile = new ConfigFileEntity().propertySet(asp);
+        ConfigFileEntity oldFile = configDao.queryConfigFile(newFile);
+
+        List<ConfigEntity> allConfigs = configDao.queryConfigList(asp, new ConfigEntity());
+        List<Pair<String, Object>> allPairs = allConfigs.stream()
+                .map(c -> new Pair<String, Object>(c.getConfigKey(), c.getConfigValue()))
+                .collect(Collectors.toList());
+        String newYamlString = YamlPropertiesFileConverter.propertiesToYaml(allPairs);
+        // 添加配置
+        if (add) {
+            newFile.setFileContent(newYamlString);
+            // h_dbc_config_file未查询到记录，即未首次添加
+            if (oldFile == null) {
+                newFile.setCreatedAt(FormatTime.nowSecs());
+                if (StringUtils.isEmpty(asp.getProfileName()) || StringUtils.equals("default", asp.getProfileName())) {
+                    newFile.setFileName("application.yml");
+                } else {
+                    newFile.setFileName(String.format("application-%s.yml", asp.getProfileName()));
+                }
+                configDao.saveConfigFile(newFile);
+            }
+            // h_dbc_config_file查询到记录，增量添加
+            else {
+                newFile.setUpdatedAt(FormatTime.nowSecs());
+                configDao.updateConfigFile(newFile);
+            }
+        }
+        // 修改或删除配置
+        else {
+            // 如果一个配置都没了，就删除h_dbc_config_file记录
+            if (StringUtils.isEmpty(newYamlString)) {
+                configDao.deleteConfigFile(oldFile);
+            }
+            // 否则更新h_dbc_config_file
+            else {
+                oldFile.setUpdatedAt(FormatTime.nowSecs());
+                oldFile.setFileContent(newYamlString);
+                configDao.updateConfigFile(oldFile);
+            }
+        }
     }
 
     @Override
@@ -97,6 +157,7 @@ public class ConfigServiceImpl implements ConfigService {
                 }
             });
         });
+        addOrUpdateConfigFile(dcm.getAsp(), false);
     }
 
     @Override
@@ -122,14 +183,102 @@ public class ConfigServiceImpl implements ConfigService {
             log.error(String.format("读取导入文件 %s 异常", file.getOriginalFilename()), e);
             throw new RuntimeException(e);
         }
-        String sqlSave = "insert into h_dbc_config(app,username,service_id,profile_name,config_key,config_value,created_at) values(?,?,?,?,?,?,?)";
-        String sqlUpdate = "update h_dbc_config set config_value=?,updated_at=? where app=? and username=? and service_id=? and profile_name=? and config_key=?";
+        batchConfigs(asp, cover, pairs);
+        addOrUpdateConfigFile(asp, true);
+    }
+
+    private void batchConfigs(AccountServiceProfile asp, String cover, List<Pair<String, Object>> pairs) {
         DigitSplit.defaultStep(200).split(pairs).forEach(data -> {
             batchSaveConfig(asp, data, sqlSave);
             if (StringUtils.equals("Y", cover)) {
                 batchUpdateConfig(asp, data, sqlUpdate);
             }
         });
+    }
+
+    @Override
+    public ConfigFileEntity queryConfigFile(AccountServiceProfile asp) {
+        asp.userInitial(context);
+        ConfigFileEntity cfe = new ConfigFileEntity().propertySet(asp);
+        ConfigFileEntity result = configDao.queryConfigFile(cfe);
+        if (result != null) {
+            result.convertDict(context);
+        }
+        return result;
+    }
+
+    @Override
+    public void updateConfigFile(ConfigFileEntity cfe) {
+        cfe.userInitial(context);
+        cfe.setUpdatedAt(FormatTime.nowSecs());
+        configDao.updateConfigFile(cfe);
+
+        // 比较和properties的差异
+        List<Pair<String, Object>> yamlParis = YamlPropertiesFileConverter.yamlToProperties(cfe.getFileContent());
+        Map<String, Pair<String, Object>> yamlPairMap = yamlParis.stream()
+                .collect(Collectors.toMap(p -> p.getKey(), p -> p, (k1, k2) -> k2));
+        AccountServiceProfile asp = new AccountServiceProfile().propertySet(cfe);
+
+        List<ConfigEntity> propertiesConfigs = configDao.queryConfigList(asp, new ConfigEntity());
+        Map<String, ConfigEntity> propertiesConfigMap = propertiesConfigs.stream()
+                .collect(Collectors.toMap(c -> c.getConfigKey(), c -> c, (k1, k2) -> k2));
+
+        List<ConfigEntity> removeList = new ArrayList<>(20);
+        ConfigEntity tce;
+        // 1.删除propertiesConfigs多出来的配置
+        Iterator<ConfigEntity> it = propertiesConfigs.iterator();
+        while (it.hasNext()) {
+            tce = it.next();
+            if (!yamlPairMap.containsKey(tce.getConfigKey())) {
+                log.debug("删除propertiesConfigs多出来的配置: {}", tce.getConfigKey());
+                removeList.add(tce);
+                it.remove();
+            }
+        }
+        DeleteConfigMultiple dcm = new DeleteConfigMultiple();
+        dcm.setConfigKeys(removeList.stream().map(c -> c.getConfigKey()).collect(Collectors.toList()));
+        dcm.setAsp(asp);
+        deleteConfigMultiple(dcm);
+
+        // 2.添加yamlParis多出来的配置
+        List<Pair<String, Object>> addList = new ArrayList<>(20);
+        Pair<String, Object> tpair;
+        Iterator<Pair<String, Object>> it2 = yamlParis.iterator();
+        while (it2.hasNext()) {
+            tpair = it2.next();
+            if (!propertiesConfigMap.containsKey(tpair.getKey())) {
+                log.debug("添加yamlParis多出来的配置: {}", tpair.getKey());
+                addList.add(tpair);
+                it2.remove();
+            }
+        }
+        batchConfigs(asp, "Y", addList);
+
+        // 3.比较剩余的配置值是否有变化，更新之
+        List<Pair<String, Object>> updateList = new ArrayList<>();
+        for (ConfigEntity configEntity : removeList) {
+            propertiesConfigMap.remove(configEntity.getConfigKey());
+        }
+        for (Pair<String, Object> pair : addList) {
+            yamlPairMap.remove(pair.getKey());
+        }
+        for (Map.Entry<String, Pair<String, Object>> entry : yamlPairMap.entrySet()) {
+            tce = propertiesConfigMap.get(entry.getKey());
+            if (tce == null) {
+                continue;
+            }
+            if (!StringUtils.equals(String.valueOf(entry.getValue().getValue()), tce.getConfigValue())) {
+                log.debug("更新yamlParis和propertiesConfigs差异的配置，key: {}, yaml值: {}, properties值: {}",
+                        tce.getConfigKey(), entry.getValue(), tce.getConfigValue());
+                updateList.add(entry.getValue());
+            }
+        }
+        SubList<Pair<String, Object>> sub = new SubList<>();
+        sub.setList(updateList);
+        batchUpdateConfig(asp, sub, sqlUpdate);
+
+//        profileDao.deleteProfileConfig(asp);
+//        batchConfigs(asp, "Y", yamlParis);
     }
 
     private void batchUpdateConfig(AccountServiceProfile asp, SubList<Pair<String, Object>> data, String sqlUpdate) {

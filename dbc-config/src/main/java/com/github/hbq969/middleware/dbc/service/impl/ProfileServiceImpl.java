@@ -53,6 +53,7 @@ public class ProfileServiceImpl implements ProfileService {
             profileDao.deleteProfileOnAdmin(name);
             profileDao.deleteAccProfileOnAdmin(name);
             profileDao.deleteProfileAllConfigOnAdmin(name);
+            profileDao.deleteProfileConfigFileOnAdmin(name);
         } else {
             AccountProfile ap = new AccountProfile();
             ap.userInitial(context);
@@ -60,6 +61,7 @@ public class ProfileServiceImpl implements ProfileService {
             profileDao.deleteProfile(ap);
             profileDao.deleteAccProfile(ap);
             profileDao.deleteProfileAllConfig(ap);
+            profileDao.deleteProfileConfigFile(ap);
         }
     }
 
@@ -88,5 +90,6 @@ public class ProfileServiceImpl implements ProfileService {
     public void deleteProfileConfig(AccountServiceProfile asp) {
         asp.userInitial(context);
         profileDao.deleteProfileConfig(asp);
+        profileDao.deleteProfileConfileFile2(asp);
     }
 }

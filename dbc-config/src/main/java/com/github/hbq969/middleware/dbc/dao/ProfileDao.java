@@ -23,11 +23,15 @@ public interface ProfileDao {
 
     void deleteProfileAllConfigOnAdmin(@Param("name") String name);
 
+    void deleteProfileConfigFileOnAdmin(@Param("name") String name);
+
     void deleteProfile(AccountProfile ap);
 
     void deleteAccProfile(AccountProfile ap);
 
     void deleteProfileAllConfig(AccountProfile ap);
+
+    void deleteProfileConfigFile(AccountProfile ap);
 
     List<ProfileEntity> queryProfileList(ProfileEntity profile);
 
@@ -38,4 +42,6 @@ public interface ProfileDao {
     List<ProfileEntity> queryProfileByName(@Param("name") String name);
 
     void deleteProfileConfig(AccountServiceProfile asp);
+
+    void deleteProfileConfileFile2(AccountServiceProfile asp);
 }

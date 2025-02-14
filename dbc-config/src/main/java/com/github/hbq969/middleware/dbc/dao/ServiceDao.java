@@ -19,6 +19,8 @@ public interface ServiceDao {
 
     void createConfig();
 
+    void createConfigFile();
+
     void saveService(ServiceEntity service);
 
     void updateService(ServiceEntity service);
@@ -29,11 +31,15 @@ public interface ServiceDao {
 
     void deleteServiceConfigOnAdmin(@Param("serviceId") String serviceId);
 
+    void deleteServiceConfigFileOnAdmin(@Param("serviceId") String serviceId);
+
     void deleteService(AccountService as);
 
     void deleteAccService(AccountService as);
 
     void deleteServiceConfig(AccountService as);
+
+    void deleteServiceConfigFile(AccountService as);
 
 
     List<ServiceEntity> queryServiceList(@Param("accService") AccountService accountService, @Param("service") ServiceEntity service);

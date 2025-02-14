@@ -335,6 +335,7 @@ const _ = (window as any).ResizeObserver;
               :limit="1"
               @change="fileChange"
               @remove="fileRemove"
+              accept=".yml,.yaml,.properties"
           >
             <el-icon class="el-icon--upload">
               <upload-filled/>
@@ -344,7 +345,7 @@ const _ = (window as any).ResizeObserver;
             </div>
             <template #tip>
               <div class="el-upload__tip">
-                支持文件格式: yml、yaml，文件大小最大1mb
+                支持文件格式: yml、yaml、properties，文件大小最大1mb
               </div>
             </template>
           </el-upload>

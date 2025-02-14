@@ -87,4 +87,44 @@
         </if>
         order by config_key
     </select>
+
+    <insert id="saveConfigFile" parameterType="com.github.hbq969.middleware.dbc.dao.entity.ConfigFileEntity">
+        insert into h_dbc_config_file(app,username,service_id,profile_name,file_name,file_content,created_at) values(#{app},#{username},#{serviceId},#{profileName},#{fileName},#{fileContent},#{createdAt})
+    </insert>
+
+    <update id="updateConfigFile" parameterType="com.github.hbq969.middleware.dbc.dao.entity.ConfigFileEntity">
+        update h_dbc_config_file
+        set file_content=#{fileContent},
+            updated_at=#{updatedAt}
+        where app = #{app}
+          and username = #{username}
+          and service_id = #{serviceId}
+          and profile_name = #{profileName}
+    </update>
+
+    <select id="queryConfigFile" parameterType="com.github.hbq969.middleware.dbc.dao.entity.ConfigFileEntity"
+            resultType="com.github.hbq969.middleware.dbc.dao.entity.ConfigFileEntity">
+        select app          AS "app",
+               username     AS "username",
+               service_id   AS "serviceId",
+               profile_name AS "profileName",
+               file_name    AS "fileName",
+               file_content AS "fileContent",
+               created_at   AS "createdAt",
+               updated_at   AS "updatedAt"
+        from h_dbc_config_file
+        where app = #{app}
+          and username = #{username}
+          and service_id = #{serviceId}
+          and profile_name = #{profileName}
+    </select>
+
+    <delete id="deleteConfigFile" parameterType="com.github.hbq969.middleware.dbc.dao.entity.ConfigFileEntity">
+        delete
+        from h_dbc_config_file
+        where app = #{app}
+          and username = #{username}
+          and service_id = #{serviceId}
+          and profile_name = #{profileName}
+    </delete>
 </mapper>

@@ -30,11 +30,16 @@ public class CustomPropertySourceInitializer implements ApplicationContextInitia
         ConfigurableEnvironment environment = applicationContext.getEnvironment();
         boolean enabled = environment.getProperty("spring.cloud.config.h-dbc.enabled", Boolean.class, false);
         if (enabled) {
-            String apiUrl = environment.getProperty("spring.cloud.config.h-dbc.api-url");
-            if (StringUtils.isNotEmpty(apiUrl)) {
-                this.customPropertySource = new APIPropertySource("apiPropertySource", environment);
-            } else {
-                this.customPropertySource = new DatabasePropertySource("dbPropertySource", environment);
+            String strategy = environment.getProperty("spring.cloud.config.h-dbc.strategy");
+            switch (strategy){
+                case "api":
+                    this.customPropertySource = new APIPropertySource("apiPropertySource", environment);
+                    break;
+                case "db":
+                    this.customPropertySource = new DatabasePropertySource("dbPropertySource", environment);
+                    break;
+                default:
+                    throw new UnsupportedOperationException(String.format("不支持的策略[%s]", strategy));
             }
             environment.getPropertySources().addFirst(this.customPropertySource);
         }

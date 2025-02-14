@@ -34,7 +34,7 @@ public class DatabasePropertySource extends MapPropertySource {
     private void loadConfig() {
         log.info("通过db方式从h-dbc配置中心读取配置。");
         try {
-            JdbcTemplate jt = conf.configSet(environment).jdbcInitial();
+            JdbcTemplate jt = conf.configSet(environment).getJt();
             String serviceName = conf.getServiceName();
             String profileName = conf.getProfileName();
             Object[] paras = new Object[]{conf.getDbcKey(), serviceName, profileName};
@@ -44,10 +44,7 @@ public class DatabasePropertySource extends MapPropertySource {
             this.configMap = new HashMap<>();
             for (Pair<String, Object> pair : pairs) {
                 String value = String.valueOf(pair.getValue());
-                if (value.startsWith("ENC(") && value.endsWith(")")) {
-                    value = APIPropertySource.stringEncryptor(environment).decrypt(value.substring(4, value.length() - 1));
-                    log.debug("解密配置中心读取的配置, 属性名: {}, 加密值: {}, 解密值: {}", pair.getKey(), pair.getValue(), value);
-                }
+                value = APIPropertySource.decode(environment, pair.getKey(), value);
                 configMap.put(pair.getKey(), value);
             }
             if (log.isTraceEnabled()) {

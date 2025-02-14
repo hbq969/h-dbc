@@ -5,13 +5,14 @@
     <update id="createService">
         create table `h_dbc_service`
         (
-            `service_id`   varchar(100) primary key,
+            `service_id`   varchar(100),
             `service_name` varchar(500) unique not null,
             `service_desc` varchar(500),
             `created_at`   numeric(20),
-            `updated_at`   numeric(20)
+            `updated_at`   numeric(20),
+            constraint pk_dbc_service primary key (`service_id`)
         ) ENGINE = InnoDB
-        DEFAULT CHARSET = utf8
+          DEFAULT CHARSET = utf8
     </update>
 
     <update id="createAccService">
@@ -20,7 +21,7 @@
             `app`        varchar(255),
             `username`   VARCHAR(255),
             `service_id` varchar(100),
-            primary key (`app`, `username`, `service_id`)
+            constraint pk_dbc_acc_service primary key (`app`, `username`, `service_id`)
         ) ENGINE = InnoDB
           DEFAULT CHARSET = utf8
     </update>
@@ -28,10 +29,11 @@
     <update id="createProfiles">
         create table `h_dbc_profiles`
         (
-            `profile_name` varchar(100) primary key,
+            `profile_name` varchar(100),
             `profile_desc` varchar(500),
             `created_at` numeric(20),
-            `updated_at` numeric(20)
+            `updated_at` numeric(20),
+            constraint pk_dbc_profiles primary key (`profile_name`)
         ) ENGINE = InnoDB
           DEFAULT CHARSET = utf8
     </update>
@@ -42,7 +44,7 @@
             `app`          varchar(255),
             `username`     VARCHAR(255),
             `profile_name` varchar(100),
-            primary key (`app`, `username`, `profile_name`)
+            constraint pk_dbc_acc_profiles primary key (`app`, `username`, `profile_name`)
         ) ENGINE = InnoDB
           DEFAULT CHARSET = utf8
     </update>
@@ -58,7 +60,23 @@
             `config_value` text,
             `created_at`   numeric(20),
             `updated_at`   numeric(20),
-            primary key (`app`, `username`, `service_id`, `profile_name`, `config_key`)
+            constraint pk_db_config primary key (`app`, `username`, `service_id`, `profile_name`, `config_key`)
+        ) ENGINE = InnoDB
+          DEFAULT CHARSET = utf8
+    </update>
+
+    <update id="createConfigFile">
+        create table `h_dbc_config_file`
+        (
+            `app`          varchar(50),
+            `username`     VARCHAR(50),
+            `service_id`   varchar(50),
+            `profile_name` varchar(50),
+            `file_name`    varchar(100),
+            `file_content` text,
+            `created_at`   numeric(20),
+            `updated_at`   numeric(20),
+            constraint pk_dbc_config_file primary key (`app`, `username`, `service_id`, `profile_name`)
         ) ENGINE = InnoDB
           DEFAULT CHARSET = utf8
     </update>

@@ -37,6 +37,7 @@ import NginxIcon from "@/components/icon/NginxIcon.vue";
 import HAProxyIcon from "@/components/icon/HAProxyIcon.vue";
 import ElasticsearchIcon from "@/components/icon/ElasticsearchIcon.vue";
 import HomeIcon from "@/components/icon/HomeIcon.vue";
+import yaml from "@/components/icon/yaml.vue";
 
 const zhCn = require('element-plus/dist/locale/zh-cn.min.js')
 
@@ -73,6 +74,7 @@ app.component('NginxIcon', NginxIcon);
 app.component('HAProxyIcon', HAProxyIcon);
 app.component('ElasticsearchIcon', ElasticsearchIcon);
 app.component('HomeIcon', HomeIcon)
+app.component('yaml', yaml)
 
 app.use(ElementPlus, {locale: zhCn})
 app.use(store)

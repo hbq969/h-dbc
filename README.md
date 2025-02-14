@@ -70,15 +70,22 @@ spring:
   cloud:
     config:
       h-dbc:
-        # 以下配置和配置中心数据库配置保持一致
         enabled: true
-        driver-class-name: com.mysql.cj.jdbc.Driver
-        url: 数据库url
-        username: 数据库账号
-        password: 数据库密码
         dbc-key: h-dbc
         service-name: h-example
         profile-name: dev
+        strategy: db
+        db:
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          username: dbc
+          password: ENC(O05LzWQnZrj5z+zWl6WJQngl4pWrd5nQddgnPH51WAQeVxBEoLcVGMrocH3xdhc4)
+          jdbc-url: jdbc:mysql://docker.for.mac.host.internal:3306/dbc?useUnicode=true&allowPublicKeyRetrieval=true&characterEncoding=utf-8&useSSL=false&autoReconnect=true&failOverReadOnly=false&maxReconnects=15000
+# 如果上面属性不用加密方式，则下面配置不需要
+# 否则需要添加下面解密密码，密码是敏感信息尽量可通过命令行传入
+#jasypt:
+#  encryptor:
+#    password: 密码
+
 ```
 
 
@@ -92,10 +99,14 @@ spring:
         dbc-key: h-dbc
         service-name: h-example
         profile-name: default
-        api-url: http://localhost:30170
-        # 取至配置中心中的encrypt.config.aes.key
-        api-secret: 接口私钥
-        api-charset: utf-8
+        strategy: api
+        api:
+          secret: ENC(tHRgyoB.....c2b+eBw==)
+# 如果上面属性不用加密方式，则下面配置不需要
+# 否则需要添加下面解密密码，密码是敏感信息尽量可通过命令行传入
+#jasypt:
+#  encryptor:
+#    password: 密码
 ```
 
 > 服务依赖
