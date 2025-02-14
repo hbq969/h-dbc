@@ -12,6 +12,8 @@ import * as monaco from 'monaco-editor';
 const editorContainer = ref<HTMLElement | null>(null);
 const diffEditorContainer = ref<HTMLElement | null>(null);
 let editor: monaco.editor.IStandaloneCodeEditor | null = null;
+let originalModel = monaco.editor.createModel('', 'yaml');
+let modifiedModel = monaco.editor.createModel('', 'yaml');
 
 onMounted(() => {
   queryConfigFile()
@@ -49,8 +51,13 @@ const queryConfigFile = () => {
     data: router.currentRoute.value.query
   }).then((res: any) => {
     if (res.data.state == 'OK') {
-      data.configFile = res.data.body
-      initialEditor()
+      if (res.data.body) {
+        data.configFile = res.data.body
+        initialEditor()
+      } else {
+        msg('无配置数据', 'info')
+        initialEditor()
+      }
     } else {
       msg(res.data.errorMessage, 'warning')
     }
@@ -77,8 +84,8 @@ const initialEditor = () => {
     });
 
     // 设置初始的原始和修改后的内容
-    const originalModel = monaco.editor.createModel(data.configFile.fileContent, 'yaml');
-    const modifiedModel = monaco.editor.createModel(data.configFile.fileContent, 'yaml');
+    originalModel = monaco.editor.createModel(data.configFile.fileContent, 'yaml');
+    modifiedModel = monaco.editor.createModel(data.configFile.fileContent, 'yaml');
     diffEditor.setModel({
       original: originalModel,
       modified: modifiedModel,
@@ -106,6 +113,8 @@ const saveConfigFile = () => {
   }).then((res: any) => {
     if (res.data.state == 'OK') {
       msg(res.data.body, 'success')
+      originalModel.setValue(form.fileContent)
+      modifiedModel.setValue(form.fileContent)
     } else {
       msg(res.data.errorMessage, 'warning')
     }

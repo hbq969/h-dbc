@@ -136,6 +136,10 @@ public class ConfigServiceImpl implements ConfigService {
 
     @Override
     public void deleteConfigMultiple(DeleteConfigMultiple dcm) {
+        deleteConfigMultiple(dcm, true);
+    }
+
+    private void deleteConfigMultiple(DeleteConfigMultiple dcm, boolean fromPage) {
         dcm.getAsp().userInitial(context);
         DigitSplit.defaultStep(200).split(dcm.getConfigKeys()).forEach(sub -> {
             String sql = "delete from h_dbc_config where app=? and username=? and service_id=? and profile_name=? and config_key=?";
@@ -157,7 +161,9 @@ public class ConfigServiceImpl implements ConfigService {
                 }
             });
         });
-        addOrUpdateConfigFile(dcm.getAsp(), false);
+        if (fromPage) {
+            addOrUpdateConfigFile(dcm.getAsp(), false);
+        }
     }
 
     @Override
@@ -238,7 +244,7 @@ public class ConfigServiceImpl implements ConfigService {
         DeleteConfigMultiple dcm = new DeleteConfigMultiple();
         dcm.setConfigKeys(removeList.stream().map(c -> c.getConfigKey()).collect(Collectors.toList()));
         dcm.setAsp(asp);
-        deleteConfigMultiple(dcm);
+        deleteConfigMultiple(dcm, false);
 
         // 2.添加yamlParis多出来的配置
         List<Pair<String, Object>> addList = new ArrayList<>(20);

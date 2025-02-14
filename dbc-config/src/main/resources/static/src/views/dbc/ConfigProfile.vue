@@ -136,10 +136,10 @@ const _ = (window as any).ResizeObserver;
                   <el-button type="info" size="small" circle :icon="Delete"/>
                 </template>
               </el-popconfirm>
-              <el-badge :value="0" style="margin-left: 12px" type="danger" max="500" :hidden="true">
+              <el-badge :value="0" style="margin-left: 12px" type="danger" :max="500" :hidden="true">
                 <el-button type="primary" size="small" circle :icon="DocumentCopy" @click="goConfigFile(source)"/>
               </el-badge>
-              <el-badge :value="source.configNum" style="margin-left: 12px" type="danger" max="500"
+              <el-badge :value="source.configNum" style="margin-left: 12px" type="danger" :max="500"
                         :hidden="source.configNum==0">
                 <el-button type="success" size="small" circle :icon="Grid" @click="goConfigList(source)"/>
               </el-badge>
