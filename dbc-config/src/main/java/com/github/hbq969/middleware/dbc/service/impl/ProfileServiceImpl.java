@@ -13,6 +13,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -43,25 +44,23 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     public void updateProfile(ProfileEntity profile) {
-        profile.setUpdatedAt(FormatTime.nowSecs());
-        profileDao.updateProfile(profile);
+        if (UserContext.permitAllow(profile.getUsername())) {
+            profile.setUpdatedAt(FormatTime.nowSecs());
+            profileDao.updateProfile(profile);
+        } else {
+            throw new UnsupportedOperationException("账号无此操作权限");
+        }
     }
 
     @Override
-    public void deleteProfile(String name) {
-        if (UserContext.get().isAdmin()) {
-            profileDao.deleteProfileOnAdmin(name);
-            profileDao.deleteAccProfileOnAdmin(name);
-            profileDao.deleteProfileAllConfigOnAdmin(name);
-            profileDao.deleteProfileConfigFileOnAdmin(name);
+    public void deleteProfile(ProfileEntity profile) {
+        if (UserContext.permitAllow(profile.getUsername())) {
+            profileDao.deleteProfileOnAdmin(profile.getProfileName());
+            profileDao.deleteAccProfileOnAdmin(profile.getProfileName());
+            profileDao.deleteProfileAllConfigOnAdmin(profile.getProfileName());
+            profileDao.deleteProfileConfigFileOnAdmin(profile.getProfileName());
         } else {
-            AccountProfile ap = new AccountProfile();
-            ap.userInitial(context);
-            ap.setProfileName(name);
-            profileDao.deleteProfile(ap);
-            profileDao.deleteAccProfile(ap);
-            profileDao.deleteProfileAllConfig(ap);
-            profileDao.deleteProfileConfigFile(ap);
+            throw new UnsupportedOperationException("账号无此操作权限");
         }
     }
 
@@ -75,21 +74,29 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     public List<ProfileEntity> queryProfileList(AccountService as) {
-        List<ProfileEntity> all = profileDao.queryAllProfileList();
-        as.setApp(context.getProperty("spring.application.name"));
-        List<ProfileEntity> config = profileDao.queryProfileConfigNum(as);
-        Map<String, Integer> map = config.stream().collect(Collectors.toMap(p -> p.getProfileName(), p -> p.getConfigNum(), (p1, p2) -> p2));
-        for (ProfileEntity profile : all) {
-            int configNum = MapUtils.getIntValue(map, profile.getProfileName(), 0);
-            profile.setConfigNum(configNum);
+        if (UserContext.permitAllow(as.getUsername())) {
+            List<ProfileEntity> all = profileDao.queryAllProfileList();
+            as.setApp(context.getProperty("spring.application.name"));
+            List<ProfileEntity> config = profileDao.queryProfileConfigNum(as);
+            Map<String, Integer> map = config.stream().collect(Collectors.toMap(p -> p.getProfileName(), p -> p.getConfigNum(), (p1, p2) -> p2));
+            for (ProfileEntity profile : all) {
+                int configNum = MapUtils.getIntValue(map, profile.getProfileName(), 0);
+                profile.setConfigNum(configNum);
+            }
+            return all;
+        } else {
+            throw new UnsupportedOperationException("账号无此操作权限");
         }
-        return all;
     }
 
     @Override
     public void deleteProfileConfig(AccountServiceProfile asp) {
-        asp.userInitial(context);
-        profileDao.deleteProfileConfig(asp);
-        profileDao.deleteProfileConfileFile2(asp);
+        asp.setApp(context.getProperty("spring.application.name"));
+        if (UserContext.permitAllow(asp.getUsername())) {
+            profileDao.deleteProfileConfig(asp);
+            profileDao.deleteProfileConfileFile2(asp);
+        } else {
+            throw new UnsupportedOperationException("账号无此操作权限");
+        }
     }
 }

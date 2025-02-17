@@ -60,6 +60,7 @@ const queryConfigFile = () => {
       }
     } else {
       msg(res.data.errorMessage, 'warning')
+      initialEditor()
     }
   }).catch((err: Error) => {
     msg('请求异常', 'error')
@@ -165,6 +166,7 @@ const _ = (window as any).ResizeObserver;
     <div ref="diffEditorContainer" style="height: 300px; width: 92%; margin-top: 20px;"></div>
     <el-form-item style="margin-top: 10px">
       <el-button type="primary" size="small" @click="saveConfigFile()">保存配置</el-button>
+      <span style="margin-left: 5px;color: red">* 仅支持yml、yaml文件</span>
     </el-form-item>
   </div>
 </template>

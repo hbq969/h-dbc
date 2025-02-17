@@ -15,9 +15,7 @@ public class AccountServiceProfile {
 
     public void userInitial(SpringContext context) {
         this.app = context.getProperty("spring.application.name");
-        if (!UserContext.get().isAdmin()) {
-            this.username = UserContext.get().getUserName();
-        } else if (StringUtils.isEmpty(username)) {
+        if (StringUtils.isEmpty(username)) {
             throw new IllegalArgumentException("账号名不能为空");
         }
     }

@@ -5,6 +5,7 @@ import cn.hutool.core.lang.Pair;
 import com.github.hbq969.code.common.spring.context.SpringContext;
 import com.github.hbq969.code.common.utils.*;
 import com.github.hbq969.code.dict.service.api.impl.MapDictHelperImpl;
+import com.github.hbq969.code.sm.login.session.UserContext;
 import com.github.hbq969.middleware.dbc.config.Config;
 import com.github.hbq969.middleware.dbc.dao.ConfigDao;
 import com.github.hbq969.middleware.dbc.dao.ProfileDao;
@@ -26,6 +27,7 @@ import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.yaml.snakeyaml.Yaml;
 
 import java.io.IOException;
 import java.sql.PreparedStatement;
@@ -61,34 +63,49 @@ public class ConfigServiceImpl implements ConfigService {
     @Override
     public PageInfo<ConfigProfileEntity> queryConfigProfileList(ConfigProfileQuery q, int pageNum, int pageSize) {
         q.userInitial(context);
-        PageInfo<ConfigProfileEntity> pg = PageHelper.startPage(pageNum, pageSize)
-                .doSelectPageInfo(() -> configDao.queryConfigProfileList(q));
-        pg.getList().forEach(e -> e.convertDict(context));
-        return pg;
+        if (UserContext.permitAllow(q.getUsername())) {
+            PageInfo<ConfigProfileEntity> pg = PageHelper.startPage(pageNum, pageSize)
+                    .doSelectPageInfo(() -> configDao.queryConfigProfileList(q));
+            pg.getList().forEach(e -> e.convertDict(context));
+            return pg;
+        } else {
+            throw new UnsupportedOperationException("账号无此操作权限");
+        }
     }
 
     @Override
     public void saveConfig(AccountServiceProfile asp, ConfigEntity config) {
-        asp.userInitial(context);
-        config.setCreatedAt(FormatTime.nowSecs());
-        configDao.saveConfig(asp, config);
-
-        addOrUpdateConfigFile(asp, true);
+        if (UserContext.permitAllow(asp.getUsername())) {
+            asp.userInitial(context);
+            config.setCreatedAt(FormatTime.nowSecs());
+            configDao.saveConfig(asp, config);
+            addOrUpdateConfigFile(asp, true);
+        } else {
+            throw new UnsupportedOperationException("账号无此操作权限");
+        }
     }
 
     @Override
     public void updateConfig(AccountServiceProfile asp, ConfigEntity config) {
-        asp.userInitial(context);
-        config.setUpdatedAt(FormatTime.nowSecs());
-        configDao.updateConfig(asp, config);
-        addOrUpdateConfigFile(asp, false);
+        if (UserContext.permitAllow(asp.getUsername())) {
+            config.setUpdatedAt(FormatTime.nowSecs());
+            asp.userInitial(context);
+            configDao.updateConfig(asp, config);
+            addOrUpdateConfigFile(asp, false);
+        } else {
+            throw new UnsupportedOperationException("账号无此操作权限");
+        }
     }
 
     @Override
     public void deleteConfig(AccountServiceProfile asp, ConfigEntity q) {
-        asp.userInitial(context);
-        configDao.deleteConfig(asp, q);
-        addOrUpdateConfigFile(asp, false);
+        if (UserContext.permitAllow(asp.getUsername())) {
+            asp.userInitial(context);
+            configDao.deleteConfig(asp, q);
+            addOrUpdateConfigFile(asp, false);
+        } else {
+            throw new UnsupportedOperationException("账号无此操作权限");
+        }
     }
 
     private void addOrUpdateConfigFile(AccountServiceProfile asp, boolean add) {
@@ -136,7 +153,12 @@ public class ConfigServiceImpl implements ConfigService {
 
     @Override
     public void deleteConfigMultiple(DeleteConfigMultiple dcm) {
-        deleteConfigMultiple(dcm, true);
+        if (UserContext.permitAllow(dcm.getAsp().getUsername())) {
+            dcm.getAsp().userInitial(context);
+            deleteConfigMultiple(dcm, true);
+        } else {
+            throw new UnsupportedOperationException("账号无此操作权限");
+        }
     }
 
     private void deleteConfigMultiple(DeleteConfigMultiple dcm, boolean fromPage) {
@@ -168,11 +190,15 @@ public class ConfigServiceImpl implements ConfigService {
 
     @Override
     public PageInfo<ConfigEntity> queryConfigList(AccountServiceProfile asp, ConfigEntity q, int pageNum, int pageSize) {
-        asp.userInitial(context);
-        PageInfo<ConfigEntity> pg = PageHelper.startPage(pageNum, pageSize)
-                .doSelectPageInfo(() -> configDao.queryConfigList(asp, q));
-        pg.getList().forEach(e -> e.convertDict(context));
-        return pg;
+        asp.setApp(context.getProperty("spring.application.name"));
+        if (UserContext.permitAllow(asp.getUsername())) {
+            PageInfo<ConfigEntity> pg = PageHelper.startPage(pageNum, pageSize)
+                    .doSelectPageInfo(() -> configDao.queryConfigList(asp, q));
+            pg.getList().forEach(e -> e.convertDict(context));
+            return pg;
+        } else {
+            throw new UnsupportedOperationException("账号无此操作权限");
+        }
     }
 
     @Override
@@ -204,18 +230,25 @@ public class ConfigServiceImpl implements ConfigService {
 
     @Override
     public ConfigFileEntity queryConfigFile(AccountServiceProfile asp) {
-        asp.userInitial(context);
-        ConfigFileEntity cfe = new ConfigFileEntity().propertySet(asp);
-        ConfigFileEntity result = configDao.queryConfigFile(cfe);
-        if (result != null) {
-            result.convertDict(context);
+        asp.setApp(context.getProperty("spring.application.name"));
+        if (UserContext.permitAllow(asp.getUsername())) {
+            ConfigFileEntity cfe = new ConfigFileEntity().propertySet(asp);
+            ConfigFileEntity result = configDao.queryConfigFile(cfe);
+            if (result != null) {
+                result.convertDict(context);
+            }
+            return result;
+        } else {
+            throw new UnsupportedOperationException("账号无此操作权限");
         }
-        return result;
     }
 
     @Override
     public void updateConfigFile(ConfigFileEntity cfe) {
-        cfe.userInitial(context);
+        cfe.setApp(context.getProperty("spring.application.name"));
+        if (!UserContext.permitAllow(cfe.getUsername())) {
+            throw new UnsupportedOperationException("账号无此操作权限");
+        }
         cfe.setUpdatedAt(FormatTime.nowSecs());
         ConfigFileEntity result = configDao.queryConfigFile(cfe);
         if (result == null) {

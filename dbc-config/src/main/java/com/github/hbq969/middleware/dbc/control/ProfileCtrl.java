@@ -40,8 +40,8 @@ public class ProfileCtrl {
     @ApiOperation("删除环境")
     @RequestMapping(path = "", method = RequestMethod.DELETE)
     @ResponseBody
-    public ReturnMessage<?> deleteProfile(@RequestParam("profileName") String profileName) {
-        profileService.deleteProfile(profileName);
+    public ReturnMessage<?> deleteProfile(ProfileEntity profile) {
+        profileService.deleteProfile(profile);
         return ReturnMessage.success("删除成功");
     }
 

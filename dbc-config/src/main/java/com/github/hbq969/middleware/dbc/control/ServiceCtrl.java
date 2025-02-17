@@ -38,8 +38,8 @@ public class ServiceCtrl {
     @ApiOperation("删除服务")
     @RequestMapping(path = "", method = RequestMethod.DELETE)
     @ResponseBody
-    public ReturnMessage<?> deleteService(@RequestParam("serviceId") String serviceId) {
-        service.deleteService(serviceId);
+    public ReturnMessage<?> deleteService(@RequestBody ServiceEntity entity) {
+        this.service.deleteService(entity);
         return ReturnMessage.success("删除成功");
     }
 

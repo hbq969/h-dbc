@@ -17,7 +17,7 @@ public interface ProfileService {
     void updateProfile(ProfileEntity profile);
 
     @Transactional(rollbackFor = Exception.class)
-    void deleteProfile(@Param("name") String name);
+    void deleteProfile(ProfileEntity profile);
 
     PageInfo<ProfileEntity> queryProfileList(ProfileEntity profile, int pageNum, int pageSize);
 

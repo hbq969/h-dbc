@@ -113,58 +113,58 @@ const updateConfig = async (formEl: FormInstance | undefined) => {
   })
 }
 
-const dialogFormVisible2 = ref(false)
-const dialogTitle2 = ref('导入配置')
-const importForm = reactive({
-  file: null,
-  cover: 'N'
-})
-const uploadRef = ref<UploadInstance>()
-const fileChange = (uploadFile: UploadFile) => {
-  importForm.file = uploadFile.raw
-  console.log("选择文件: ", uploadFile.raw)
-}
-const fileRemove = (uploadFile: UploadFile) => {
-  importForm.file = null
-  console.log("选择文件: ", uploadFile.raw)
-}
-const configImport = () => {
-  if (importForm.file == null) {
-    alert('请先选择导入的文件')
-    return
-  }
-  const formData = new FormData();
-  formData.append("file", importForm.file)
-  formData.append("cover", importForm.cover)
-  let query = router.currentRoute.value.query
-  formData.append("username", query.username)
-  formData.append("serviceId", query.serviceId)
-  formData.append("profileName", query.profileName)
-  axios({
-    url: '/config/import',
-    method: 'post',
-    data: formData,
-    headers: {
-      "Content-Type": "multipart/form-data"
-    }
-  }).then((res: any) => {
-    if (res.data.state == 'OK') {
-      msg(res.data.body, 'success')
-      dialogFormVisible2.value = false
-      uploadRef.value!.clearFiles()
-      queryConfigList()
-    } else {
-      msg(res.data.errorMessage, 'warning')
-    }
-  }).catch((err: Error) => {
-    msg('请求异常', 'error')
-  })
-}
-const showConfigImportDialog = () => {
-  dialogFormVisible2.value = true
-  importForm.file = null
-  importForm.cover = 'N'
-}
+// const dialogFormVisible2 = ref(false)
+// const dialogTitle2 = ref('导入配置')
+// const importForm = reactive({
+//   file: null,
+//   cover: 'N'
+// })
+// const uploadRef = ref<UploadInstance>()
+// const fileChange = (uploadFile: UploadFile) => {
+//   importForm.file = uploadFile.raw
+//   console.log("选择文件: ", uploadFile.raw)
+// }
+// const fileRemove = (uploadFile: UploadFile) => {
+//   importForm.file = null
+//   console.log("选择文件: ", uploadFile.raw)
+// }
+// const configImport = () => {
+//   if (importForm.file == null) {
+//     alert('请先选择导入的文件')
+//     return
+//   }
+//   const formData = new FormData();
+//   formData.append("file", importForm.file)
+//   formData.append("cover", importForm.cover)
+//   let query = router.currentRoute.value.query
+//   formData.append("username", query.username)
+//   formData.append("serviceId", query.serviceId)
+//   formData.append("profileName", query.profileName)
+//   axios({
+//     url: '/config/import',
+//     method: 'post',
+//     data: formData,
+//     headers: {
+//       "Content-Type": "multipart/form-data"
+//     }
+//   }).then((res: any) => {
+//     if (res.data.state == 'OK') {
+//       msg(res.data.body, 'success')
+//       dialogFormVisible2.value = false
+//       uploadRef.value!.clearFiles()
+//       queryConfigList()
+//     } else {
+//       msg(res.data.errorMessage, 'warning')
+//     }
+//   }).catch((err: Error) => {
+//     msg('请求异常', 'error')
+//   })
+// }
+// const showConfigImportDialog = () => {
+//   dialogFormVisible2.value = true
+//   importForm.file = null
+//   importForm.cover = 'N'
+// }
 
 const deleteConfig = (scope) => {
   axios({
@@ -258,7 +258,7 @@ const _ = (window as any).ResizeObserver;
       <el-form-item>
         <el-button type="primary" size="small" @click="queryConfigList()">查询</el-button>
         <el-button type="success" :icon="Edit" circle @click="showConfigAddDialog()" title="新增角色"/>
-        <el-button type="warning" :icon="UploadFilled" circle @click="showConfigImportDialog()" title="导入配置"/>
+<!--        <el-button type="warning" :icon="UploadFilled" circle @click="showConfigImportDialog()" title="导入配置"/>-->
         <el-popconfirm title="确认是否批量删除这些配置?" confirm-button-type="danger" @confirm="deleteMultipleConfig()">
             <template #reference>
               <el-button type="danger" :icon="Delete" circle title="批量删除配置"/>
@@ -321,54 +321,54 @@ const _ = (window as any).ResizeObserver;
       </template>
     </el-dialog>
 
-    <el-dialog v-model="dialogFormVisible2" :title="dialogTitle2" draggable>
-      <el-form :model="importForm" label-position="left" size="small" :inline="false" label-width="10%">
-        <div>
-          <el-upload
-              action="#"
-              name="file"
-              ref="uploadRef"
-              class="upload-demo"
-              drag
-              :multiple="false"
-              :auto-upload="false"
-              :limit="1"
-              @change="fileChange"
-              @remove="fileRemove"
-              accept=".yml,.yaml,.properties"
-          >
-            <el-icon class="el-icon--upload">
-              <upload-filled/>
-            </el-icon>
-            <div class="el-upload__text">
-              拖动文件到这里 或 <em>点击上传图标</em>
-            </div>
-            <template #tip>
-              <div class="el-upload__tip">
-                支持文件格式: yml、yaml、properties，文件大小最大1mb
-              </div>
-            </template>
-          </el-upload>
-        </div>
-        <br/>
-        <el-form-item label="是否覆盖" prop="cover">
-          <el-switch
-              v-model="importForm.cover"
-              inline-prompt
-              active-text="是"
-              inactive-text="否"
-              active-value="Y"
-              inactive-value="N"
-          />
-        </el-form-item>
-      </el-form>
-      <template #footer>
-          <span class="dialog-footer">
-            <el-button @click="dialogFormVisible2 = false">取消</el-button>
-            <el-button type="primary" @click="configImport()">保存</el-button>
-          </span>
-      </template>
-    </el-dialog>
+<!--    <el-dialog v-model="dialogFormVisible2" :title="dialogTitle2" draggable>-->
+<!--      <el-form :model="importForm" label-position="left" size="small" :inline="false" label-width="10%">-->
+<!--        <div>-->
+<!--          <el-upload-->
+<!--              action="#"-->
+<!--              name="file"-->
+<!--              ref="uploadRef"-->
+<!--              class="upload-demo"-->
+<!--              drag-->
+<!--              :multiple="false"-->
+<!--              :auto-upload="false"-->
+<!--              :limit="1"-->
+<!--              @change="fileChange"-->
+<!--              @remove="fileRemove"-->
+<!--              accept=".yml,.yaml,.properties"-->
+<!--          >-->
+<!--            <el-icon class="el-icon&#45;&#45;upload">-->
+<!--              <upload-filled/>-->
+<!--            </el-icon>-->
+<!--            <div class="el-upload__text">-->
+<!--              拖动文件到这里 或 <em>点击上传图标</em>-->
+<!--            </div>-->
+<!--            <template #tip>-->
+<!--              <div class="el-upload__tip">-->
+<!--                支持文件格式: yml、yaml、properties，文件大小最大1mb-->
+<!--              </div>-->
+<!--            </template>-->
+<!--          </el-upload>-->
+<!--        </div>-->
+<!--        <br/>-->
+<!--        <el-form-item label="是否覆盖" prop="cover">-->
+<!--          <el-switch-->
+<!--              v-model="importForm.cover"-->
+<!--              inline-prompt-->
+<!--              active-text="是"-->
+<!--              inactive-text="否"-->
+<!--              active-value="Y"-->
+<!--              inactive-value="N"-->
+<!--          />-->
+<!--        </el-form-item>-->
+<!--      </el-form>-->
+<!--      <template #footer>-->
+<!--          <span class="dialog-footer">-->
+<!--            <el-button @click="dialogFormVisible2 = false">取消</el-button>-->
+<!--            <el-button type="primary" @click="configImport()">保存</el-button>-->
+<!--          </span>-->
+<!--      </template>-->
+<!--    </el-dialog>-->
   </div>
 </template>
 

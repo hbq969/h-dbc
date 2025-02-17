@@ -5,6 +5,7 @@ import com.github.hbq969.code.common.utils.FormatTime;
 import com.github.hbq969.code.dict.service.api.DictAware;
 import com.github.hbq969.code.dict.service.api.DictModel;
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 
 @Data
 public class ServiceEntity implements DictAware, DictModel {
@@ -26,5 +27,9 @@ public class ServiceEntity implements DictAware, DictModel {
         if(updatedAt!=null){
             this.fmtUpdatedAt=FormatTime.YYYYMMDDHHMISS.withSecs(updatedAt.longValue());
         }
+    }
+
+    public boolean sameUser(String username){
+        return StringUtils.equals(this.username,username);
     }
 }

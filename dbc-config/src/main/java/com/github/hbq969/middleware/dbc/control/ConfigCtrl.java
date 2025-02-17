@@ -1,6 +1,7 @@
 package com.github.hbq969.middleware.dbc.control;
 
 import com.github.hbq969.code.common.restful.ReturnMessage;
+import com.github.hbq969.code.sm.login.session.UserContext;
 import com.github.hbq969.middleware.dbc.dao.entity.ConfigEntity;
 import com.github.hbq969.middleware.dbc.dao.entity.ConfigFileEntity;
 import com.github.hbq969.middleware.dbc.dao.entity.ConfigProfileEntity;
@@ -13,6 +14,7 @@ import com.github.pagehelper.PageInfo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -76,13 +78,21 @@ public class ConfigCtrl {
     @ApiOperation("导入配置")
     @RequestMapping(path = "/import", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseBody
-    public ReturnMessage<?> configImport(@RequestParam("username") String username, @RequestParam("serviceId") String serviceId, @RequestParam("profileName") String profileName, @RequestParam("file") MultipartFile file, @RequestParam("cover") String cover) {
-        AccountServiceProfile asp = new AccountServiceProfile();
-        asp.setUsername(username);
-        asp.setServiceId(serviceId);
-        asp.setProfileName(profileName);
-        configService.configImport(asp, file, cover);
-        return ReturnMessage.success("导入成功");
+    public ReturnMessage<?> configImport(@RequestParam("username") String username,
+                                         @RequestParam("serviceId") String serviceId,
+                                         @RequestParam("profileName") String profileName,
+                                         @RequestParam("file") MultipartFile file,
+                                         @RequestParam("cover") String cover) {
+        if (UserContext.permitAllow(username)) {
+            AccountServiceProfile asp = new AccountServiceProfile();
+            asp.setUsername(username);
+            asp.setServiceId(serviceId);
+            asp.setProfileName(profileName);
+            configService.configImport(asp, file, cover);
+            return ReturnMessage.success("导入成功");
+        } else {
+            throw new UnsupportedOperationException("账号无此操作权限");
+        }
     }
 
     @ApiOperation("查询yml配置文件信息")

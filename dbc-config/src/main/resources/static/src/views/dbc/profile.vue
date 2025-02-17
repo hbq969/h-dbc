@@ -73,6 +73,7 @@ const queryProfileList = () => {
 const dialogFormVisible = ref(false)
 const dialogTitle = ref('新增环境')
 const profileForm = reactive({
+  username: '',
   profileName: '',
   profileDesc: ''
 })
@@ -83,12 +84,14 @@ const profileRules = reactive<FormRules>({
 const showProfileAddDialog = () => {
   dialogFormVisible.value = true
   dialogTitle.value = '新增环境'
+  profileForm.username=''
   profileForm.profileName = ''
   profileForm.profileDesc = ''
 }
 const showProfileEditDialog = (scope) => {
   dialogFormVisible.value = true
   dialogTitle.value = '编辑环境'
+  profileForm.username=scope.row.username
   profileForm.profileName = scope.row.profileName
   profileForm.profileDesc = scope.row.profileDesc
 }
@@ -118,7 +121,10 @@ const deleteProfile = (scope) => {
   axios({
     url: '/profile',
     method: 'delete',
-    params: {profileName: scope.row.profileName}
+    params: {
+      username: scope.row.username,
+      profileName: scope.row.profileName
+    }
   }).then((res: any) => {
     if (res.data.state == 'OK') {
       queryProfileList()

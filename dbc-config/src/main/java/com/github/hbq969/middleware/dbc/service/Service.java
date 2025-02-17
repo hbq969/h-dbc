@@ -11,7 +11,7 @@ public interface Service {
     void updateService(ServiceEntity service);
 
     @Transactional(rollbackFor = Exception.class)
-    void deleteService(String serviceId);
+    void deleteService(ServiceEntity service);
 
     PageInfo<ServiceEntity> queryServiceList(ServiceEntity service,int pageNum,int pageSize);
 }

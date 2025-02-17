@@ -66,6 +66,7 @@ const queryServiceList = () => {
 const dialogFormVisible = ref(false)
 const dialogTitle = ref('新增服务')
 const serviceForm = reactive({
+  username: '',
   serviceId: '',
   serviceName: '',
   serviceDesc: ''
@@ -99,6 +100,7 @@ const updateService = async (formEl: FormInstance | undefined) => {
 const showServiceAddDialog = () => {
   dialogFormVisible.value = true
   dialogTitle.value = '新增服务'
+  serviceForm.username=''
   serviceForm.serviceId = ''
   serviceForm.serviceName = ''
   serviceForm.serviceDesc = ''
@@ -107,6 +109,7 @@ const showServiceAddDialog = () => {
 const showServiceEditDialog = (scope) => {
   dialogFormVisible.value = true
   dialogTitle.value = '编辑服务'
+  serviceForm.username=scope.row.username
   serviceForm.serviceId = scope.row.serviceId
   serviceForm.serviceName = scope.row.serviceName
   serviceForm.serviceDesc = scope.row.serviceDesc
@@ -116,7 +119,11 @@ const deleteService = (scope) => {
   axios({
     url: '/service',
     method: 'delete',
-    params: {serviceId: scope.row.serviceId}
+    data: {
+      username: scope.row.username,
+      serviceId: scope.row.serviceId,
+      serviceName: scope.row.serviceName
+    }
   }).then((res: any) => {
     if (res.data.state == 'OK') {
       msg(res.data.body, 'success')
@@ -177,17 +184,17 @@ const _ = (window as any).ResizeObserver;
               size="small" :highlight-current-row="true" :header-cell-style="headerCellStyle">
       <el-table-column fixed="left" label="操作" width="180" header-align="center" align="center">
         <template #default="scope">
-          <el-button link type="primary" size="small" @click="showServiceEditDialog(scope)">编辑
+          <el-button link type="primary" size="small" @click="showServiceEditDialog(scope)" :disabled="user.roleName!='ADMIN' && scope.row.username!=user.userName">编辑
           </el-button>
           <el-popconfirm title="你确定要删除本条记录吗?" @confirm="deleteService(scope)"
                          icon-color="red"
                          confirm-button-type="danger">
             <template #reference>
-              <el-button link type="danger" size="small">删除
+              <el-button link type="danger" size="small" :disabled="user.roleName!='ADMIN' && scope.row.username!=user.userName">删除
               </el-button>
             </template>
           </el-popconfirm>
-          <el-button link type="success" size="small" @click="router.push({path:'/config/profile',query:scope.row})">配置管理
+          <el-button link type="success" size="small" @click="router.push({path:'/config/profile',query:scope.row})" :disabled="user.roleName!='ADMIN' && scope.row.username!=user.userName">配置管理
           </el-button>
         </template>
       </el-table-column>
@@ -198,6 +205,8 @@ const _ = (window as any).ResizeObserver;
       <el-table-column prop="serviceName" label="服务名称" :show-overflow-tooltip="true" header-align="center"
                        align="center"/>
       <el-table-column prop="serviceDesc" label="服务描述" :show-overflow-tooltip="true" header-align="center"
+                       align="center"/>
+      <el-table-column prop="username" label="创建者" :show-overflow-tooltip="true" header-align="center"
                        align="center"/>
       <el-table-column prop="fmtCreatedAt" label="创建时间" :show-overflow-tooltip="true" header-align="center"
                        align="center"/>

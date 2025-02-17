@@ -64,27 +64,26 @@ public class ServiceImpl implements Service, InitializingBean {
 
     @Override
     public void updateService(ServiceEntity service) {
-        service.setUpdatedAt(FormatTime.nowSecs());
-        serviceDao.updateService(service);
+
+        if(UserContext.permitAllow(service.getUsername())){
+            service.setUpdatedAt(FormatTime.nowSecs());
+            serviceDao.updateService(service);
+        }
+        else{
+            throw new UnsupportedOperationException("当前账号无此操作权限");
+        }
     }
 
     @Override
-    public void deleteService(String serviceId) {
-        ServiceEntity service = new ServiceEntity();
-        service.setServiceId(serviceId);
-        if (UserContext.get().isAdmin()) {
+    public void deleteService(ServiceEntity service) {
+
+        if (UserContext.permitAllow(service.getUsername())) {
             serviceDao.deleteServiceOnAdmin(service);
-            serviceDao.deleteAccServiceOnAdmin(serviceId);
-            serviceDao.deleteServiceConfigOnAdmin(serviceId);
-            serviceDao.deleteServiceConfigFileOnAdmin(serviceId);
+            serviceDao.deleteAccServiceOnAdmin(service.getServiceId());
+            serviceDao.deleteServiceConfigOnAdmin(service.getServiceId());
+            serviceDao.deleteServiceConfigFileOnAdmin(service.getServiceId());
         } else {
-            AccountService as = new AccountService();
-            as.userInitial(context);
-            as.setServiceId(serviceId);
-            serviceDao.deleteService(as);
-            serviceDao.deleteAccService(as);
-            serviceDao.deleteServiceConfig(as);
-            serviceDao.deleteServiceConfigFile(as);
+            throw new UnsupportedOperationException("账号无此操作权限");
         }
     }
 
