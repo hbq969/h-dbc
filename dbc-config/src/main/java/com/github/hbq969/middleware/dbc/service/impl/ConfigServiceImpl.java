@@ -6,7 +6,6 @@ import com.github.hbq969.code.common.spring.context.SpringContext;
 import com.github.hbq969.code.common.utils.*;
 import com.github.hbq969.code.dict.service.api.impl.MapDictHelperImpl;
 import com.github.hbq969.code.sm.login.session.UserContext;
-import com.github.hbq969.middleware.dbc.config.Config;
 import com.github.hbq969.middleware.dbc.dao.ConfigDao;
 import com.github.hbq969.middleware.dbc.dao.ProfileDao;
 import com.github.hbq969.middleware.dbc.dao.entity.ConfigEntity;
@@ -16,20 +15,24 @@ import com.github.hbq969.middleware.dbc.model.AccountServiceProfile;
 import com.github.hbq969.middleware.dbc.service.ConfigService;
 import com.github.hbq969.middleware.dbc.view.request.ConfigProfileQuery;
 import com.github.hbq969.middleware.dbc.view.request.DeleteConfigMultiple;
+import com.github.hbq969.middleware.dbc.view.request.DownFile;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.checkerframework.checker.units.qual.C;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.web.multipart.MultipartFile;
-import org.yaml.snakeyaml.Yaml;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -323,6 +326,34 @@ public class ConfigServiceImpl implements ConfigService {
 
 //        profileDao.deleteProfileConfig(asp);
 //        batchConfigs(asp, "Y", yamlParis);
+    }
+
+    @Override
+    public void downFile(HttpServletResponse response, DownFile downFile) {
+        try {
+            downFile.userInitial(context);
+            String filename = downFile.getFilename();
+            AccountServiceProfile asp = downFile.propertySet();
+            ConfigFileEntity cfe = queryConfigFile(asp);
+            if (StringUtils.equals("yml", downFile.getFileSuffix())) {
+                response.setHeader("Content-disposition", "attachment; filename=" + filename);
+                response.setContentType("application/yaml");
+                FileCopyUtils.copy(new StringReader(cfe.getFileContent()), response.getWriter());
+            } else if (StringUtils.equals("properties", downFile.getFileSuffix())) {
+                List<Pair<String, Object>> pairs = YamlPropertiesFileConverter.yamlToProperties(cfe.getFileContent());
+                ByteArrayOutputStream out = new ByteArrayOutputStream();
+                for (Pair<String, Object> pair : pairs) {
+                    out.write(String.join(": ", pair.getKey(), String.valueOf(pair.getValue())).getBytes(StandardCharsets.UTF_8));
+                    out.write("\n".getBytes(StandardCharsets.UTF_8));
+                }
+                FileCopyUtils.copy(out.toByteArray(), response.getOutputStream());
+            } else {
+                throw new UnsupportedOperationException("不支持的文件类型");
+            }
+        } catch (Exception e) {
+            log.error("下载文件异常", e);
+            throw new RuntimeException(e);
+        }
     }
 
     private void batchUpdateConfig(AccountServiceProfile asp, SubList<Pair<String, Object>> data, String sqlUpdate) {

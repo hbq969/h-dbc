@@ -6,10 +6,12 @@ import com.github.hbq969.middleware.dbc.dao.entity.ConfigProfileEntity;
 import com.github.hbq969.middleware.dbc.model.AccountServiceProfile;
 import com.github.hbq969.middleware.dbc.view.request.ConfigProfileQuery;
 import com.github.hbq969.middleware.dbc.view.request.DeleteConfigMultiple;
+import com.github.hbq969.middleware.dbc.view.request.DownFile;
 import com.github.pagehelper.PageInfo;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 public interface ConfigService {
@@ -35,4 +37,6 @@ public interface ConfigService {
     ConfigFileEntity queryConfigFile(AccountServiceProfile asp);
 
     void updateConfigFile(ConfigFileEntity cfe);
+
+    void downFile(HttpServletResponse response, DownFile downFile);
 }

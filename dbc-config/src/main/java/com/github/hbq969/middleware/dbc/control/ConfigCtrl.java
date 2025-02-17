@@ -10,15 +10,17 @@ import com.github.hbq969.middleware.dbc.service.ConfigService;
 import com.github.hbq969.middleware.dbc.view.request.ConfigProfileQuery;
 import com.github.hbq969.middleware.dbc.view.request.ConfigQuery;
 import com.github.hbq969.middleware.dbc.view.request.DeleteConfigMultiple;
+import com.github.hbq969.middleware.dbc.view.request.DownFile;
 import com.github.pagehelper.PageInfo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import javax.servlet.http.HttpServletResponse;
 
 @RestController("dbc-ConfigCtrl")
 @Api(tags = "配置中心-配置管理接口")
@@ -78,11 +80,7 @@ public class ConfigCtrl {
     @ApiOperation("导入配置")
     @RequestMapping(path = "/import", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseBody
-    public ReturnMessage<?> configImport(@RequestParam("username") String username,
-                                         @RequestParam("serviceId") String serviceId,
-                                         @RequestParam("profileName") String profileName,
-                                         @RequestParam("file") MultipartFile file,
-                                         @RequestParam("cover") String cover) {
+    public ReturnMessage<?> configImport(@RequestParam("username") String username, @RequestParam("serviceId") String serviceId, @RequestParam("profileName") String profileName, @RequestParam("file") MultipartFile file, @RequestParam("cover") String cover) {
         if (UserContext.permitAllow(username)) {
             AccountServiceProfile asp = new AccountServiceProfile();
             asp.setUsername(username);
@@ -108,6 +106,12 @@ public class ConfigCtrl {
     public ReturnMessage<?> updateConfigFile(@RequestBody ConfigFileEntity cfe) {
         configService.updateConfigFile(cfe);
         return ReturnMessage.success("更新成功");
+    }
+
+    @ApiOperation("下载配置文件")
+    @RequestMapping(path = "/download", method = RequestMethod.POST)
+    public void downFile(HttpServletResponse response, @RequestBody DownFile downFile) {
+        configService.downFile(response, downFile);
     }
 
 }

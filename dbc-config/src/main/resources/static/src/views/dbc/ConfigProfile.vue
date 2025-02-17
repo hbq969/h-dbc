@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-  Edit, ArrowLeft, Delete, Grid, DocumentCopy, UploadFilled
+  Edit, ArrowLeft, Delete, Grid, DocumentCopy, UploadFilled, Download
 } from '@element-plus/icons-vue'
 import {ref, reactive, onMounted, computed, provide, inject} from 'vue'
 import axios from '@/network'
@@ -146,9 +146,61 @@ const showConfigImportDialog = (source) => {
   dialogFormVisible2.value = true
   importForm.file = null
   importForm.cover = 'N'
-  importForm.serviceId=router.currentRoute.value.query.serviceId
-  importForm.username=router.currentRoute.value.query.username
-  importForm.profileName=source.profileName
+  importForm.serviceId = router.currentRoute.value.query.serviceId
+  importForm.username = router.currentRoute.value.query.username
+  importForm.profileName = source.profileName
+}
+
+const dialogFormVisible3 = ref(false)
+const dialogTitle3 = ref('下载配置')
+const downForm = reactive({
+  serviceId: '',
+  username: '',
+  profileName: '',
+  fileSuffix: 'yml',
+  getFilename: function () {
+    if (!this.profileName || this.profileName == '' || this.profileName == 'default') {
+      return "application." + this.fileSuffix;
+    } else {
+      return "application-" + this.profileName + "." + this.fileSuffix;
+    }
+  }
+})
+
+const showConfigDownloadDialog = (source) => {
+  dialogFormVisible3.value = true
+  downForm.serviceId = router.currentRoute.value.query.serviceId
+  downForm.username = router.currentRoute.value.query.username
+  downForm.profileName = source.profileName
+}
+
+const downFile = (fileSuffix) => {
+  downForm.fileSuffix = fileSuffix
+  axios({
+    url: '/config/download',
+    method: 'post',
+    data: downForm,
+  }).then((res: any) => {
+    const blob = new Blob([res.data]);
+    const fileName =downForm.getFilename();
+    if ('download' in document.createElement('a')) { // 非IE下载
+      const elink = document.createElement('a');
+      elink.download = fileName
+      elink.style.display = 'none';
+      elink.href = URL.createObjectURL(blob);
+      document.body.appendChild(elink);
+      elink.click();
+      URL.revokeObjectURL(elink.href);// 释放URL 对象
+      document.body.removeChild(elink);
+    } else {
+      // IE10+下载
+      // if (navigator) {
+      //   navigator.msSaveBlob(blob, fileName);
+      // }
+    }
+  }).catch((err: Error) => {
+    msg('请求异常', 'error')
+  })
 }
 
 const debounce = (callback: (...args: any[]) => void, delay: number) => {
@@ -184,7 +236,7 @@ const _ = (window as any).ResizeObserver;
     <el-divider content-position="left"></el-divider>
 
     <el-space wrap>
-      <el-card style="max-width: 250px;height: 220px;" v-for="(source,index) in data.profileList">
+      <el-card style="max-width: 280px;height: 220px;" v-for="(source,index) in data.profileList">
         <template #header="scope">
           <div class="card-header" style="display: flex; align-items: center; justify-content: space-between">
             <div style="margin-top: 5px;text-align: center;flex: 1;display: flex; justify-content: left">
@@ -197,7 +249,12 @@ const _ = (window as any).ResizeObserver;
                 </template>
               </el-popconfirm>
               <el-badge :value="0" style="margin-left: 12px" type="danger" :max="500" :hidden="true">
-                <el-button type="warning" size="small" :icon="UploadFilled" circle @click="showConfigImportDialog(source)"/>
+                <el-button type="warning" size="small" :icon="UploadFilled" circle
+                           @click="showConfigImportDialog(source)"/>
+              </el-badge>
+              <el-badge :value="0" style="margin-left: 12px" type="danger" :max="500" :hidden="true">
+                <el-button type="success" size="small" :icon="Download" circle
+                           @click="showConfigDownloadDialog(source)"/>
               </el-badge>
               <el-badge :value="0" style="margin-left: 12px" type="danger" :max="500" :hidden="true">
                 <el-button type="primary" size="small" circle :icon="DocumentCopy" @click="goConfigFile(source)"/>
@@ -211,7 +268,7 @@ const _ = (window as any).ResizeObserver;
         </template>
         <template #default="scope">
           <el-form size="small" label-position="right" inline-message :inline="false" label-width="100px"
-                   style="width:200px">
+                   style="width:240px">
             <el-form-item label="环境名称：">
               {{ source.profileName }}
             </el-form-item>
@@ -269,6 +326,18 @@ const _ = (window as any).ResizeObserver;
           <el-button type="primary" @click="configImport()">保存</el-button>
         </el-form-item>
       </el-form>
+    </el-dialog>
+
+    <el-dialog v-model="dialogFormVisible3" :title="dialogTitle3" draggable width="300px">
+      <div>
+        <el-button type="primary" @click="downFile('yml')">YAML</el-button>
+        <el-button type="success" @click="downFile('properties')">Properties</el-button>
+      </div>
+      <template #footer>
+            <span class="dialog-footer">
+              <el-button @click="dialogFormVisible3 = false">取消</el-button>
+            </span>
+      </template>
     </el-dialog>
   </div>
 </template>
