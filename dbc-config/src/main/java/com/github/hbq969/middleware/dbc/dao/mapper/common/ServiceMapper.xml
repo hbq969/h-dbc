@@ -38,17 +38,10 @@
         h_dbc_acc_service b
         where a.service_id = b.service_id
         and b.app = #{accService.app}
-<!--        <choose>-->
-<!--            <when test="accService.username=='admin'">-->
-<!--                <if test="service.username!=null and service.username!=''">-->
-<!--                    <bind name="usernameLike" value="'%' + service.username + '%'"/>-->
-<!--                    and b.username like #{usernameLike}-->
-<!--                </if>-->
-<!--            </when>-->
-<!--            <otherwise>-->
-<!--                and b.username = #{accService.username}-->
-<!--            </otherwise>-->
-<!--        </choose>-->
+        <if test="service.username!=null and service.username!=''">
+            <bind name="usernameLike" value="'%' + service.username + '%'"/>
+            and b.username like #{usernameLike}
+        </if>
         <if test="service.serviceName!=null and service.serviceName!=''">
             <bind name="serviceNameLike" value="'%' + service.serviceName + '%'"/>
             and a.service_name like #{service.serviceNameLike}

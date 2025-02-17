@@ -165,7 +165,7 @@ const _ = (window as any).ResizeObserver;
 <template>
   <div class="container">
     <el-form :model="form" size="small" label-position="right" inline-message inline>
-      <el-form-item label="账号名称" prop="username" v-if="user.roleName=='ADMIN'">
+      <el-form-item label="账号名称" prop="username">
         <el-input v-model="form.username" placeholder="请输入..." type="text" clearable/>
       </el-form-item>
       <el-form-item label="服务名称" prop="serviceName">

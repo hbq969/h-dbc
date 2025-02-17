@@ -11,3 +11,10 @@ insert into h_role_menus(app,role_name,menu_name) values('h-dbc','ADMIN','Config
 insert into h_role_menus(app,role_name,menu_name) values('h-dbc','ADMIN','Profile');
 insert into h_role_menus(app,role_name,menu_name) values('h-dbc','ADMIN','Service');
 insert into h_role_menus(app,role_name,menu_name) values('h-dbc','ADMIN','Encrypt');
+
+insert into h_dbc_profiles(profile_name,profile_desc,created_at) values('default','缺省环境',1739763078);
+insert into h_dbc_profiles(profile_name,profile_desc,created_at) values('dev','开发环境',1739763078);
+insert into h_dbc_profiles(profile_name,profile_desc,created_at) values('test','测试环境',1739763078);
+insert into h_dbc_profiles(profile_name,profile_desc,created_at) values('prod','生成环境',1739763078);
+insert into h_dbc_profiles(profile_name,profile_desc,created_at) values('mysql','MySQL环境',1739763078);
+insert into h_dbc_profiles(profile_name,profile_desc,created_at) values('oracle','Oracle环境',1739763078);

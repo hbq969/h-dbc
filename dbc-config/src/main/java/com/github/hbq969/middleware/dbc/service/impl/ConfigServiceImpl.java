@@ -332,6 +332,9 @@ public class ConfigServiceImpl implements ConfigService {
     public void downFile(HttpServletResponse response, DownFile downFile) {
         try {
             downFile.userInitial(context);
+            if (!UserContext.permitAllow(downFile.getUsername())) {
+                throw new UnsupportedOperationException("账号无此操作权限");
+            }
             String filename = downFile.getFilename();
             AccountServiceProfile asp = downFile.propertySet();
             ConfigFileEntity cfe = queryConfigFile(asp);
