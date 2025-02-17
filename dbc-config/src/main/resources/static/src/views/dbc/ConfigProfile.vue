@@ -223,8 +223,8 @@ const _ = (window as any).ResizeObserver;
       </el-card>
     </el-space>
 
-    <el-dialog v-model="dialogFormVisible2" :title="dialogTitle2" draggable>
-      <el-form :model="importForm" label-position="left" size="small" :inline="false" label-width="10%">
+    <el-dialog v-model="dialogFormVisible2" :title="dialogTitle2" draggable style="height: 420px;width:450px">
+      <el-form :model="importForm" label-position="left" size="small" :inline="false" label-width="15%">
         <div>
           <el-upload
               action="#"
@@ -238,6 +238,7 @@ const _ = (window as any).ResizeObserver;
               @change="fileChange"
               @remove="fileRemove"
               accept=".yml,.yaml,.properties"
+              style="height:230px"
           >
             <el-icon class="el-icon--upload">
               <upload-filled/>
@@ -263,13 +264,11 @@ const _ = (window as any).ResizeObserver;
               inactive-value="N"
           />
         </el-form-item>
+        <el-form-item label-width="73%">
+          <el-button @click="dialogFormVisible2 = false">取消</el-button>
+          <el-button type="primary" @click="configImport()">保存</el-button>
+        </el-form-item>
       </el-form>
-      <template #footer>
-          <span class="dialog-footer">
-            <el-button @click="dialogFormVisible2 = false">取消</el-button>
-            <el-button type="primary" @click="configImport()">保存</el-button>
-          </span>
-      </template>
     </el-dialog>
   </div>
 </template>

@@ -222,14 +222,14 @@ const _ = (window as any).ResizeObserver;
                    :page-sizes="[5, 10, 20, 50, 100]"/>
   </div>
 
-  <el-dialog v-model="dialogFormVisible" :title="dialogTitle" draggable>
+  <el-dialog v-model="dialogFormVisible" :title="dialogTitle" draggable width="400px">
     <el-form :model="serviceForm" label-position="right" size="small" :inline="false" ref="serviceRef"
-             :rules="serviceRules" label-width="20%">
+             :rules="serviceRules" label-width="28%">
       <el-form-item label="服务名称：" prop="serviceName">
         <el-input v-model="serviceForm.serviceName" type="text" clearable/>
       </el-form-item>
       <el-form-item label="服务描述：" prop="serviceDesc">
-        <el-input v-model="serviceForm.serviceDesc" type="textarea" rows="5" clearable/>
+        <el-input v-model="serviceForm.serviceDesc" type="textarea" rows="2" clearable/>
       </el-form-item>
     </el-form>
     <template #footer>
