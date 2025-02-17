@@ -90,7 +90,7 @@ spring:
       base-packages: com.github.hbq969
       default-lookup-key: hikari
     hikari:
-      jdbc-url: jdbc:h2:~/.h2/dbc
+      jdbc-url: jdbc:h2:~/.h2/dbc;DB_CLOSE_DELAY=-1;AUTO_SERVER=TRUE
       driver-class-name: org.h2.Driver
       username: h-dbc
       password: ENC(PQWxMysuG2mMhw2IpXF9BudyHe2cS5hL3nPx6tJBvYJLl9dZ2eSkBhU6ed7FDgQZ)

@@ -38,10 +38,10 @@ public class ServiceImpl implements Service, InitializingBean {
 
     @Override
     public void afterPropertiesSet() throws Exception {
+        tableInitial();
         if (loginService != null) {
             loginService.finished(() -> InitScriptUtils.initial(context, "h-dbc-data.sql", () -> dict.reloadImmediately()));
         }
-        tableInitial();
     }
 
     @Override

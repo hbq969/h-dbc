@@ -18,3 +18,9 @@ insert into h_dbc_profiles(profile_name,profile_desc,created_at) values('test','
 insert into h_dbc_profiles(profile_name,profile_desc,created_at) values('prod','生成环境',1739763078);
 insert into h_dbc_profiles(profile_name,profile_desc,created_at) values('mysql','MySQL环境',1739763078);
 insert into h_dbc_profiles(profile_name,profile_desc,created_at) values('oracle','Oracle环境',1739763078);
+insert into h_dbc_acc_profiles(app,username,profile_name) values('h-dbc','admin','default');
+insert into h_dbc_acc_profiles(app,username,profile_name) values('h-dbc','admin','dev');
+insert into h_dbc_acc_profiles(app,username,profile_name) values('h-dbc','admin','test');
+insert into h_dbc_acc_profiles(app,username,profile_name) values('h-dbc','admin','prod');
+insert into h_dbc_acc_profiles(app,username,profile_name) values('h-dbc','admin','mysql');
+insert into h_dbc_acc_profiles(app,username,profile_name) values('h-dbc','admin','oracle');
