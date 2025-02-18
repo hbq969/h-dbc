@@ -3,6 +3,7 @@ package com.github.hbq969.middleware.dbc.service;
 import com.github.hbq969.middleware.dbc.dao.entity.ConfigEntity;
 import com.github.hbq969.middleware.dbc.dao.entity.ConfigFileEntity;
 import com.github.hbq969.middleware.dbc.dao.entity.ConfigProfileEntity;
+import com.github.hbq969.middleware.dbc.dao.entity.ServiceConfigEntity;
 import com.github.hbq969.middleware.dbc.model.AccountServiceProfile;
 import com.github.hbq969.middleware.dbc.view.request.ConfigProfileQuery;
 import com.github.hbq969.middleware.dbc.view.request.DeleteConfigMultiple;
@@ -13,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
+import java.util.Map;
 
 public interface ConfigService {
     PageInfo<ConfigProfileEntity> queryConfigProfileList(ConfigProfileQuery q, int pageNum, int pageSize);
@@ -24,7 +26,13 @@ public interface ConfigService {
     void updateConfig(AccountServiceProfile asp, ConfigEntity config);
 
     @Transactional(rollbackFor = Exception.class)
+    void batchUpdateConfig(List<ServiceConfigEntity> rows);
+
+    @Transactional(rollbackFor = Exception.class)
     void deleteConfig(AccountServiceProfile asp, ConfigEntity q);
+
+    @Transactional(rollbackFor = Exception.class)
+    void batchDeleteConfig(List<ServiceConfigEntity> rows);
 
     @Transactional(rollbackFor = Exception.class)
     void deleteConfigMultiple(DeleteConfigMultiple dcm);
@@ -39,4 +47,6 @@ public interface ConfigService {
     void updateConfigFile(ConfigFileEntity cfe);
 
     void downFile(HttpServletResponse response, DownFile downFile);
+
+    List<ServiceConfigEntity> queryAllProfilesThisConfig(Map map);
 }

@@ -5,7 +5,8 @@ import {
 import {ref, reactive, onMounted, computed, provide, inject} from 'vue'
 import axios from '@/network'
 import {msg, notify} from '@/utils/Utils'
-import type {FormInstance, FormRules, UploadInstance, TableInstance} from 'element-plus'
+import {ElMessage, ElMessageBox} from 'element-plus'
+import {FormInstance, FormRules, UploadInstance, TableInstance} from 'element-plus'
 import router from "@/router";
 
 onMounted(() => {
@@ -138,7 +139,12 @@ const selectAll = ref(false)
 const deleteMultipleConfig = () => {
   let selectionRows = multipleTableRef.value?.getSelectionRows()
   if (!selectionRows || selectionRows.length == 0) {
-    alert('请选择需要删除的配置')
+    ElMessageBox.alert('请选择需要删除的配置', '标题', {
+      // if you want to disable its autofocus
+      // autofocus: false,
+      confirmButtonText: 'OK',
+      type: 'warning'
+    })
     return
   }
   let configKeys = selectionRows.map(r => r.configKey);
@@ -159,6 +165,12 @@ const deleteMultipleConfig = () => {
   }).catch((err: Error) => {
     msg('请求异常', 'error')
   })
+}
+
+const goConfigQuery = (scope) => {
+  let query = scope.row;
+  query.fromPage='configList'
+  router.push({path: '/config/query', query: query})
 }
 
 const debounce = (callback: (...args: any[]) => void, delay: number) => {
@@ -205,11 +217,11 @@ const _ = (window as any).ResizeObserver;
       <el-form-item>
         <el-button type="primary" size="small" @click="queryConfigList()">查询</el-button>
         <el-button type="success" :icon="Edit" circle @click="showConfigAddDialog()" title="新增角色"/>
-<!--        <el-button type="warning" :icon="UploadFilled" circle @click="showConfigImportDialog()" title="导入配置"/>-->
+        <!--        <el-button type="warning" :icon="UploadFilled" circle @click="showConfigImportDialog()" title="导入配置"/>-->
         <el-popconfirm title="确认是否批量删除这些配置?" confirm-button-type="danger" @confirm="deleteMultipleConfig()">
-            <template #reference>
-              <el-button type="danger" :icon="Delete" circle title="批量删除配置"/>
-            </template>
+          <template #reference>
+            <el-button type="danger" :icon="Delete" circle title="批量删除配置"/>
+          </template>
         </el-popconfirm>
       </el-form-item>
     </el-form>
@@ -219,7 +231,7 @@ const _ = (window as any).ResizeObserver;
               size="small" :highlight-current-row="true" :header-cell-style="headerCellStyle">
       <el-table-column type="selection" header-align="center"
                        align="center"/>
-      <el-table-column fixed="left" label="操作" width="100" header-align="center" align="center">
+      <el-table-column fixed="left" label="操作" width="170" header-align="center" align="center">
         <template #default="scope">
           <el-button link type="primary" size="small" @click="showConfigEditDialog(scope)">编辑
           </el-button>
@@ -231,6 +243,7 @@ const _ = (window as any).ResizeObserver;
               </el-button>
             </template>
           </el-popconfirm>
+          <el-button link type="warning" size="small" @click="goConfigQuery(scope)">批量管理</el-button>
         </template>
       </el-table-column>
       <el-table-column prop="configKey" label="属性名称" :show-overflow-tooltip="true" header-align="center"

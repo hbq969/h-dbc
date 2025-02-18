@@ -5,6 +5,7 @@ import com.github.hbq969.code.sm.login.session.UserContext;
 import com.github.hbq969.middleware.dbc.dao.entity.ConfigEntity;
 import com.github.hbq969.middleware.dbc.dao.entity.ConfigFileEntity;
 import com.github.hbq969.middleware.dbc.dao.entity.ConfigProfileEntity;
+import com.github.hbq969.middleware.dbc.dao.entity.ServiceConfigEntity;
 import com.github.hbq969.middleware.dbc.model.AccountServiceProfile;
 import com.github.hbq969.middleware.dbc.service.ConfigService;
 import com.github.hbq969.middleware.dbc.view.request.ConfigProfileQuery;
@@ -21,6 +22,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
+import java.util.Map;
 
 @RestController("dbc-ConfigCtrl")
 @Api(tags = "配置中心-配置管理接口")
@@ -54,12 +57,28 @@ public class ConfigCtrl {
         return ReturnMessage.success("更新成功");
     }
 
+    @ApiOperation("批量更新配置")
+    @RequestMapping(path = "/batch", method = RequestMethod.PUT)
+    @ResponseBody
+    public ReturnMessage<?> batchUpdateConfig(@RequestBody List<ServiceConfigEntity> rows) {
+        configService.batchUpdateConfig(rows);
+      return ReturnMessage.success("更新成功");
+    }
+
     @ApiOperation("删除配置")
     @RequestMapping(path = "", method = RequestMethod.DELETE)
     @ResponseBody
     public ReturnMessage<?> deleteConfig(@RequestBody ConfigQuery cq) {
         configService.deleteConfig(cq.getAsp(), cq.getConfig());
         return ReturnMessage.success("删除成功");
+    }
+
+    @ApiOperation("批量删除配置")
+    @RequestMapping(path = "/batch", method = RequestMethod.DELETE)
+    @ResponseBody
+    public ReturnMessage<?> batchDeleteConfig(@RequestBody List<ServiceConfigEntity> rows) {
+        configService.batchDeleteConfig(rows);
+      return ReturnMessage.success("删除成功");
     }
 
     @ApiOperation("批量删除配置")
@@ -112,6 +131,13 @@ public class ConfigCtrl {
     @RequestMapping(path = "/download", method = RequestMethod.POST)
     public void downFile(HttpServletResponse response, @RequestBody DownFile downFile) {
         configService.downFile(response, downFile);
+    }
+
+    @ApiOperation("精确查询账号下所有服务的指定配置")
+    @RequestMapping(path = "/list/services", method = RequestMethod.POST)
+    @ResponseBody
+    public ReturnMessage<List<ServiceConfigEntity>> queryAllProfilesThisConfig(@RequestBody Map map) {
+        return ReturnMessage.success(configService.queryAllProfilesThisConfig(map));
     }
 
 }

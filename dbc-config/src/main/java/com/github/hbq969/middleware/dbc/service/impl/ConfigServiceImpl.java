@@ -1,6 +1,7 @@
 package com.github.hbq969.middleware.dbc.service.impl;
 
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.lang.Assert;
 import cn.hutool.core.lang.Pair;
 import com.github.hbq969.code.common.spring.context.SpringContext;
 import com.github.hbq969.code.common.utils.*;
@@ -11,6 +12,7 @@ import com.github.hbq969.middleware.dbc.dao.ProfileDao;
 import com.github.hbq969.middleware.dbc.dao.entity.ConfigEntity;
 import com.github.hbq969.middleware.dbc.dao.entity.ConfigFileEntity;
 import com.github.hbq969.middleware.dbc.dao.entity.ConfigProfileEntity;
+import com.github.hbq969.middleware.dbc.dao.entity.ServiceConfigEntity;
 import com.github.hbq969.middleware.dbc.model.AccountServiceProfile;
 import com.github.hbq969.middleware.dbc.service.ConfigService;
 import com.github.hbq969.middleware.dbc.view.request.ConfigProfileQuery;
@@ -35,10 +37,7 @@ import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service("dbc-ConfigServiceImpl")
@@ -60,9 +59,6 @@ public class ConfigServiceImpl implements ConfigService {
     @Autowired
     private FileReaderFacade fileReader;
 
-    @Autowired
-    private ProfileDao profileDao;
-
     @Override
     public PageInfo<ConfigProfileEntity> queryConfigProfileList(ConfigProfileQuery q, int pageNum, int pageSize) {
         q.userInitial(context);
@@ -82,7 +78,6 @@ public class ConfigServiceImpl implements ConfigService {
             asp.userInitial(context);
             config.setCreatedAt(FormatTime.nowSecs());
             configDao.saveConfig(asp, config);
-            addOrUpdateConfigFile(asp, true);
         } else {
             throw new UnsupportedOperationException("账号无此操作权限");
         }
@@ -94,10 +89,37 @@ public class ConfigServiceImpl implements ConfigService {
             config.setUpdatedAt(FormatTime.nowSecs());
             asp.userInitial(context);
             configDao.updateConfig(asp, config);
-            addOrUpdateConfigFile(asp, false);
         } else {
             throw new UnsupportedOperationException("账号无此操作权限");
         }
+    }
+
+    @Override
+    public void batchUpdateConfig(List<ServiceConfigEntity> rows) {
+        Assert.notNull(rows, "批量更新的配置为空");
+        String sql = "update h_dbc_config set config_value=? where app=? and username=? and service_id=? and profile_name=? and config_key=?";
+        String app = context.getProperty("spring.application.name");
+        log.info("批量更新配置, {}, [username,serviceId,profileName,configKey,configValue] => {}",
+                sql, rows.stream()
+                        .map(r -> String.join(",", r.getUsername(), r.getServiceId(), r.getProfileName(), r.getConfigKey(), r.getConfigValue()))
+                        .collect(Collectors.toList()));
+        context.getBean(JdbcTemplate.class).batchUpdate(sql, new BatchPreparedStatementSetter() {
+            @Override
+            public void setValues(PreparedStatement ps, int i) throws SQLException {
+                ServiceConfigEntity row = rows.get(i);
+                ps.setString(1, row.getConfigValue());
+                ps.setString(2, app);
+                ps.setString(3, UserContext.get().isAdmin() ? row.getUsername() : UserContext.get().getUserName());
+                ps.setString(4, row.getServiceId());
+                ps.setString(5, row.getProfileName());
+                ps.setString(6, row.getConfigKey());
+            }
+
+            @Override
+            public int getBatchSize() {
+                return rows.size();
+            }
+        });
     }
 
     @Override
@@ -105,53 +127,36 @@ public class ConfigServiceImpl implements ConfigService {
         if (UserContext.permitAllow(asp.getUsername())) {
             asp.userInitial(context);
             configDao.deleteConfig(asp, q);
-            addOrUpdateConfigFile(asp, false);
         } else {
             throw new UnsupportedOperationException("账号无此操作权限");
         }
     }
 
-    private void addOrUpdateConfigFile(AccountServiceProfile asp, boolean add) {
-        ConfigFileEntity newFile = new ConfigFileEntity().propertySet(asp);
-        ConfigFileEntity oldFile = configDao.queryConfigFile(newFile);
+    @Override
+    public void batchDeleteConfig(List<ServiceConfigEntity> rows) {
+        Assert.notNull(rows, "批量更新的配置为空");
+        String sql = "delete from h_dbc_config where app=? and username=? and service_id=? and profile_name=? and config_key=?";
+        String app = context.getProperty("spring.application.name");
+        log.info("批量删除配置, {}, [username,serviceId,profileName,configKey] => {}",
+                sql, rows.stream()
+                        .map(r -> String.join(",", r.getUsername(), r.getServiceId(), r.getProfileName(), r.getConfigKey()))
+                        .collect(Collectors.toList()));
+        context.getBean(JdbcTemplate.class).batchUpdate(sql, new BatchPreparedStatementSetter() {
+            @Override
+            public void setValues(PreparedStatement ps, int i) throws SQLException {
+                ServiceConfigEntity row = rows.get(i);
+                ps.setString(1, app);
+                ps.setString(2, UserContext.get().isAdmin() ? row.getUsername() : UserContext.get().getUserName());
+                ps.setString(3, row.getServiceId());
+                ps.setString(4, row.getProfileName());
+                ps.setString(5, row.getConfigKey());
+            }
 
-        List<ConfigEntity> allConfigs = configDao.queryConfigList(asp, new ConfigEntity());
-        List<Pair<String, Object>> allPairs = allConfigs.stream()
-                .map(c -> new Pair<String, Object>(c.getConfigKey(), c.getConfigValue()))
-                .collect(Collectors.toList());
-        String newYamlString = YamlPropertiesFileConverter.propertiesToYaml(allPairs);
-        // 添加配置
-        if (add) {
-            newFile.setFileContent(newYamlString);
-            // h_dbc_config_file未查询到记录，即未首次添加
-            if (oldFile == null) {
-                newFile.setCreatedAt(FormatTime.nowSecs());
-                if (StringUtils.isEmpty(asp.getProfileName()) || StringUtils.equals("default", asp.getProfileName())) {
-                    newFile.setFileName("application.yml");
-                } else {
-                    newFile.setFileName(String.format("application-%s.yml", asp.getProfileName()));
-                }
-                configDao.saveConfigFile(newFile);
+            @Override
+            public int getBatchSize() {
+                return rows.size();
             }
-            // h_dbc_config_file查询到记录，增量添加
-            else {
-                newFile.setUpdatedAt(FormatTime.nowSecs());
-                configDao.updateConfigFile(newFile);
-            }
-        }
-        // 修改或删除配置
-        else {
-            // 如果一个配置都没了，就删除h_dbc_config_file记录
-            if (StringUtils.isEmpty(newYamlString)) {
-                configDao.deleteConfigFile(oldFile);
-            }
-            // 否则更新h_dbc_config_file
-            else {
-                oldFile.setUpdatedAt(FormatTime.nowSecs());
-                oldFile.setFileContent(newYamlString);
-                configDao.updateConfigFile(oldFile);
-            }
-        }
+        });
     }
 
     @Override
@@ -186,9 +191,6 @@ public class ConfigServiceImpl implements ConfigService {
                 }
             });
         });
-        if (fromPage) {
-            addOrUpdateConfigFile(dcm.getAsp(), false);
-        }
     }
 
     @Override
@@ -219,7 +221,6 @@ public class ConfigServiceImpl implements ConfigService {
             throw new RuntimeException(e);
         }
         batchConfigs(asp, cover, pairs);
-        addOrUpdateConfigFile(asp, true);
     }
 
     private void batchConfigs(AccountServiceProfile asp, String cover, List<Pair<String, Object>> pairs) {
@@ -235,11 +236,13 @@ public class ConfigServiceImpl implements ConfigService {
     public ConfigFileEntity queryConfigFile(AccountServiceProfile asp) {
         asp.setApp(context.getProperty("spring.application.name"));
         if (UserContext.permitAllow(asp.getUsername())) {
-            ConfigFileEntity cfe = new ConfigFileEntity().propertySet(asp);
-            ConfigFileEntity result = configDao.queryConfigFile(cfe);
-            if (result != null) {
-                result.convertDict(context);
-            }
+            List<ConfigEntity> cfes = configDao.queryConfigList(asp,new ConfigEntity());
+            List<Pair<String,Object>> paris = cfes.stream()
+                    .map(c->new Pair<String,Object>(c.getConfigKey(),c.getConfigValue()))
+                    .collect(Collectors.toList());
+            ConfigFileEntity result=new ConfigFileEntity();
+            String fileContent=YamlPropertiesFileConverter.propertiesToYaml(paris);
+            result.setFileContent(fileContent);
             return result;
         } else {
             throw new UnsupportedOperationException("账号无此操作权限");
@@ -253,12 +256,6 @@ public class ConfigServiceImpl implements ConfigService {
             throw new UnsupportedOperationException("账号无此操作权限");
         }
         cfe.setUpdatedAt(FormatTime.nowSecs());
-        ConfigFileEntity result = configDao.queryConfigFile(cfe);
-        if (result == null) {
-            configDao.saveConfigFile(cfe);
-        } else {
-            configDao.updateConfigFile(cfe);
-        }
 
         // 比较和properties的差异
         List<Pair<String, Object>> yamlParis = YamlPropertiesFileConverter.yamlToProperties(cfe.getFileContent());
@@ -324,8 +321,6 @@ public class ConfigServiceImpl implements ConfigService {
         sub.setList(updateList);
         batchUpdateConfig(asp, sub, sqlUpdate);
 
-//        profileDao.deleteProfileConfig(asp);
-//        batchConfigs(asp, "Y", yamlParis);
     }
 
     @Override
@@ -337,13 +332,16 @@ public class ConfigServiceImpl implements ConfigService {
             }
             String filename = downFile.getFilename();
             AccountServiceProfile asp = downFile.propertySet();
-            ConfigFileEntity cfe = queryConfigFile(asp);
+            List<ConfigEntity> cfs = configDao.queryConfigList(asp,new ConfigEntity());
+            List<Pair<String,Object>> pairs = cfs.stream()
+                    .map(c->new Pair<String,Object>(c.getConfigKey(),c.getConfigValue()))
+                    .collect(Collectors.toList());
+            String yamlContent = YamlPropertiesFileConverter.propertiesToYaml(pairs);
             if (StringUtils.equals("yml", downFile.getFileSuffix())) {
                 response.setHeader("Content-disposition", "attachment; filename=" + filename);
                 response.setContentType("application/yaml");
-                FileCopyUtils.copy(new StringReader(cfe.getFileContent()), response.getWriter());
+                FileCopyUtils.copy(new StringReader(yamlContent), response.getWriter());
             } else if (StringUtils.equals("properties", downFile.getFileSuffix())) {
-                List<Pair<String, Object>> pairs = YamlPropertiesFileConverter.yamlToProperties(cfe.getFileContent());
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
                 for (Pair<String, Object> pair : pairs) {
                     out.write(String.join(": ", pair.getKey(), String.valueOf(pair.getValue())).getBytes(StandardCharsets.UTF_8));
@@ -357,6 +355,16 @@ public class ConfigServiceImpl implements ConfigService {
             log.error("下载文件异常", e);
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public List<ServiceConfigEntity> queryAllProfilesThisConfig(Map map) {
+        map.put("app", context.getProperty("spring.application.name"));
+        map.put("admin", UserContext.get().isAdmin());
+        map.put("username", UserContext.get().getUserName());
+        List<ServiceConfigEntity> list = configDao.queryAllProfilesThisConfig(map);
+        list.forEach(e -> e.convertDict(context));
+        return list;
     }
 
     private void batchUpdateConfig(AccountServiceProfile asp, SubList<Pair<String, Object>> data, String sqlUpdate) {

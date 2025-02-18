@@ -7,6 +7,7 @@ import axios from '@/network'
 import {msg} from '@/utils/Utils'
 import router from "@/router";
 import * as monaco from 'monaco-editor';
+import {ElMessage, ElMessageBox} from 'element-plus'
 
 // 获取编辑器容器的引用
 const editorContainer = ref<HTMLElement | null>(null);
@@ -107,7 +108,12 @@ const initialEditor = () => {
 const saveConfigFile = () => {
   let content = editor?.getValue()
   if (!content || content.trim() == '') {
-    alert('配置文件内容不能为空')
+    ElMessageBox.alert('配置文件内容不能为空', '标题', {
+      // if you want to disable its autofocus
+      // autofocus: false,
+      confirmButtonText: 'OK',
+      type:'warning'
+    })
     return
   }
   let form = router.currentRoute.value.query

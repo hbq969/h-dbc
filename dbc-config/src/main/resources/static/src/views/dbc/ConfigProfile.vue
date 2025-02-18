@@ -5,6 +5,7 @@ import {
 import {ref, reactive, onMounted, computed, provide, inject} from 'vue'
 import axios from '@/network'
 import {msg} from '@/utils/Utils'
+import {ElMessage, ElMessageBox} from 'element-plus'
 import type {FormInstance, FormRules, UploadInstance} from 'element-plus'
 import router from "@/router";
 
@@ -111,7 +112,12 @@ const fileRemove = (uploadFile: UploadFile) => {
 }
 const configImport = () => {
   if (importForm.file == null) {
-    alert('请先选择导入的文件')
+    ElMessageBox.alert('请先选择导入的文件', '标题', {
+      // if you want to disable its autofocus
+      // autofocus: false,
+      confirmButtonText: 'OK',
+      type:'warning'
+    })
     return
   }
   const formData = new FormData();
@@ -182,7 +188,7 @@ const downFile = (fileSuffix) => {
     data: downForm,
   }).then((res: any) => {
     const blob = new Blob([res.data]);
-    const fileName =downForm.getFilename();
+    const fileName = downForm.getFilename();
     if ('download' in document.createElement('a')) { // 非IE下载
       const elink = document.createElement('a');
       elink.download = fileName

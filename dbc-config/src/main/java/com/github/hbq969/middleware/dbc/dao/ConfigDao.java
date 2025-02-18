@@ -3,12 +3,14 @@ package com.github.hbq969.middleware.dbc.dao;
 import com.github.hbq969.middleware.dbc.dao.entity.ConfigEntity;
 import com.github.hbq969.middleware.dbc.dao.entity.ConfigFileEntity;
 import com.github.hbq969.middleware.dbc.dao.entity.ConfigProfileEntity;
+import com.github.hbq969.middleware.dbc.dao.entity.ServiceConfigEntity;
 import com.github.hbq969.middleware.dbc.model.AccountServiceProfile;
 import com.github.hbq969.middleware.dbc.view.request.ConfigProfileQuery;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface ConfigDao {
@@ -29,4 +31,6 @@ public interface ConfigDao {
     void deleteConfigFile(ConfigFileEntity file);
 
     ConfigFileEntity queryConfigFile(ConfigFileEntity file);
+
+    List<ServiceConfigEntity> queryAllProfilesThisConfig(Map map);
 }
