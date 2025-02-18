@@ -7,7 +7,8 @@ import com.github.hbq969.code.dict.service.api.DictModel;
 import lombok.Data;
 
 @Data
-public class ServiceConfigEntity implements DictModel, DictAware {
+public class BackupEntity implements DictAware, DictModel {
+    private String id;
     private String app;
     private String username;
     private String serviceId;
@@ -15,21 +16,16 @@ public class ServiceConfigEntity implements DictModel, DictAware {
     private String serviceDesc;
     private String profileName;
     private String profileDesc;
-    private String configKey;
-    private String configValue;
+    private String filename;
+    private String backupContent;
     private Long createdAt;
-    private Long updatedAt;
     private String fmtCreatedAt;
-    private String fmtUpdatedAt;
 
     @Override
     public void convertDict(SpringContext context) {
         DictAware.super.convertDict(context);
         if (createdAt != null) {
             this.fmtCreatedAt = FormatTime.YYYYMMDDHHMISS.withSecs(createdAt.longValue());
-        }
-        if (updatedAt != null) {
-            this.fmtUpdatedAt = FormatTime.YYYYMMDDHHMISS.withSecs(updatedAt.longValue());
         }
     }
 }

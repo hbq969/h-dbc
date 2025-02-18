@@ -1,6 +1,6 @@
 <script lang="ts" setup xmlns="http://www.w3.org/1999/html">
 import {
-  Edit, ArrowLeft, UploadFilled, Delete
+  Edit, ArrowLeft, UploadFilled, Delete,CopyDocument
 } from '@element-plus/icons-vue'
 import {ref, reactive, onMounted, computed, provide, inject} from 'vue'
 import axios from '@/network'
@@ -173,6 +173,22 @@ const goConfigQuery = (scope) => {
   router.push({path: '/config/query', query: query})
 }
 
+const backupConfig=()=>{
+  axios({
+    url: '/config/backup',
+    method: 'post',
+    data: router.currentRoute.value.query
+  }).then((res: any) => {
+    if (res.data.state == 'OK') {
+      msg(res.data.body, 'success')
+    } else {
+      msg(res.data.errorMessage, 'warning')
+    }
+  }).catch((err: Error) => {
+    msg('请求异常', 'error')
+  })
+}
+
 const debounce = (callback: (...args: any[]) => void, delay: number) => {
   let tid: any;
   return function (...args: any[]) {
@@ -216,8 +232,12 @@ const _ = (window as any).ResizeObserver;
       </el-form-item>
       <el-form-item>
         <el-button type="primary" size="small" @click="queryConfigList()">查询</el-button>
+        <el-popconfirm title="确定要备份吗?" confirm-button-type="danger" @confirm="backupConfig()">
+          <template #reference>
+            <el-button type="primary">备份</el-button>
+          </template>
+        </el-popconfirm>
         <el-button type="success" :icon="Edit" circle @click="showConfigAddDialog()" title="新增角色"/>
-        <!--        <el-button type="warning" :icon="UploadFilled" circle @click="showConfigImportDialog()" title="导入配置"/>-->
         <el-popconfirm title="确认是否批量删除这些配置?" confirm-button-type="danger" @confirm="deleteMultipleConfig()">
           <template #reference>
             <el-button type="danger" :icon="Delete" circle title="批量删除配置"/>
@@ -229,8 +249,7 @@ const _ = (window as any).ResizeObserver;
     <el-table ref="multipleTableRef" :select-on-indeterminate="selectAll" :data="data.configList" style="width: 100%"
               :border="true" table-layout="fixed" :stripe="true"
               size="small" :highlight-current-row="true" :header-cell-style="headerCellStyle">
-      <el-table-column type="selection" header-align="center"
-                       align="center"/>
+      <el-table-column type="selection" header-align="center" align="center"/>
       <el-table-column fixed="left" label="操作" width="170" header-align="center" align="center">
         <template #default="scope">
           <el-button link type="primary" size="small" @click="showConfigEditDialog(scope)">编辑

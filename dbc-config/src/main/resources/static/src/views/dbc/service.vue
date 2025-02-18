@@ -226,7 +226,7 @@ const _ = (window as any).ResizeObserver;
     <el-form :model="serviceForm" label-position="right" size="small" :inline="false" ref="serviceRef"
              :rules="serviceRules" label-width="28%">
       <el-form-item label="服务名称：" prop="serviceName">
-        <el-input v-model="serviceForm.serviceName" type="text" clearable/>
+        <el-input v-model="serviceForm.serviceName" type="text" clearable :disabled="dialogTitle=='编辑服务'"/>
       </el-form-item>
       <el-form-item label="服务描述：" prop="serviceDesc">
         <el-input v-model="serviceForm.serviceDesc" type="textarea" rows="2" clearable/>

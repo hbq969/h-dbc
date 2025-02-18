@@ -21,6 +21,7 @@ public class ConfigFileEntity implements DictModel, DictAware {
     private Long updatedAt;
     private String fmtCreatedAt;
     private String fmtUpdatedAt;
+    private String backup;
 
     public void userInitial(SpringContext context) {
         this.app = context.getProperty("spring.application.name");

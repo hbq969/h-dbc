@@ -263,7 +263,7 @@ const _ = (window as any).ResizeObserver;
       <el-form-item>
         <el-button type="primary" size="small" @click="queryConfigList(formRef)">查询</el-button>
         <el-button type="warning" size="small" @click="showBatchUpdateConfigDialog">批量修改</el-button>
-        <el-popconfirm title="确认是否删除这些配置?" confirm-button-type="danger" @confirm="batchDeleteConfig">
+        <el-popconfirm title="请先做好备份，确认是否删除这些配置?" confirm-button-type="danger" @confirm="batchDeleteConfig">
           <template #reference>
             <el-button type="danger" size="small">批量删除</el-button>
           </template>
@@ -278,7 +278,7 @@ const _ = (window as any).ResizeObserver;
         <template #default="scope">
           <el-button link type="primary" size="small" @click="showConfigEditDialog(scope)">编辑
           </el-button>
-          <el-popconfirm title="你确定要删除本条记录吗?" @confirm="deleteConfig(scope)"
+          <el-popconfirm title="请先做好备份，确定要删除本条记录吗?" @confirm="deleteConfig(scope)"
                          icon-color="red"
                          confirm-button-type="danger">
             <template #reference>
@@ -337,7 +337,7 @@ const _ = (window as any).ResizeObserver;
       <template #footer>
           <span class="dialog-footer">
             <el-button @click="dialogFormVisible2 = false">取消</el-button>
-            <el-popconfirm title="确认是否修改?" confirm-button-type="warning" @confirm="batchUpdateConfig(configFormRef2)">
+            <el-popconfirm title="请先做好备份，确认是否修改?" confirm-button-type="warning" @confirm="batchUpdateConfig(configFormRef2)">
                 <template #reference>
                   <el-button type="primary">保存</el-button>
                 </template>

@@ -28,6 +28,10 @@ const routes = [
     {
         path: '/config/query',
         component: () => import((`@/views/dbc/ConfigQuery.vue`))
+    },
+    {
+        path: '/back/data',
+        component: () => import((`@/views/dbc/BackData.vue`))
     }
 ]
 

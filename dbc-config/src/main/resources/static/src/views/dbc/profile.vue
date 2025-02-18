@@ -84,14 +84,14 @@ const profileRules = reactive<FormRules>({
 const showProfileAddDialog = () => {
   dialogFormVisible.value = true
   dialogTitle.value = '新增环境'
-  profileForm.username=''
+  profileForm.username = ''
   profileForm.profileName = ''
   profileForm.profileDesc = ''
 }
 const showProfileEditDialog = (scope) => {
   dialogFormVisible.value = true
   dialogTitle.value = '编辑环境'
-  profileForm.username=scope.row.username
+  profileForm.username = scope.row.username
   profileForm.profileName = scope.row.profileName
   profileForm.profileDesc = scope.row.profileDesc
 }
@@ -136,6 +136,39 @@ const deleteProfile = (scope) => {
   })
 }
 
+const backup = (scope) => {
+  axios({
+    url: '/profile/backup',
+    method: 'post',
+    data: {
+      profileName: scope.row.profileName
+    }
+  }).then((res: any) => {
+    if (res.data.state == 'OK') {
+      msg(res.data.body, 'success')
+    } else {
+      msg(res.data.errorMessage, 'warning')
+    }
+  }).catch((err: Error) => {
+    msg('请求异常', 'error')
+  })
+}
+
+const backupAll=()=>{
+  axios({
+    url: '/profile/backup/all',
+    method: 'post'
+  }).then((res: any) => {
+    if (res.data.state == 'OK') {
+      msg(res.data.body, 'success')
+    } else {
+      msg(res.data.errorMessage, 'warning')
+    }
+  }).catch((err: Error) => {
+    msg('请求异常', 'error')
+  })
+}
+
 const debounce = (callback: (...args: any[]) => void, delay: number) => {
   let tid: any;
   return function (...args: any[]) {
@@ -168,6 +201,11 @@ const _ = (window as any).ResizeObserver;
       </el-form-item>
       <el-form-item>
         <el-button type="primary" size="small" @click="queryProfileList()">查询</el-button>
+        <el-popconfirm title="此操作会备份所有配置，是否确认此操作?" confirm-button-type="warning" @confirm="backupAll">
+          <template #reference>
+            <el-button type="success" size="small" v-if="user.roleName=='ADMIN'">全量备份</el-button>
+          </template>
+        </el-popconfirm>
         <el-button type="success" :icon="Edit" circle @click="showProfileAddDialog()" title="新增环境"/>
       </el-form-item>
     </el-form>
@@ -187,6 +225,14 @@ const _ = (window as any).ResizeObserver;
               </el-button>
             </template>
           </el-popconfirm>
+          <el-popconfirm title="此操作会备份环境下所有服务的配置，是否确认备份?" @confirm="backup(scope)"
+                         icon-color="red"
+                         confirm-button-type="danger">
+            <template #reference>
+              <el-button link type="success" size="small">备份
+              </el-button>
+            </template>
+          </el-popconfirm>
         </template>
       </el-table-column>
       <el-table-column fixed="left" label="操作" width="180" header-align="center" align="center" v-else>
@@ -199,6 +245,14 @@ const _ = (window as any).ResizeObserver;
                          confirm-button-type="danger">
             <template #reference>
               <el-button link type="danger" size="small" :disabled="user.userName!=scope.row.username">删除
+              </el-button>
+            </template>
+          </el-popconfirm>
+          <el-popconfirm title="此操作会备份环境下所有服务的配置，是否确认备份?" @confirm="backup(scope)"
+                         icon-color="red"
+                         confirm-button-type="danger">
+            <template #reference>
+              <el-button link type="success" size="small" :disabled="user.userName!=scope.row.username">备份
               </el-button>
             </template>
           </el-popconfirm>

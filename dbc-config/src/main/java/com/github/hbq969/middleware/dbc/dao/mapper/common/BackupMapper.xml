@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.github.hbq969.middleware.dbc.dao.BackupDao">
+    <select id="queryConfigListByProfileName"
+            resultType="com.github.hbq969.middleware.dbc.dao.entity.ServiceConfigEntity">
+        select a.app          AS "app",
+               d.username     AS "username",
+               a.service_id   AS "serviceId",
+               b.service_name AS "serviceName",
+               b.service_desc AS "serviceDesc",
+               a.profile_name AS "profileName",
+               c.profile_desc AS "profileDesc",
+               a.config_Key   AS "configKey",
+               a.config_value AS "configValue",
+               a.created_at   AS "createdAt",
+               a.updated_at   AS "updatedAt"
+        from h_dbc_config a,
+             h_dbc_service b,
+             h_dbc_acc_service d,
+             h_dbc_profiles c
+        where a.service_id = b.service_id
+          and b.service_id = d.service_id
+          and a.profile_name = c.profile_name
+          and a.profile_name = #{profileName}
+        order by b.service_name, a.profile_name
+    </select>
+
+    <select id="queryConfigListByServiceId"
+            resultType="com.github.hbq969.middleware.dbc.dao.entity.ServiceConfigEntity">
+        select a.app          AS "app",
+               d.username     AS "username",
+               a.service_id   AS "serviceId",
+               b.service_name AS "serviceName",
+               b.service_desc AS "serviceDesc",
+               a.profile_name AS "profileName",
+               c.profile_desc AS "profileDesc",
+               a.config_Key   AS "configKey",
+               a.config_value AS "configValue",
+               a.created_at   AS "createdAt",
+               a.updated_at   AS "updatedAt"
+        from h_dbc_config a,
+             h_dbc_service b,
+             h_dbc_acc_service d,
+             h_dbc_profiles c
+        where a.service_id = b.service_id
+          and b.service_id = d.service_id
+          and a.profile_name = c.profile_name
+          and a.service_id = #{serviceId}
+        order by b.service_name, a.profile_name
+    </select>
+
+    <select id="queryConfigListByServiceAndProfile"
+            resultType="com.github.hbq969.middleware.dbc.dao.entity.ServiceConfigEntity"
+            parameterType="com.github.hbq969.middleware.dbc.model.AccountServiceProfile">
+        select a.app          AS "app",
+               d.username     AS "username",
+               a.service_id   AS "serviceId",
+               b.service_name AS "serviceName",
+               b.service_desc AS "serviceDesc",
+               a.profile_name AS "profileName",
+               c.profile_desc AS "profileDesc",
+               a.config_Key   AS "configKey",
+               a.config_value AS "configValue",
+               a.created_at   AS "createdAt",
+               a.updated_at   AS "updatedAt"
+        from h_dbc_config a,
+             h_dbc_service b,
+             h_dbc_acc_service d,
+             h_dbc_profiles c
+        where a.service_id = b.service_id
+          and b.service_id = d.service_id
+          and a.profile_name = c.profile_name
+          and a.service_id = #{serviceId}
+          and a.profile_name = #{profileName}
+        order by b.service_name, a.profile_name
+    </select>
+
+    <select id="queryBackupList" resultType="com.github.hbq969.middleware.dbc.dao.entity.BackupEntity"
+            parameterType="com.github.hbq969.middleware.dbc.model.AccountServiceProfile">
+        select id AS "id",
+        app AS "app",
+        username AS "username",
+        service_id AS "serviceId",
+        service_name AS "serviceName",
+        service_desc AS "serviceDesc",
+        profile_name AS "profileName",
+        profile_desc AS "profileDesc",
+        file_name AS "filename",
+        created_at AS "createdAt"
+        from h_dbc_config_bk
+        <where>
+            <if test="serviceName!=null and serviceName!=''">
+                <bind name="serviceNameLike" value="'%' + serviceName + '%'"/>
+                and service_name like #{serviceNameLike}
+            </if>
+            <if test="profileName!=null and profileName!=''">
+                and profile_name = #{profileName}
+            </if>
+        </where>
+        order by createdAt desc
+    </select>
+
+    <delete id="deleteBackup" parameterType="com.github.hbq969.middleware.dbc.dao.entity.BackupEntity">
+        delete
+        from h_dbc_config_bk
+        where id = #{id}
+    </delete>
+
+    <select id="queryBackup" resultType="com.github.hbq969.middleware.dbc.dao.entity.BackupEntity"
+            parameterType="com.github.hbq969.middleware.dbc.dao.entity.BackupEntity">
+        select id             AS "id",
+               app            AS "app",
+               username       AS "username",
+               service_id     AS "serviceId",
+               service_name   AS "serviceName",
+               service_desc   AS "serviceDesc",
+               profile_name   AS "profileName",
+               profile_desc   AS "profileDesc",
+               file_name      AS "filename",
+               backup_content AS "backupContent"
+        from h_dbc_config_bk
+        where id=#{id}
+    </select>
+</mapper>

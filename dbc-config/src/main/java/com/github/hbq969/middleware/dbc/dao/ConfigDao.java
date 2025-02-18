@@ -8,10 +8,12 @@ import com.github.hbq969.middleware.dbc.model.AccountServiceProfile;
 import com.github.hbq969.middleware.dbc.view.request.ConfigProfileQuery;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
 
+@Repository("dbc-ConfigDao")
 @Mapper
 public interface ConfigDao {
     List<ConfigProfileEntity> queryConfigProfileList(ConfigProfileQuery q);

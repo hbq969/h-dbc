@@ -10,6 +10,7 @@ import com.github.hbq969.code.sm.login.session.UserContext;
 import com.github.hbq969.middleware.dbc.dao.ServiceDao;
 import com.github.hbq969.middleware.dbc.dao.entity.ServiceEntity;
 import com.github.hbq969.middleware.dbc.model.AccountService;
+import com.github.hbq969.middleware.dbc.service.BackupService;
 import com.github.hbq969.middleware.dbc.service.Service;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -17,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.util.List;
 
@@ -35,6 +37,10 @@ public class ServiceImpl implements Service, InitializingBean {
 
     @Autowired
     private MapDictHelperImpl dict;
+
+    @Autowired
+    @Qualifier("dbc-BackupProxyImpl")
+    private BackupService backupService;
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -65,11 +71,10 @@ public class ServiceImpl implements Service, InitializingBean {
     @Override
     public void updateService(ServiceEntity service) {
 
-        if(UserContext.permitAllow(service.getUsername())){
+        if (UserContext.permitAllow(service.getUsername())) {
             service.setUpdatedAt(FormatTime.nowSecs());
             serviceDao.updateService(service);
-        }
-        else{
+        } else {
             throw new UnsupportedOperationException("当前账号无此操作权限");
         }
     }
@@ -78,6 +83,7 @@ public class ServiceImpl implements Service, InitializingBean {
     public void deleteService(ServiceEntity service) {
 
         if (UserContext.permitAllow(service.getUsername())) {
+            backupService.backupOnDeleteService(service);
             serviceDao.deleteServiceOnAdmin(service);
             serviceDao.deleteAccServiceOnAdmin(service.getServiceId());
             serviceDao.deleteServiceConfigOnAdmin(service.getServiceId());
@@ -134,6 +140,12 @@ public class ServiceImpl implements Service, InitializingBean {
             log.info("表h_dbc_config_file创建成功");
         } catch (Exception e) {
             log.error("表h_dbc_config_file已存在");
+        }
+        try {
+            serviceDao.createConfigBackup();
+            log.info("表h_dbc_config_bk创建成功");
+        } catch (Exception e) {
+            log.error("表h_dbc_config_bk已存在");
         }
     }
 }

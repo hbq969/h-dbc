@@ -6,9 +6,9 @@
     <update id="createService">
         create table `h_dbc_service`
         (
-            `service_id`   varchar(100) primary key,
-            `service_name` varchar(500) unique not null,
-            `service_desc` varchar(500),
+            `service_id`   varchar(50) primary key,
+            `service_name` varchar(100) unique not null,
+            `service_desc` varchar(255),
             `created_at`   numeric(20),
             `updated_at`   numeric(20)
         )
@@ -17,9 +17,9 @@
     <update id="createAccService">
         create table `h_dbc_acc_service`
         (
-            `app`        varchar(255),
-            `username`   VARCHAR(255),
-            `service_id` varchar(100),
+            `app`        varchar(100),
+            `username`   VARCHAR(100),
+            `service_id` varchar(50),
             primary key (`app`, `username`, `service_id`)
         )
     </update>
@@ -28,7 +28,7 @@
         create table `h_dbc_profiles`
         (
             `profile_name` varchar(100) primary key,
-            `profile_desc` varchar(500),
+            `profile_desc` varchar(255),
             `created_at` numeric(20),
             `updated_at` numeric(20)
         )
@@ -37,20 +37,20 @@
     <update id="createAccProfiles">
         create table `h_dbc_acc_profiles`
         (
-            `app`          varchar(255),
-            `username`     VARCHAR(255),
+            `app`          varchar(100),
+            `username`     VARCHAR(100),
             `profile_name` varchar(100),
-            primary key (`app`, `username`, `profile_name`)
+            primary key (`app`, `profile_name`)
         )
     </update>
 
     <update id="createConfig">
         create table `h_dbc_config`
         (
-            `app`          varchar(50),
-            `username`     VARCHAR(50),
-            `service_id`   varchar(50),
-            `profile_name` varchar(50),
+            `app`          varchar(100),
+            `username`     VARCHAR(100),
+            `service_id`   varchar(100),
+            `profile_name` varchar(100),
             `config_key`   varchar(500),
             `config_value` text,
             `created_at`   numeric(20),
@@ -62,15 +62,33 @@
     <update id="createConfigFile">
         create table `h_dbc_config_file`
         (
-            `app`          varchar(50),
-            `username`     VARCHAR(50),
-            `service_id`   varchar(50),
-            `profile_name` varchar(50),
+            `app`          varchar(100),
+            `username`     VARCHAR(100),
+            `service_id`   varchar(100),
+            `profile_name` varchar(100),
             `file_name`    varchar(100),
             `file_content` text,
             `created_at`   numeric(20),
             `updated_at`   numeric(20),
             primary key (`app`, `username`, `service_id`, `profile_name`)
+        )
+    </update>
+
+    <update id="createConfigBackup">
+        create table `h_dbc_config_bk`
+        (
+            `id`             varchar(50),
+            `app`            varchar(100),
+            `username`       VARCHAR(100),
+            `service_id`     varchar(100),
+            `service_name`  varchar(100),
+            `service_desc` varchar(255),
+            `profile_name`   varchar(100),
+            `profile_desc` varchar(255),
+            `file_name`      varchar(100),
+            `backup_content` text,
+            `created_at`     numeric(20),
+            primary key (`id`)
         )
     </update>
 </mapper>

@@ -4,9 +4,11 @@ import com.github.hbq969.middleware.dbc.dao.entity.ServiceEntity;
 import com.github.hbq969.middleware.dbc.model.AccountService;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+@Repository("dbc-ServiceDao")
 @Mapper
 public interface ServiceDao {
     void createService();
@@ -20,6 +22,8 @@ public interface ServiceDao {
     void createConfig();
 
     void createConfigFile();
+
+    void createConfigBackup();
 
     void saveService(ServiceEntity service);
 

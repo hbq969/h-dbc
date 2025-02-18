@@ -40,7 +40,7 @@ public interface ConfigService {
     PageInfo<ConfigEntity> queryConfigList(AccountServiceProfile asp, ConfigEntity q, int pageNum, int pageSize);
 
     @Transactional(rollbackFor = Exception.class)
-    void configImport(AccountServiceProfile asp, MultipartFile file, String cover);
+    void configImport(AccountServiceProfile asp, MultipartFile file, String cover,String backup);
 
     ConfigFileEntity queryConfigFile(AccountServiceProfile asp);
 
@@ -49,4 +49,6 @@ public interface ConfigService {
     void downFile(HttpServletResponse response, DownFile downFile);
 
     List<ServiceConfigEntity> queryAllProfilesThisConfig(Map map);
+
+    void backup(AccountServiceProfile asp);
 }

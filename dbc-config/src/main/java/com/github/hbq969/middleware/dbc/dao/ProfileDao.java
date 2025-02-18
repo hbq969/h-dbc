@@ -6,9 +6,11 @@ import com.github.hbq969.middleware.dbc.model.AccountService;
 import com.github.hbq969.middleware.dbc.model.AccountServiceProfile;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+@Repository("dbc-ProfileDao")
 @Mapper
 public interface ProfileDao {
     void saveProfile(ProfileEntity profile);

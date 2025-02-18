@@ -99,13 +99,19 @@ public class ConfigCtrl {
     @ApiOperation("导入配置")
     @RequestMapping(path = "/import", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseBody
-    public ReturnMessage<?> configImport(@RequestParam("username") String username, @RequestParam("serviceId") String serviceId, @RequestParam("profileName") String profileName, @RequestParam("file") MultipartFile file, @RequestParam("cover") String cover) {
+    public ReturnMessage<?> configImport(
+            @RequestParam("username") String username,
+            @RequestParam("serviceId") String serviceId,
+            @RequestParam("profileName") String profileName,
+            @RequestParam("file") MultipartFile file,
+            @RequestParam("cover") String cover,
+            @RequestParam("backup") String backup) {
         if (UserContext.permitAllow(username)) {
             AccountServiceProfile asp = new AccountServiceProfile();
             asp.setUsername(username);
             asp.setServiceId(serviceId);
             asp.setProfileName(profileName);
-            configService.configImport(asp, file, cover);
+            configService.configImport(asp, file, cover,backup);
             return ReturnMessage.success("导入成功");
         } else {
             throw new UnsupportedOperationException("账号无此操作权限");
@@ -138,6 +144,14 @@ public class ConfigCtrl {
     @ResponseBody
     public ReturnMessage<List<ServiceConfigEntity>> queryAllProfilesThisConfig(@RequestBody Map map) {
         return ReturnMessage.success(configService.queryAllProfilesThisConfig(map));
+    }
+
+    @ApiOperation("备份配置")
+    @RequestMapping(path = "/backup", method = RequestMethod.POST)
+    @ResponseBody
+    public ReturnMessage<?> backup(@RequestBody AccountServiceProfile asp) {
+        configService.backup(asp);
+      return ReturnMessage.success("备份成功");
     }
 
 }

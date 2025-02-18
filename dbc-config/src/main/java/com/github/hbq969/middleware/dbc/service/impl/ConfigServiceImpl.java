@@ -14,6 +14,7 @@ import com.github.hbq969.middleware.dbc.dao.entity.ConfigFileEntity;
 import com.github.hbq969.middleware.dbc.dao.entity.ConfigProfileEntity;
 import com.github.hbq969.middleware.dbc.dao.entity.ServiceConfigEntity;
 import com.github.hbq969.middleware.dbc.model.AccountServiceProfile;
+import com.github.hbq969.middleware.dbc.service.BackupService;
 import com.github.hbq969.middleware.dbc.service.ConfigService;
 import com.github.hbq969.middleware.dbc.view.request.ConfigProfileQuery;
 import com.github.hbq969.middleware.dbc.view.request.DeleteConfigMultiple;
@@ -23,6 +24,7 @@ import com.github.pagehelper.PageInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -58,6 +60,10 @@ public class ConfigServiceImpl implements ConfigService {
 
     @Autowired
     private FileReaderFacade fileReader;
+
+    @Autowired
+    @Qualifier("dbc-BackupProxyImpl")
+    private BackupService backupService;
 
     @Override
     public PageInfo<ConfigProfileEntity> queryConfigProfileList(ConfigProfileQuery q, int pageNum, int pageSize) {
@@ -207,8 +213,12 @@ public class ConfigServiceImpl implements ConfigService {
     }
 
     @Override
-    public void configImport(AccountServiceProfile asp, MultipartFile file, String cover) {
+    public void configImport(AccountServiceProfile asp, MultipartFile file, String cover, String backup) {
         asp.userInitial(context);
+        if (!UserContext.permitAllow(asp.getUsername())) {
+            throw new UnsupportedOperationException("账号无此操作权限");
+        }
+        backupService.backupOnConfigImport(asp);
         String fileType = FileUtil.getSuffix(file.getOriginalFilename());
         if (!dict.isDictKey("import,file,type", fileType)) {
             throw new UnsupportedOperationException(String.format("不支持的导入文件类型: %s", fileType));
@@ -236,12 +246,12 @@ public class ConfigServiceImpl implements ConfigService {
     public ConfigFileEntity queryConfigFile(AccountServiceProfile asp) {
         asp.setApp(context.getProperty("spring.application.name"));
         if (UserContext.permitAllow(asp.getUsername())) {
-            List<ConfigEntity> cfes = configDao.queryConfigList(asp,new ConfigEntity());
-            List<Pair<String,Object>> paris = cfes.stream()
-                    .map(c->new Pair<String,Object>(c.getConfigKey(),c.getConfigValue()))
+            List<ConfigEntity> cfes = configDao.queryConfigList(asp, new ConfigEntity());
+            List<Pair<String, Object>> paris = cfes.stream()
+                    .map(c -> new Pair<String, Object>(c.getConfigKey(), c.getConfigValue()))
                     .collect(Collectors.toList());
-            ConfigFileEntity result=new ConfigFileEntity();
-            String fileContent=YamlPropertiesFileConverter.propertiesToYaml(paris);
+            ConfigFileEntity result = new ConfigFileEntity();
+            String fileContent = YamlPropertiesFileConverter.propertiesToYaml(paris);
             result.setFileContent(fileContent);
             return result;
         } else {
@@ -256,7 +266,7 @@ public class ConfigServiceImpl implements ConfigService {
             throw new UnsupportedOperationException("账号无此操作权限");
         }
         cfe.setUpdatedAt(FormatTime.nowSecs());
-
+        backupService.backupOnUpdateConfigFile(cfe);
         // 比较和properties的差异
         List<Pair<String, Object>> yamlParis = YamlPropertiesFileConverter.yamlToProperties(cfe.getFileContent());
         Map<String, Pair<String, Object>> yamlPairMap = yamlParis.stream()
@@ -332,9 +342,9 @@ public class ConfigServiceImpl implements ConfigService {
             }
             String filename = downFile.getFilename();
             AccountServiceProfile asp = downFile.propertySet();
-            List<ConfigEntity> cfs = configDao.queryConfigList(asp,new ConfigEntity());
-            List<Pair<String,Object>> pairs = cfs.stream()
-                    .map(c->new Pair<String,Object>(c.getConfigKey(),c.getConfigValue()))
+            List<ConfigEntity> cfs = configDao.queryConfigList(asp, new ConfigEntity());
+            List<Pair<String, Object>> pairs = cfs.stream()
+                    .map(c -> new Pair<String, Object>(c.getConfigKey(), c.getConfigValue()))
                     .collect(Collectors.toList());
             String yamlContent = YamlPropertiesFileConverter.propertiesToYaml(pairs);
             if (StringUtils.equals("yml", downFile.getFileSuffix())) {
@@ -365,6 +375,11 @@ public class ConfigServiceImpl implements ConfigService {
         List<ServiceConfigEntity> list = configDao.queryAllProfilesThisConfig(map);
         list.forEach(e -> e.convertDict(context));
         return list;
+    }
+
+    @Override
+    public void backup(AccountServiceProfile asp) {
+        backupService.backupOnConfigImport(asp);
     }
 
     private void batchUpdateConfig(AccountServiceProfile asp, SubList<Pair<String, Object>> data, String sqlUpdate) {

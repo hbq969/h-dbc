@@ -97,6 +97,7 @@ const dialogTitle2 = ref('导入配置')
 const importForm = reactive({
   file: null,
   cover: 'N',
+  backup: 'N',
   serviceId: '',
   username: '',
   profileName: ''
@@ -116,13 +117,14 @@ const configImport = () => {
       // if you want to disable its autofocus
       // autofocus: false,
       confirmButtonText: 'OK',
-      type:'warning'
+      type: 'warning'
     })
     return
   }
   const formData = new FormData();
   formData.append("file", importForm.file)
   formData.append("cover", importForm.cover)
+  formData.append("backup", importForm.backup)
   formData.append("username", importForm.username)
   formData.append("serviceId", importForm.serviceId)
   formData.append("profileName", importForm.profileName)
@@ -286,7 +288,7 @@ const _ = (window as any).ResizeObserver;
       </el-card>
     </el-space>
 
-    <el-dialog v-model="dialogFormVisible2" :title="dialogTitle2" draggable style="height: 420px;width:450px">
+    <el-dialog v-model="dialogFormVisible2" :title="dialogTitle2" draggable style="height: 460px;width:450px">
       <el-form :model="importForm" label-position="left" size="small" :inline="false" label-width="15%">
         <div>
           <el-upload
@@ -317,9 +319,20 @@ const _ = (window as any).ResizeObserver;
           </el-upload>
         </div>
         <br/>
-        <el-form-item label="是否覆盖" prop="cover">
+        <el-form-item label="是否覆盖" prop="cover" label-width="80">
           <el-switch
               v-model="importForm.cover"
+              inline-prompt
+              active-text="是"
+              inactive-text="否"
+              active-value="Y"
+              inactive-value="N"
+              @change="importForm.cover=='Y'?importForm.backup='Y':importForm.backup='N'"
+          />
+        </el-form-item>
+        <el-form-item label="是否备份" prop="cover" label-width="80">
+          <el-switch
+              v-model="importForm.backup"
               inline-prompt
               active-text="是"
               inactive-text="否"

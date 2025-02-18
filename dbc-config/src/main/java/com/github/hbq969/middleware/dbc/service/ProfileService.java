@@ -24,4 +24,9 @@ public interface ProfileService {
     List<ProfileEntity> queryProfileList(AccountService as);
 
     void deleteProfileConfig(AccountServiceProfile asp);
+
+    void backup(ProfileEntity profile);
+
+    @Transactional(rollbackFor = Exception.class)
+    void backupAll();
 }

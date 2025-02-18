@@ -6,27 +6,12 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-@ConfigurationProperties(prefix = "login")
+@ConfigurationProperties(prefix = "dbc")
 @Component
 @Data
 public class Config {
     /**
-     * 是否启用登录功能
+     * 是否开启自动备份
      */
-    private boolean enabled;
-
-    /**
-     * cookie最大存活时间（秒）
-     */
-    private long cookieMaxAgeSec = 1800;
-
-    /**
-     * 无需校验会话的url
-     */
-    private List<String> excludeUrls;
-
-    /**
-     * 数据库dialect，默认mysql，可支持oracle
-     */
-    private String dialect = "mysql";
+    private boolean backup = true;
 }

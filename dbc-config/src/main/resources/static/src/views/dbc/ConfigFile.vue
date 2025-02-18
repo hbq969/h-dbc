@@ -104,7 +104,7 @@ const initialEditor = () => {
     });
   }
 }
-
+const backup=ref('N')
 const saveConfigFile = () => {
   let content = editor?.getValue()
   if (!content || content.trim() == '') {
@@ -118,6 +118,7 @@ const saveConfigFile = () => {
   }
   let form = router.currentRoute.value.query
   form.fileContent = content
+  form.backup=backup.value
   axios({
     url: '/config/file',
     method: 'post',
@@ -172,6 +173,16 @@ const _ = (window as any).ResizeObserver;
     <div ref="diffEditorContainer" style="height: 300px; width: 92%; margin-top: 20px;"></div>
     <el-form-item style="margin-top: 10px">
       <el-button type="primary" size="small" @click="saveConfigFile()">保存配置</el-button>
+      <el-form-item label="是否备份" prop="backup" style="margin-left: 10px">
+        <el-switch
+            v-model="backup"
+            inline-prompt
+            active-text="是"
+            inactive-text="否"
+            active-value="Y"
+            inactive-value="N"
+        />
+      </el-form-item>
       <span style="margin-left: 5px;color: red">* 仅支持yml、yaml文件</span>
     </el-form-item>
   </div>

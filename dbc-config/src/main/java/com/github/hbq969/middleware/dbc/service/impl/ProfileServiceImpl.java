@@ -3,11 +3,13 @@ package com.github.hbq969.middleware.dbc.service.impl;
 import com.github.hbq969.code.common.spring.context.SpringContext;
 import com.github.hbq969.code.common.utils.FormatTime;
 import com.github.hbq969.code.sm.login.session.UserContext;
+import com.github.hbq969.middleware.dbc.dao.BackupDao;
 import com.github.hbq969.middleware.dbc.dao.ProfileDao;
 import com.github.hbq969.middleware.dbc.dao.entity.ProfileEntity;
 import com.github.hbq969.middleware.dbc.model.AccountProfile;
 import com.github.hbq969.middleware.dbc.model.AccountService;
 import com.github.hbq969.middleware.dbc.model.AccountServiceProfile;
+import com.github.hbq969.middleware.dbc.service.BackupService;
 import com.github.hbq969.middleware.dbc.service.ProfileService;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -15,6 +17,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,6 +30,9 @@ public class ProfileServiceImpl implements ProfileService {
     private ProfileDao profileDao;
     @Autowired
     private SpringContext context;
+    @Autowired
+    @Qualifier("dbc-BackupProxyImpl")
+    private BackupService backupService;
 
     @Override
     public void saveProfile(ProfileEntity profile) {
@@ -55,6 +61,7 @@ public class ProfileServiceImpl implements ProfileService {
     @Override
     public void deleteProfile(ProfileEntity profile) {
         if (UserContext.permitAllow(profile.getUsername())) {
+            backupService.backupOnDeleteProfile(profile);
             profileDao.deleteProfileOnAdmin(profile.getProfileName());
             profileDao.deleteAccProfileOnAdmin(profile.getProfileName());
             profileDao.deleteProfileAllConfigOnAdmin(profile.getProfileName());
@@ -93,10 +100,24 @@ public class ProfileServiceImpl implements ProfileService {
     public void deleteProfileConfig(AccountServiceProfile asp) {
         asp.setApp(context.getProperty("spring.application.name"));
         if (UserContext.permitAllow(asp.getUsername())) {
+            backupService.backupOnClearProfileConfig(asp);
             profileDao.deleteProfileConfig(asp);
             profileDao.deleteProfileConfileFile2(asp);
         } else {
             throw new UnsupportedOperationException("账号无此操作权限");
+        }
+    }
+
+    @Override
+    public void backup(ProfileEntity profile) {
+        backupService.backupOnDeleteProfile(profile);
+    }
+
+    @Override
+    public void backupAll() {
+        List<ProfileEntity> profiles = profileDao.queryAllProfileList();
+        for (ProfileEntity profile : profiles) {
+            backupService.backupOnDeleteProfile(profile);
         }
     }
 }

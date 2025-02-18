@@ -69,4 +69,20 @@ public class ProfileCtrl {
         profileService.deleteProfileConfig(asp);
         return ReturnMessage.success("清理成功");
     }
+
+    @ApiOperation("备份配置")
+    @RequestMapping(path = "/backup", method = RequestMethod.POST)
+    @ResponseBody
+    public ReturnMessage<?> backup(@RequestBody ProfileEntity profile) {
+        profileService.backup(profile);
+        return ReturnMessage.success("备份成功");
+    }
+
+    @ApiOperation("备份所有配置")
+    @RequestMapping(path = "/backup/all", method = RequestMethod.POST)
+    @ResponseBody
+    public ReturnMessage<?> backupAll() {
+        profileService.backupAll();
+        return ReturnMessage.success("备份成功");
+    }
 }
