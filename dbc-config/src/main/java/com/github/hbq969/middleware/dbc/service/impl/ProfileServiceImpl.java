@@ -36,6 +36,9 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     public void saveProfile(ProfileEntity profile) {
+        if (!UserContext.get().isAdmin()) {
+            throw new UnsupportedOperationException("此操作只允许admin");
+        }
         List<ProfileEntity> pes = profileDao.queryProfileByName(profile.getProfileName());
         if (CollectionUtils.isNotEmpty(pes)) {
             throw new IllegalArgumentException(String.format("该环境已经被 [%s] 创建", pes.get(0).getUsername()));
@@ -50,6 +53,9 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     public void updateProfile(ProfileEntity profile) {
+        if (!UserContext.get().isAdmin()) {
+            throw new UnsupportedOperationException("此操作只允许admin");
+        }
         if (UserContext.permitAllow(profile.getUsername())) {
             profile.setUpdatedAt(FormatTime.nowSecs());
             profileDao.updateProfile(profile);
@@ -60,15 +66,14 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     public void deleteProfile(ProfileEntity profile) {
-        if (UserContext.permitAllow(profile.getUsername())) {
-            backupService.backupOnDeleteProfile(profile);
-            profileDao.deleteProfileOnAdmin(profile.getProfileName());
-            profileDao.deleteAccProfileOnAdmin(profile.getProfileName());
-            profileDao.deleteProfileAllConfigOnAdmin(profile.getProfileName());
-            profileDao.deleteProfileConfigFileOnAdmin(profile.getProfileName());
-        } else {
-            throw new UnsupportedOperationException("账号无此操作权限");
+        if (!UserContext.get().isAdmin()) {
+            throw new UnsupportedOperationException("此操作只允许admin");
         }
+        backupService.backupOnDeleteProfile(profile);
+        profileDao.deleteProfileOnAdmin(profile.getProfileName());
+        profileDao.deleteAccProfileOnAdmin(profile.getProfileName());
+        profileDao.deleteProfileAllConfigOnAdmin(profile.getProfileName());
+        profileDao.deleteProfileConfigFileOnAdmin(profile.getProfileName());
     }
 
     @Override
@@ -110,11 +115,17 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     public void backup(ProfileEntity profile) {
+        if (!UserContext.get().isAdmin()) {
+            throw new UnsupportedOperationException("此操作只允许admin");
+        }
         backupService.backupOnDeleteProfile(profile);
     }
 
     @Override
     public void backupAll() {
+        if (!UserContext.get().isAdmin()) {
+            throw new UnsupportedOperationException("此操作只允许admin");
+        }
         List<ProfileEntity> profiles = profileDao.queryAllProfileList();
         for (ProfileEntity profile : profiles) {
             backupService.backupOnDeleteProfile(profile);

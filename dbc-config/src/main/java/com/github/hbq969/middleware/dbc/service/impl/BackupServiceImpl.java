@@ -5,21 +5,29 @@ import com.github.hbq969.code.common.spring.context.SpringContext;
 import com.github.hbq969.code.common.utils.DigitSplit;
 import com.github.hbq969.code.common.utils.FormatTime;
 import com.github.hbq969.code.common.utils.GsonUtils;
+import com.github.hbq969.code.sm.login.session.UserContext;
 import com.github.hbq969.middleware.dbc.dao.BackupDao;
 import com.github.hbq969.middleware.dbc.dao.ProfileDao;
 import com.github.hbq969.middleware.dbc.dao.entity.*;
 import com.github.hbq969.middleware.dbc.model.AccountServiceProfile;
 import com.github.hbq969.middleware.dbc.service.BackupService;
+import com.github.hbq969.middleware.dbc.view.request.BatchDeleteBackup;
+import com.github.hbq969.middleware.dbc.view.request.BatchDeleteRecovery;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.gson.reflect.TypeToken;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.Collections;
@@ -109,38 +117,57 @@ public class BackupServiceImpl implements BackupService {
 
     @Override
     public void deleteBackup(BackupEntity bk) {
-        backupDao.deleteBackup(bk);
+        if (UserContext.permitAllow(bk.getUsername())) {
+            backupDao.deleteBackup(bk);
+        } else {
+            throw new UnsupportedOperationException("账号无此操作权限");
+        }
     }
 
     @Override
-    public void deleteBackups(List<BackupEntity> list) {
+    public void deleteBackups(BatchDeleteBackup bdb) {
+        if (!UserContext.permitAllow(bdb.getUsername())) {
+            throw new UnsupportedOperationException("账号无此操作权限");
+        }
+        bdb.check();
         String sql = "delete from h_dbc_config_bk where id=?";
-        log.info("批量删除备份数据, {}, {}", sql, list);
+        log.info("批量删除备份数据, {}, {}", sql, bdb.getBackups());
         context.getBean(JdbcTemplate.class).batchUpdate(sql, new BatchPreparedStatementSetter() {
             @Override
             public void setValues(PreparedStatement ps, int i) throws SQLException {
-                BackupEntity bk = list.get(i);
+                BackupEntity bk = bdb.getBackups().get(i);
                 ps.setString(1, bk.getId());
             }
 
             @Override
             public int getBatchSize() {
-                return list.size();
+                return bdb.getBackups().size();
             }
         });
     }
 
     @Override
     public void recoveryBackup(BackupEntity bk) {
+        if (!UserContext.permitAllow(bk.getUsername())) {
+            throw new UnsupportedOperationException("账号无此操作权限");
+        }
         BackupEntity entity = backupDao.queryBackup(bk);
-        String sql = "select count(1) from h_dbc_service where service_id=?";
-        int c = context.getBean(JdbcTemplate.class).queryForObject(sql, new Object[]{entity.getServiceId()}, new int[]{Types.VARCHAR}, Integer.class);
-        log.info("查询服务是否存在, {}, {}, {}", sql, entity.getServiceId(), c);
+        String sql = "select service_id AS \"serviceId\",service_name AS \"serviceName\" from h_dbc_service where service_name=?";
+        List<ServiceEntity> services = null;
+        try {
+            services = context.getBean(JdbcTemplate.class).query(sql, new Object[]{entity.getServiceName()}, new int[]{Types.VARCHAR}, (rs, rowNum) -> {
+                ServiceEntity se = new ServiceEntity();
+                se.setServiceId(rs.getString(1));
+                se.setServiceName(rs.getString(2));
+                return se;
+            });
+        } catch (DataAccessException e) {
+        }
+        log.info("查询服务是否存在, {}, {}, {}", sql, entity.getServiceName(), services);
         // 服务不存在需要恢复
         long now = FormatTime.nowSecs();
         final String newServiceId = UUID.fastUUID().toString(true);
-        String serviceId = newServiceId;
-        if (c == 0) {
+        if (CollectionUtils.isEmpty(services)) {
             context.getBean(JdbcTemplate.class).update("insert into h_dbc_service(service_id,service_name,service_desc,created_at) values(?,?,?,?)", ps -> {
                 ps.setString(1, newServiceId);
                 ps.setString(2, entity.getServiceName());
@@ -153,14 +180,11 @@ public class BackupServiceImpl implements BackupService {
                 ps.setString(2, entity.getUsername());
                 ps.setString(3, newServiceId);
             });
-        } else {
-            serviceId = entity.getServiceId();
+            log.info("服务{}, {} 创建成功", newServiceId, entity.getServiceName());
         }
 
-        final String sid = serviceId;
-
         sql = "select count(1) from h_dbc_profiles where profile_name=?";
-        c = context.getBean(JdbcTemplate.class).queryForObject(sql, new Object[]{entity.getProfileName()}, new int[]{Types.VARCHAR}, Integer.class);
+        int c = context.getBean(JdbcTemplate.class).queryForObject(sql, new Object[]{entity.getProfileName()}, new int[]{Types.VARCHAR}, Integer.class);
         log.info("查询环境是否存在, {}, {}, {}", sql, entity.getProfileName(), c);
         // 环境不存在需要恢复
         if (c == 0) {
@@ -174,45 +198,65 @@ public class BackupServiceImpl implements BackupService {
                 ps.setString(2, entity.getUsername());
                 ps.setString(3, entity.getProfileName());
             });
+            log.info("环境 {} 创建成功", entity.getProfileName());
         }
         // 恢复配置
         sql = "delete from h_dbc_config where app=? and username=? and service_id=? and profile_name=?";
-        log.info("删除原有配置, {}, [{},{},{}]", sql, entity.getUsername(), sid, entity.getProfileName());
+        log.info("删除原有配置, {}, [{},{},{}]", sql, entity.getUsername(), entity.getServiceId(), entity.getProfileName());
         context.getBean(JdbcTemplate.class).update(sql, ps -> {
             ps.setString(1, entity.getApp());
             ps.setString(2, entity.getUsername());
-            ps.setString(3, sid);
+            ps.setString(3, entity.getServiceId());
             ps.setString(4, entity.getProfileName());
         });
+        if (CollectionUtils.isNotEmpty(services)) {
+            ServiceEntity service = services.get(0);
+            log.info("删除原有配置, {}, [{},{},{}]", sql, entity.getUsername(), service.getServiceId(), entity.getProfileName());
+            context.getBean(JdbcTemplate.class).update(sql, ps -> {
+                ps.setString(1, entity.getApp());
+                ps.setString(2, entity.getUsername());
+                ps.setString(3, service.getServiceId());
+                ps.setString(4, entity.getProfileName());
+            });
+        }
         List<ConfigEntity> configs = GsonUtils.parseArray(entity.getBackupContent(), new TypeToken<List<ConfigEntity>>() {
         });
+        String serviceId = newServiceId;
+        if (CollectionUtils.isNotEmpty(services)) {
+            serviceId = services.get(0).getServiceId();
+        }
+        final String sid = serviceId;
         DigitSplit.defaultStep(200).split(configs).forEach(sub -> {
             log.info("批量恢复配置, [{},{},{}], {} 个", entity.getUsername(), sid, entity.getProfileName(), sub.getList().size());
             context.getBean(JdbcTemplate.class).batchUpdate("insert into h_dbc_config(app,username,service_id,profile_name,config_key,config_value,created_at) values(?,?,?,?,?,?,?)",
                     new BatchPreparedStatementSetter() {
-                @Override
-                public void setValues(PreparedStatement ps, int i) throws SQLException {
-                    ConfigEntity ce = sub.getList().get(i);
-                    ps.setString(1, entity.getApp());
-                    ps.setString(2, entity.getUsername());
-                    ps.setString(3, sid);
-                    ps.setString(4, entity.getProfileName());
-                    ps.setString(5, ce.getConfigKey());
-                    ps.setString(6, ce.getConfigValue());
-                    ps.setLong(7, now);
-                }
+                        @Override
+                        public void setValues(PreparedStatement ps, int i) throws SQLException {
+                            ConfigEntity ce = sub.getList().get(i);
+                            ps.setString(1, entity.getApp());
+                            ps.setString(2, entity.getUsername());
+                            ps.setString(3, sid);
+                            ps.setString(4, entity.getProfileName());
+                            ps.setString(5, ce.getConfigKey());
+                            ps.setString(6, ce.getConfigValue());
+                            ps.setLong(7, now);
+                        }
 
-                @Override
-                public int getBatchSize() {
-                    return sub.getList().size();
-                }
-            });
+                        @Override
+                        public int getBatchSize() {
+                            return sub.getList().size();
+                        }
+                    });
         });
     }
 
     @Override
-    public void recoveryBackups(List<BackupEntity> bks) {
-        for (BackupEntity bk : bks) {
+    public void recoveryBackups(BatchDeleteRecovery bdr) {
+        if (!UserContext.permitAllow(bdr.getUsername())) {
+            throw new UnsupportedOperationException("账号无此操作权限");
+        }
+        bdr.check();
+        for (BackupEntity bk : bdr.getRecoveries()) {
             recoveryBackup(bk);
         }
     }

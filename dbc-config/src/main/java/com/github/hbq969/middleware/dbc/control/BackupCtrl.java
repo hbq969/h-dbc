@@ -5,6 +5,8 @@ import com.github.hbq969.middleware.dbc.dao.entity.BackupEntity;
 import com.github.hbq969.middleware.dbc.dao.entity.ProfileEntity;
 import com.github.hbq969.middleware.dbc.model.AccountServiceProfile;
 import com.github.hbq969.middleware.dbc.service.BackupService;
+import com.github.hbq969.middleware.dbc.view.request.BatchDeleteBackup;
+import com.github.hbq969.middleware.dbc.view.request.BatchDeleteRecovery;
 import com.github.pagehelper.PageInfo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -53,8 +55,8 @@ public class BackupCtrl {
     @ApiOperation("批量恢复配置")
     @RequestMapping(path = "/recovery/batch", method = RequestMethod.POST)
     @ResponseBody
-    public ReturnMessage<?> batchRecovery(@RequestBody List<BackupEntity> bks) {
-        backupService.recoveryBackups(bks);
+    public ReturnMessage<?> batchRecovery(@RequestBody BatchDeleteRecovery bdr) {
+        backupService.recoveryBackups(bdr);
         return ReturnMessage.success("恢复成功");
     }
 
@@ -69,8 +71,8 @@ public class BackupCtrl {
     @ApiOperation("删除备份记录")
     @RequestMapping(path = "/batch", method = RequestMethod.DELETE)
     @ResponseBody
-    public ReturnMessage<?> deleteBackups(@RequestBody List<BackupEntity> bks) {
-        backupService.deleteBackups(bks);
+    public ReturnMessage<?> deleteBackups(@RequestBody BatchDeleteBackup bdb) {
+        backupService.deleteBackups(bdb);
         return ReturnMessage.success("删除成功");
     }
 }

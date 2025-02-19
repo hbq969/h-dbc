@@ -4,6 +4,8 @@ import com.github.hbq969.middleware.dbc.config.Config;
 import com.github.hbq969.middleware.dbc.dao.entity.*;
 import com.github.hbq969.middleware.dbc.model.AccountServiceProfile;
 import com.github.hbq969.middleware.dbc.service.BackupService;
+import com.github.hbq969.middleware.dbc.view.request.BatchDeleteBackup;
+import com.github.hbq969.middleware.dbc.view.request.BatchDeleteRecovery;
 import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -73,9 +75,9 @@ public class BackupProxyImpl implements BackupService {
     }
 
     @Override
-    public void deleteBackups(List<BackupEntity> list) {
+    public void deleteBackups(BatchDeleteBackup bdb) {
         if(conf.isBackup()){
-            target.deleteBackups(list);
+            target.deleteBackups(bdb);
         }
     }
 
@@ -87,9 +89,9 @@ public class BackupProxyImpl implements BackupService {
     }
 
     @Override
-    public void recoveryBackups(List<BackupEntity> bks) {
+    public void recoveryBackups(BatchDeleteRecovery bdr) {
         if(conf.isBackup()){
-            target.recoveryBackups(bks);
+            target.recoveryBackups(bdr);
         }
     }
 

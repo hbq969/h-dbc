@@ -125,7 +125,10 @@ const saveConfigFile = () => {
     data: form,
   }).then((res: any) => {
     if (res.data.state == 'OK') {
-      msg(res.data.body, 'success')
+      ElMessageBox.alert(res.data.body, '标题', {
+        confirmButtonText: 'OK',
+        type:'warning'
+      })
       originalModel.setValue(form.fileContent)
       modifiedModel.setValue(form.fileContent)
     } else {

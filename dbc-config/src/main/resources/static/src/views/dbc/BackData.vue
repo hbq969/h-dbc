@@ -136,7 +136,10 @@ const batchDeleteBackup = () => {
   axios({
     url: '/backup/batch',
     method: 'delete',
-    data: rows
+    data: {
+      username: user.userName,
+      backups: rows
+    },
   }).then((res: any) => {
     if (res.data.state == 'OK') {
       msg(res.data.body, 'success')
@@ -149,7 +152,7 @@ const batchDeleteBackup = () => {
   })
 }
 
-const batchRecovery=()=>{
+const batchRecovery = () => {
   let rows = tableRef.value?.getSelectionRows()
   if (!rows || rows.length == 0) {
     ElMessageBox.alert('请选择需要恢复的备份记录', '标题', {
@@ -161,7 +164,10 @@ const batchRecovery=()=>{
   axios({
     url: '/backup/recovery/batch',
     method: 'post',
-    data: rows
+    data: {
+      username: user.userName,
+      recoveries: rows
+    },
   }).then((res: any) => {
     if (res.data.state == 'OK') {
       msg(res.data.body, 'success')

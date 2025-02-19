@@ -2,6 +2,8 @@ package com.github.hbq969.middleware.dbc.service;
 
 import com.github.hbq969.middleware.dbc.dao.entity.*;
 import com.github.hbq969.middleware.dbc.model.AccountServiceProfile;
+import com.github.hbq969.middleware.dbc.view.request.BatchDeleteBackup;
+import com.github.hbq969.middleware.dbc.view.request.BatchDeleteRecovery;
 import com.github.pagehelper.PageInfo;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,13 +25,13 @@ public interface BackupService {
     void deleteBackup(BackupEntity bk);
 
     @Transactional(rollbackFor = Exception.class)
-    void deleteBackups(List<BackupEntity> list);
+    void deleteBackups(BatchDeleteBackup bdb);
 
     @Transactional(rollbackFor = Exception.class)
     void recoveryBackup(BackupEntity bk);
 
     @Transactional(rollbackFor = Exception.class)
-    void recoveryBackups(List<BackupEntity> bks);
+    void recoveryBackups(BatchDeleteRecovery bdr);
 
     List<ProfileEntity> queryProfileList();
 }

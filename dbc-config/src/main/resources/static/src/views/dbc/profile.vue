@@ -141,6 +141,7 @@ const backup = (scope) => {
     url: '/profile/backup',
     method: 'post',
     data: {
+      username: scope.row.username,
       profileName: scope.row.profileName
     }
   }).then((res: any) => {
@@ -206,7 +207,7 @@ const _ = (window as any).ResizeObserver;
             <el-button type="success" size="small" v-if="user.roleName=='ADMIN'">全量备份</el-button>
           </template>
         </el-popconfirm>
-        <el-button type="success" :icon="Edit" circle @click="showProfileAddDialog()" title="新增环境"/>
+        <el-button type="success" :icon="Edit" circle @click="showProfileAddDialog()" title="新增环境" v-if="user.roleName=='ADMIN'"/>
       </el-form-item>
     </el-form>
 
@@ -230,29 +231,6 @@ const _ = (window as any).ResizeObserver;
                          confirm-button-type="danger">
             <template #reference>
               <el-button link type="success" size="small">备份
-              </el-button>
-            </template>
-          </el-popconfirm>
-        </template>
-      </el-table-column>
-      <el-table-column fixed="left" label="操作" width="180" header-align="center" align="center" v-else>
-        <template #default="scope">
-          <el-button link type="primary" size="small" @click="showProfileEditDialog(scope)"
-                     :disabled="user.userName!=scope.row.username">编辑
-          </el-button>
-          <el-popconfirm title="你确定要删除本条记录吗?" @confirm="deleteProfile(scope)"
-                         icon-color="red"
-                         confirm-button-type="danger">
-            <template #reference>
-              <el-button link type="danger" size="small" :disabled="user.userName!=scope.row.username">删除
-              </el-button>
-            </template>
-          </el-popconfirm>
-          <el-popconfirm title="此操作会备份环境下所有服务的配置，是否确认备份?" @confirm="backup(scope)"
-                         icon-color="red"
-                         confirm-button-type="danger">
-            <template #reference>
-              <el-button link type="success" size="small" :disabled="user.userName!=scope.row.username">备份
               </el-button>
             </template>
           </el-popconfirm>
