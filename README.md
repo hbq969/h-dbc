@@ -102,6 +102,11 @@ spring:
         strategy: api
         api:
           secret: ENC(tHRgyoB.....c2b+eBw==)
+          auth:
+            basic:
+              username: foo
+              password: bar
+            enabled: true
 # 如果上面属性不用加密方式，则下面配置不需要
 # 否则需要添加下面解密密码，密码是敏感信息尽量可通过命令行传入
 #jasypt:
@@ -136,6 +141,9 @@ spring:
 
 
 ![](dbc-config/src/main/resources/static/src/assets/img/6.png)
+
+
+![](dbc-config/src/main/resources/static/src/assets/img/7.png)
 
 
 

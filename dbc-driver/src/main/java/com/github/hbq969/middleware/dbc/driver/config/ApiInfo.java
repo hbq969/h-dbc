@@ -33,6 +33,7 @@ public class ApiInfo {
      */
     private String charset = "utf-8";
 
+    private Auth auth = new Auth();
 
     private volatile transient ConfigService api;
 
@@ -42,6 +43,10 @@ public class ApiInfo {
         this.secret = APIPropertySource.decode(env, "spring.cloud.config.h-dbc.api.secret",
                 env.getProperty("spring.cloud.config.h-dbc.api.secret"));
         this.charset = env.getProperty("spring.cloud.config.h-dbc.api.charset", this.charset);
+        this.auth.setEnabled(env.getProperty("spring.cloud.config.h-dbc.api.auth.enabled",Boolean.class,true));
+        this.auth.getBasic().setKey(APIPropertySource.decode(env,"spring.cloud.config.h-dbc.api.auth.basic.key",env.getProperty("spring.cloud.config.h-dbc.api.auth.basic.key",this.auth.getBasic().getKey())));
+        this.auth.getBasic().setUsername(APIPropertySource.decode(env,"spring.cloud.config.h-dbc.api.auth.basic.username",env.getProperty("spring.cloud.config.h-dbc.api.auth.basic.username")));
+        this.auth.getBasic().setPassword(APIPropertySource.decode(env,"spring.cloud.config.h-dbc.api.auth.basic.password",env.getProperty("spring.cloud.config.h-dbc.api.auth.basic.password")));
         return this;
     }
 
