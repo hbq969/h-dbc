@@ -155,10 +155,9 @@ const showBatchUpdateConfigDialog = () => {
   let rows = tableRef.value?.getSelectionRows()
   if (!rows || rows.length == 0) {
     ElMessageBox.alert('请选择选择需要批量修改的配置', '标题', {
-      // if you want to disable its autofocus
-      // autofocus: false,
       confirmButtonText: 'OK',
-      type:'warning'
+      type:'warning',
+      showClose: false
     })
     return
   }
@@ -205,10 +204,9 @@ const batchDeleteConfig = () => {
   let rows = tableRef.value?.getSelectionRows()
   if (!rows || rows.length == 0) {
     ElMessageBox.alert('请选择选择需要批量删除的配置', '标题', {
-      // if you want to disable its autofocus
-      // autofocus: false,
       confirmButtonText: 'OK',
-      type:'warning'
+      type:'warning',
+      showClose: false
     })
     return
   }

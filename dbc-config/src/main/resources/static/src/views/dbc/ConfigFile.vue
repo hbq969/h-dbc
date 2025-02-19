@@ -109,10 +109,9 @@ const saveConfigFile = () => {
   let content = editor?.getValue()
   if (!content || content.trim() == '') {
     ElMessageBox.alert('配置文件内容不能为空', '标题', {
-      // if you want to disable its autofocus
-      // autofocus: false,
       confirmButtonText: 'OK',
-      type:'warning'
+      type:'warning',
+      showClose: false
     })
     return
   }
@@ -127,7 +126,8 @@ const saveConfigFile = () => {
     if (res.data.state == 'OK') {
       ElMessageBox.alert(res.data.body, '标题', {
         confirmButtonText: 'OK',
-        type:'warning'
+        type:'warning',
+        showClose: false
       })
       originalModel.setValue(form.fileContent)
       modifiedModel.setValue(form.fileContent)

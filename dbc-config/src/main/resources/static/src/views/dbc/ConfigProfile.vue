@@ -114,10 +114,9 @@ const fileRemove = (uploadFile: UploadFile) => {
 const configImport = () => {
   if (importForm.file == null) {
     ElMessageBox.alert('请先选择导入的文件', '标题', {
-      // if you want to disable its autofocus
-      // autofocus: false,
       confirmButtonText: 'OK',
-      type: 'warning'
+      type: 'warning',
+      showClose: false
     })
     return
   }

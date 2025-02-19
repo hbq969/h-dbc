@@ -140,10 +140,9 @@ const deleteMultipleConfig = () => {
   let selectionRows = multipleTableRef.value?.getSelectionRows()
   if (!selectionRows || selectionRows.length == 0) {
     ElMessageBox.alert('请选择需要删除的配置', '标题', {
-      // if you want to disable its autofocus
-      // autofocus: false,
       confirmButtonText: 'OK',
-      type: 'warning'
+      type: 'warning',
+      showClose: false
     })
     return
   }

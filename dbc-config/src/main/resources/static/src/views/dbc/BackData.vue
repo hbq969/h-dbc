@@ -129,7 +129,8 @@ const batchDeleteBackup = () => {
   if (!rows || rows.length == 0) {
     ElMessageBox.alert('请选择需要删除的备份记录', '标题', {
       confirmButtonText: 'OK',
-      type: 'warning'
+      type: 'warning',
+      showClose: false
     })
     return
   }
@@ -157,7 +158,8 @@ const batchRecovery = () => {
   if (!rows || rows.length == 0) {
     ElMessageBox.alert('请选择需要恢复的备份记录', '标题', {
       confirmButtonText: 'OK',
-      type: 'warning'
+      type: 'warning',
+      showClose: false
     })
     return
   }

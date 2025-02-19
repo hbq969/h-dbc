@@ -19,9 +19,9 @@ import java.util.Base64;
 import java.util.List;
 
 @ConditionalOnProperty(prefix = "dbc.auth", name = "enabled", havingValue = "true")
-@Component("dbc-HdbcSessionInterceptor")
+@Component("dbc-APIAuthInterceptor")
 @Slf4j
-public class HdbcSessionInterceptor extends AbstractHandlerInterceptor {
+public class APIAuthInterceptor extends AbstractHandlerInterceptor {
 
     @Autowired
     private Config conf;
@@ -59,7 +59,7 @@ public class HdbcSessionInterceptor extends AbstractHandlerInterceptor {
                 });
                 if (CollectionUtils.isNotEmpty(uis)) {
                     boolean r = encoder.matches(array[1], uis.get(0).getPassword());
-                    log.warn("basic认证结果，{}, {}", r, array[0]);
+                    log.info("basic认证结果，{}, {}", r, array[0]);
                     if (!r) {
                         response.setStatus(HttpStatus.UNAUTHORIZED.value());
                     }
