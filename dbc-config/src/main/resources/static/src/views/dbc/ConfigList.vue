@@ -1,6 +1,6 @@
 <script lang="ts" setup xmlns="http://www.w3.org/1999/html">
 import {
-  Edit, ArrowLeft, UploadFilled, Delete,CopyDocument
+  Edit, ArrowLeft, UploadFilled, EditPen, Delete, Search,CopyDocument, DocumentCopy
 } from '@element-plus/icons-vue'
 import {ref, reactive, onMounted, computed, provide, inject} from 'vue'
 import axios from '@/network'
@@ -230,16 +230,16 @@ const _ = (window as any).ResizeObserver;
         <el-input v-model="form.configValue" placeholder="请输入..." type="text" clearable/>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" size="small" @click="queryConfigList()">查询</el-button>
+        <el-button type="primary" size="small" @click="queryConfigList()" :icon="Search">查询</el-button>
         <el-popconfirm title="确定要备份吗?" confirm-button-type="danger" @confirm="backupConfig()">
           <template #reference>
-            <el-button type="primary">备份</el-button>
+            <el-button type="primary" :icon="CopyDocument">备份</el-button>
           </template>
         </el-popconfirm>
-        <el-button type="success" :icon="Edit" circle @click="showConfigAddDialog()" title="新增角色"/>
+        <el-button type="success" :icon="EditPen" @click="showConfigAddDialog()">新增配置</el-button>
         <el-popconfirm title="确认是否批量删除这些配置?" confirm-button-type="danger" @confirm="deleteMultipleConfig()">
           <template #reference>
-            <el-button type="danger" :icon="Delete" circle title="批量删除配置"/>
+            <el-button type="danger" :icon="Delete">批量删除配置</el-button>
           </template>
         </el-popconfirm>
       </el-form-item>
@@ -249,19 +249,19 @@ const _ = (window as any).ResizeObserver;
               :border="true" table-layout="fixed" :stripe="true"
               size="small" :highlight-current-row="true" :header-cell-style="headerCellStyle">
       <el-table-column type="selection" header-align="center" align="center"/>
-      <el-table-column fixed="left" label="操作" width="170" header-align="center" align="center">
+      <el-table-column fixed="left" label="操作" width="130" header-align="center" align="center">
         <template #default="scope">
-          <el-button link type="primary" size="small" @click="showConfigEditDialog(scope)">编辑
-          </el-button>
+          <el-button circle :icon="Edit" title="编辑" type="primary" size="small" @click="showConfigEditDialog(scope)"/>
           <el-popconfirm title="你确定要删除本条记录吗?" @confirm="deleteConfig(scope)"
                          icon-color="red"
                          confirm-button-type="danger">
             <template #reference>
-              <el-button link type="danger" size="small">删除
-              </el-button>
+              <el-button circle :icon="Delete" title="删除" type="danger" size="small"/>
             </template>
           </el-popconfirm>
-          <el-button link type="warning" size="small" @click="goConfigQuery(scope)">批量管理</el-button>
+          <el-tooltip content="批量管理" effect="dark" placement="top">
+            <el-button circle :icon="DocumentCopy" type="warning" size="small" @click="goConfigQuery(scope)"/>
+          </el-tooltip>
         </template>
       </el-table-column>
       <el-table-column prop="configKey" label="属性名称" :show-overflow-tooltip="true" header-align="center"

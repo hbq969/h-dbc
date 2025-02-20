@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-  Edit, ArrowLeft
+  Edit, ArrowLeft, Delete,EditPen,Search, CopyDocument
 } from '@element-plus/icons-vue'
 import {ref, reactive, onMounted, computed, provide, inject} from 'vue'
 import axios from '@/network'
@@ -201,13 +201,13 @@ const _ = (window as any).ResizeObserver;
         <el-input v-model="form.profileDesc" placeholder="请输入..." type="text" clearable/>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" size="small" @click="queryProfileList()">查询</el-button>
+        <el-button type="primary" size="small" @click="queryProfileList()" :icon="Search">查询</el-button>
         <el-popconfirm title="此操作会备份所有配置，是否确认此操作?" confirm-button-type="warning" @confirm="backupAll">
           <template #reference>
-            <el-button type="success" size="small" v-if="user.roleName=='ADMIN'">全量备份</el-button>
+            <el-button type="success" size="small" v-if="user.roleName=='ADMIN'" :icon="CopyDocument">全量备份</el-button>
           </template>
         </el-popconfirm>
-        <el-button type="success" :icon="Edit" circle @click="showProfileAddDialog()" title="新增环境" v-if="user.roleName=='ADMIN'"/>
+        <el-button type="success" :icon="EditPen" @click="showProfileAddDialog()" v-if="user.roleName=='ADMIN'">新增环境</el-button>
       </el-form-item>
     </el-form>
 
@@ -216,22 +216,19 @@ const _ = (window as any).ResizeObserver;
       <el-table-column fixed="left" label="操作" width="180" header-align="center" align="center"
                        v-if="user.roleName=='ADMIN'">
         <template #default="scope">
-          <el-button link type="primary" size="small" @click="showProfileEditDialog(scope)">编辑
-          </el-button>
+          <el-button circle :icon="EditPen" type="success" size="small" @click="showProfileEditDialog(scope)" title="编辑"/>
           <el-popconfirm title="此操作会删除本环境关联的所有服务配置?" @confirm="deleteProfile(scope)"
                          icon-color="red"
                          confirm-button-type="danger">
             <template #reference>
-              <el-button link type="danger" size="small">删除
-              </el-button>
+              <el-button circle :icon="Delete" type="danger" size="small" title="删除"/>
             </template>
           </el-popconfirm>
           <el-popconfirm title="此操作会备份环境下所有服务的配置，是否确认备份?" @confirm="backup(scope)"
                          icon-color="red"
                          confirm-button-type="danger">
             <template #reference>
-              <el-button link type="success" size="small">备份
-              </el-button>
+              <el-button circle :icon="CopyDocument" type="success" size="small" title="备份"/>
             </template>
           </el-popconfirm>
         </template>

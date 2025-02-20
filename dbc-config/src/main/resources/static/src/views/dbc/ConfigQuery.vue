@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-  Edit, ArrowLeft
+  Edit, ArrowLeft, EditPen, Delete, Search
 } from '@element-plus/icons-vue'
 import {ref, reactive, onMounted, computed, provide, inject} from 'vue'
 import axios from '@/network'
@@ -259,11 +259,11 @@ const _ = (window as any).ResizeObserver;
         <el-input v-model="form.configKey" placeholder="精确匹配..." type="text" clearable style="width: 400px"/>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" size="small" @click="queryConfigList(formRef)">查询</el-button>
-        <el-button type="warning" size="small" @click="showBatchUpdateConfigDialog">批量修改</el-button>
+        <el-button :icon="Search" type="primary" size="small" @click="queryConfigList(formRef)">查询</el-button>
+        <el-button :icon="EditPen" type="warning" size="small" @click="showBatchUpdateConfigDialog">批量修改</el-button>
         <el-popconfirm title="请先做好备份，确认是否删除这些配置?" confirm-button-type="danger" @confirm="batchDeleteConfig">
           <template #reference>
-            <el-button type="danger" size="small">批量删除</el-button>
+            <el-button :icon="Delete" type="danger" size="small">批量删除</el-button>
           </template>
         </el-popconfirm>
       </el-form-item>
@@ -274,14 +274,12 @@ const _ = (window as any).ResizeObserver;
       <el-table-column type="selection" header-align="center" align="center"/>
       <el-table-column fixed="left" label="操作" width="100" header-align="center" align="center">
         <template #default="scope">
-          <el-button link type="primary" size="small" @click="showConfigEditDialog(scope)">编辑
-          </el-button>
+          <el-button circle :icon="EditPen" type="primary" size="small" @click="showConfigEditDialog(scope)"/>
           <el-popconfirm title="请先做好备份，确定要删除本条记录吗?" @confirm="deleteConfig(scope)"
                          icon-color="red"
                          confirm-button-type="danger">
             <template #reference>
-              <el-button link type="danger" size="small">删除
-              </el-button>
+              <el-button circle :icon="Delete" type="danger" size="small"/>
             </template>
           </el-popconfirm>
         </template>

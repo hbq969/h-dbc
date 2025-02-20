@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-  Edit, ArrowLeft
+  Edit, ArrowLeft, RefreshRight, Search, Delete
 } from '@element-plus/icons-vue'
 import {ref, reactive, onMounted, computed, provide, inject} from 'vue'
 import axios from '@/network'
@@ -217,15 +217,15 @@ const _ = (window as any).ResizeObserver;
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" size="small" @click="queryBackupList()">查询</el-button>
+        <el-button type="primary" size="small" @click="queryBackupList()" :icon="Search">查询</el-button>
         <el-popconfirm title="确认是否删除?" confirm-button-type="danger" @confirm="batchDeleteBackup">
           <template #reference>
-            <el-button type="warning" size="small">批量删除</el-button>
+            <el-button type="danger" size="small" :icon="Delete">批量删除</el-button>
           </template>
         </el-popconfirm>
         <el-popconfirm title="确认是否恢复?" confirm-button-type="danger" @confirm="batchRecovery">
           <template #reference>
-            <el-button type="warning" size="small">批量恢复</el-button>
+            <el-button type="warning" size="small" :icon="RefreshRight">批量恢复</el-button>
           </template>
         </el-popconfirm>
       </el-form-item>
@@ -238,18 +238,16 @@ const _ = (window as any).ResizeObserver;
         <template #default="scope">
           <el-popconfirm title="此操作会覆盖原有配置，请确认?" confirm-button-type="warning" @confirm="recovery(scope)">
             <template #reference>
-              <el-button link type="primary" size="small"
-                         :disabled="user.roleName!='ADMIN' && user.userName!=scope.row.username">恢复
-              </el-button>
+              <el-button circle :icon="RefreshRight" type="warning" size="small"
+                         :disabled="user.roleName!='ADMIN' && user.userName!=scope.row.username" title="恢复"/>
             </template>
           </el-popconfirm>
           <el-popconfirm title="你确定要删除本条记录吗?" @confirm="deleteBackup(scope)"
                          icon-color="red"
                          confirm-button-type="danger">
             <template #reference>
-              <el-button link type="danger" size="small"
-                         :disabled="user.roleName!='ADMIN' && user.userName!=scope.row.username">删除
-              </el-button>
+              <el-button circle :icon="Delete" type="danger" size="small"
+                         :disabled="user.roleName!='ADMIN' && user.userName!=scope.row.username" title="删除"/>
             </template>
           </el-popconfirm>
         </template>

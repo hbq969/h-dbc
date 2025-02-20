@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-  Edit, ArrowLeft
+  Edit, ArrowLeft, Delete,Grid, ZoomIn, EditPen, Search
 } from '@element-plus/icons-vue'
 import {ref, reactive, onMounted, computed, provide, inject} from 'vue'
 import axios from '@/network'
@@ -175,8 +175,8 @@ const _ = (window as any).ResizeObserver;
         <el-input v-model="form.serviceDesc" placeholder="请输入..." type="text" clearable/>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" size="small" @click="queryServiceList()">查询</el-button>
-        <el-button type="success" :icon="Edit" circle @click="showServiceAddDialog()" title="新增服务"/>
+        <el-button type="primary" size="small" @click="queryServiceList()" :icon="Search">查询</el-button>
+        <el-button type="success" :icon="EditPen" @click="showServiceAddDialog()">新增服务</el-button>
       </el-form-item>
     </el-form>
 
@@ -184,18 +184,20 @@ const _ = (window as any).ResizeObserver;
               size="small" :highlight-current-row="true" :header-cell-style="headerCellStyle">
       <el-table-column fixed="left" label="操作" width="180" header-align="center" align="center">
         <template #default="scope">
-          <el-button link type="primary" size="small" @click="showServiceEditDialog(scope)" :disabled="user.roleName!='ADMIN' && scope.row.username!=user.userName">编辑
-          </el-button>
+          <el-button circle :icon="EditPen" title="编辑" type="success" size="small" @click="showServiceEditDialog(scope)" :disabled="user.roleName!='ADMIN' && scope.row.username!=user.userName"/>
           <el-popconfirm title="你确定要删除本条记录吗?" @confirm="deleteService(scope)"
                          icon-color="red"
                          confirm-button-type="danger">
             <template #reference>
-              <el-button link type="danger" size="small" :disabled="user.roleName!='ADMIN' && scope.row.username!=user.userName">删除
-              </el-button>
+              <el-button circle :icon="Delete" title="删除" type="danger" size="small" :disabled="user.roleName!='ADMIN' && scope.row.username!=user.userName"/>
             </template>
           </el-popconfirm>
-          <el-button link type="success" size="small" @click="router.push({path:'/config/profile',query:scope.row})" :disabled="user.roleName!='ADMIN' && scope.row.username!=user.userName">配置管理
-          </el-button>
+          <el-tooltip content="配置管理" effect="dark" placement="top">
+            <el-button circle :icon="Grid" type="success" size="small" @click="router.push({path:'/config/profile',query:scope.row})" :disabled="user.roleName!='ADMIN' && scope.row.username!=user.userName"/>
+          </el-tooltip>
+          <el-tooltip content="配置比较" effect="dark" placement="top">
+            <el-button circle :icon="ZoomIn" type="primary" size="small" @click="router.push({path:'/config/compare',query:scope.row})" :disabled="user.roleName!='ADMIN' && scope.row.username!=user.userName"/>
+          </el-tooltip>
         </template>
       </el-table-column>
       <el-table-column prop="username" label="创建者" :show-overflow-tooltip="true" header-align="center"
