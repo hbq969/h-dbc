@@ -36,12 +36,6 @@ spring:
         enabled: true
       api-safe:
         enabled: false
-        include-path-patterns:
-          - /hbq969-common/**
-          - /hbq969-dict/**
-          - /hbq969-tabula/**
-        header-name: api-safe-token
-        header-value-regex: ENC(3nSTj512SWemElbk1rzkLVrcoUntPtEQCv5HCi7ZevwSYx5ik+af4tRrGQdXc/c39LrqIWff8CQSv+APj3YQ9umBRQRSLxb6autlhZYa5d4=)
       resource-handler-registry:
         entries:
           - handlers: /hbq969-common/**
