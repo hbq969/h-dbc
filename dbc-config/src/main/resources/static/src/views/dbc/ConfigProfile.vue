@@ -252,23 +252,31 @@ const _ = (window as any).ResizeObserver;
             <div style="flex: 1; display: flex; justify-content: flex-end">
               <el-popconfirm title="确认清空此环境配置?" confirm-button-type="danger" @confirm="deleteConfig(source)">
                 <template #reference>
-                  <el-button type="info" size="small" circle :icon="Delete"/>
+                  <el-button type="info" size="small" circle :icon="Delete" title="清空配置"/>
                 </template>
               </el-popconfirm>
               <el-badge :value="0" style="margin-left: 12px" type="danger" :max="500" :hidden="true">
-                <el-button type="warning" size="small" :icon="UploadFilled" circle
-                           @click="showConfigImportDialog(source)"/>
+                <el-tooltip content="导入配置" effect="dark" placement="top">
+                  <el-button type="warning" size="small" :icon="UploadFilled" circle
+                             @click="showConfigImportDialog(source)"/>
+                </el-tooltip>
               </el-badge>
               <el-badge :value="0" style="margin-left: 12px" type="danger" :max="500" :hidden="true">
-                <el-button type="success" size="small" :icon="Download" circle
-                           @click="showConfigDownloadDialog(source)"/>
+                <el-tooltip content="下载配置" effect="dark" placement="top">
+                  <el-button type="success" size="small" :icon="Download" circle
+                             @click="showConfigDownloadDialog(source)"/>
+                </el-tooltip>
               </el-badge>
               <el-badge :value="0" style="margin-left: 12px" type="danger" :max="500" :hidden="true">
-                <el-button type="primary" size="small" circle :icon="DocumentCopy" @click="goConfigFile(source)"/>
+                <el-tooltip content="查看YAML" effect="dark" placement="top">
+                  <el-button type="primary" size="small" circle :icon="DocumentCopy" @click="goConfigFile(source)"/>
+                </el-tooltip>
               </el-badge>
               <el-badge :value="source.configNum" style="margin-left: 12px" type="danger" :max="500"
                         :hidden="source.configNum==0">
-                <el-button type="success" size="small" circle :icon="Grid" @click="goConfigList(source)"/>
+                <el-tooltip content="查看Properties" effect="dark" placement="top">
+                  <el-button type="success" size="small" circle :icon="Grid" @click="goConfigList(source)"/>
+                </el-tooltip>
               </el-badge>
             </div>
           </div>

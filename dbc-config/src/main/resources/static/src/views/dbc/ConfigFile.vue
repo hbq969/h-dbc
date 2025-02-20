@@ -52,7 +52,7 @@ const queryConfigFile = () => {
     data: router.currentRoute.value.query
   }).then((res: any) => {
     if (res.data.state == 'OK') {
-      if (res.data.body) {
+      if (res.data.body && res.data.body.fileContent) {
         data.configFile = res.data.body
         initialEditor()
       } else {
@@ -64,6 +64,7 @@ const queryConfigFile = () => {
       initialEditor()
     }
   }).catch((err: Error) => {
+    console.log('', err)
     msg('请求异常', 'error')
   })
 }
@@ -77,7 +78,7 @@ const initialEditor = () => {
       theme: 'vs-dark',
     });
 
-    editor?.setValue(data.configFile.fileContent)
+    editor?.setValue(data.configFile.fileContent ? data.configFile.fileContent : '')
 
     // 创建 DiffEditor
     const diffEditor = monaco.editor.createDiffEditor(diffEditorContainer.value, {
@@ -98,26 +99,26 @@ const initialEditor = () => {
       const modifiedValue = editor.getValue();
       modifiedModel.setValue(modifiedValue);
       let originalContent = originalModel.getValue()
-      if(!originalContent || originalContent.trim()==''){
+      if (!originalContent || originalContent.trim() == '') {
         originalModel.setValue(modifiedValue)
       }
     });
   }
 }
-const backup=ref('N')
+const backup = ref('N')
 const saveConfigFile = () => {
   let content = editor?.getValue()
   if (!content || content.trim() == '') {
     ElMessageBox.alert('配置文件内容不能为空', '标题', {
       confirmButtonText: 'OK',
-      type:'warning',
+      type: 'warning',
       showClose: false
     })
     return
   }
   let form = router.currentRoute.value.query
   form.fileContent = content
-  form.backup=backup.value
+  form.backup = backup.value
   axios({
     url: '/config/file',
     method: 'post',
@@ -126,7 +127,7 @@ const saveConfigFile = () => {
     if (res.data.state == 'OK') {
       ElMessageBox.alert(res.data.body, '标题', {
         confirmButtonText: 'OK',
-        type:'warning',
+        type: 'warning',
         showClose: false
       })
       originalModel.setValue(form.fileContent)
