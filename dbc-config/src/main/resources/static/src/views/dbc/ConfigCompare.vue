@@ -9,6 +9,9 @@ import type {FormInstance, FormRules} from 'element-plus'
 import router from "@/router";
 import * as monaco from 'monaco-editor';
 import {ITextModel} from "monaco-editor";
+import {getLangData} from "@/i18n/locale";
+
+const langData = getLangData()
 
 const diffEditorContainer = ref<HTMLElement | null>(null);
 let diffEditor: monaco.editor.IStandaloneCodeEditor | null = null;
@@ -67,10 +70,12 @@ const queryAllProfileList = () => {
         queryConfigFile(profile2Model,form.profile2)
       }
     } else {
-      msg(res.data.errorMessage, 'warning')
+      let content = res.config.baseURL+res.config.url+': '+res.data.errorMessage;
+      msg(content, "warning")
     }
   }).catch((err: Error) => {
-    msg('请求异常', 'error')
+    console.log('',err)
+    msg(langData.axiosRequestErr, 'error')
   })
 }
 
@@ -89,15 +94,16 @@ const queryConfigFile = (model: ITextModel, profileName) => {
       if (res.data.body && res.data.body.fileContent) {
         file = res.data.body
       } else {
-        msg('无配置数据', 'info')
+        msg(langData.configFileNoConfigData, 'info')
       }
       model.setValue(file.fileContent)
     } else {
-      msg(res.data.errorMessage, 'warning')
+      let content = res.config.baseURL+res.config.url+': '+res.data.errorMessage;
+      msg(content, "warning")
     }
   }).catch((err: Error) => {
     console.log('', err)
-    msg('请求异常', 'error')
+    msg(langData.axiosRequestErr, 'error')
   })
 }
 
@@ -139,7 +145,7 @@ const _ = (window as any).ResizeObserver;
   <div class="container">
     <el-page-header :icon="ArrowLeft" @back="router.back()">
       <template #content>
-        <span class="text-large font-600 mr-3"> 配置比较 </span>
+        <span class="text-large font-600 mr-3"> {{langData.configCompareHeaderTitle}} </span>
       </template>
     </el-page-header>
     <el-divider content-position="left"></el-divider>

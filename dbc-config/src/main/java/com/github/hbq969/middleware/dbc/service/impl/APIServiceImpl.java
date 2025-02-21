@@ -5,6 +5,7 @@ import com.github.hbq969.code.common.spring.context.SpringContext;
 import com.github.hbq969.middleware.dbc.dao.APIDao;
 import com.github.hbq969.middleware.dbc.dao.entity.ConfigEntity;
 import com.github.hbq969.middleware.dbc.model.APIModel;
+import com.github.hbq969.middleware.dbc.model.ConfigModel;
 import com.github.hbq969.middleware.dbc.service.APIService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,5 +31,13 @@ public class APIServiceImpl implements APIService {
         return ces.stream()
                 .map(e -> new Pair(e.getConfigKey(), e.getConfigValue()))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Pair getConfigValue(ConfigModel model) {
+        model.setApp(context.getProperty("spring.application.name"));
+        ConfigEntity entity = apiDao.queryConfig(model);
+        return entity == null ? new Pair(model.getConfigKey(), null) :
+                new Pair(model.getConfigKey(), entity.getConfigValue());
     }
 }

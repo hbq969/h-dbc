@@ -103,22 +103,24 @@ public class ConfigServiceImpl implements ConfigService {
     @Override
     public void batchUpdateConfig(List<ServiceConfigEntity> rows) {
         Assert.notNull(rows, "批量更新的配置为空");
-        String sql = "update h_dbc_config set config_value=? where app=? and username=? and service_id=? and profile_name=? and config_key=?";
+        String sql = "update h_dbc_config set config_value=?, updated_at=? where app=? and username=? and service_id=? and profile_name=? and config_key=?";
         String app = context.getProperty("spring.application.name");
         log.info("批量更新配置, {}, [username,serviceId,profileName,configKey,configValue] => {}",
                 sql, rows.stream()
                         .map(r -> String.join(",", r.getUsername(), r.getServiceId(), r.getProfileName(), r.getConfigKey(), r.getConfigValue()))
                         .collect(Collectors.toList()));
+        long updatedAt = FormatTime.nowSecs();
         context.getBean(JdbcTemplate.class).batchUpdate(sql, new BatchPreparedStatementSetter() {
             @Override
             public void setValues(PreparedStatement ps, int i) throws SQLException {
                 ServiceConfigEntity row = rows.get(i);
                 ps.setString(1, row.getConfigValue());
-                ps.setString(2, app);
-                ps.setString(3, UserContext.get().isAdmin() ? row.getUsername() : UserContext.get().getUserName());
-                ps.setString(4, row.getServiceId());
-                ps.setString(5, row.getProfileName());
-                ps.setString(6, row.getConfigKey());
+                ps.setLong(2, updatedAt);
+                ps.setString(3, app);
+                ps.setString(4, UserContext.get().isAdmin() ? row.getUsername() : UserContext.get().getUserName());
+                ps.setString(5, row.getServiceId());
+                ps.setString(6, row.getProfileName());
+                ps.setString(7, row.getConfigKey());
             }
 
             @Override

@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-  Edit, ArrowLeft, Delete, Grid, DocumentCopy, UploadFilled, Download
+  Edit, ArrowLeft, Delete, Grid, DocumentCopy, UploadFilled, Download, CopyDocument
 } from '@element-plus/icons-vue'
 import {ref, reactive, onMounted, computed, provide, inject} from 'vue'
 import axios from '@/network'
@@ -8,6 +8,9 @@ import {msg} from '@/utils/Utils'
 import {ElMessage, ElMessageBox} from 'element-plus'
 import type {FormInstance, FormRules, UploadInstance} from 'element-plus'
 import router from "@/router";
+import {getLangData} from "@/i18n/locale";
+
+const langData = getLangData()
 
 onMounted(() => {
   queryAllProfileList()
@@ -44,10 +47,12 @@ const queryAllProfileList = () => {
     if (res.data.state == 'OK') {
       data.profileList = res.data.body
     } else {
-      msg(res.data.errorMessage, 'warning')
+      let content = res.config.baseURL+res.config.url+': '+res.data.errorMessage;
+      msg(content, "warning")
     }
   }).catch((err: Error) => {
-    msg('请求异常', 'error')
+    console.log('',err)
+    msg(langData.axiosRequestErr, 'error')
   })
 }
 
@@ -65,10 +70,12 @@ const deleteConfig = (source) => {
       msg(res.data.body, 'success')
       queryAllProfileList()
     } else {
-      msg(res.data.errorMessage, 'warning')
+      let content = res.config.baseURL+res.config.url+': '+res.data.errorMessage;
+      msg(content, "warning")
     }
   }).catch((err: Error) => {
-    msg('请求异常', 'error')
+    console.log('',err)
+    msg(langData.axiosRequestErr, 'error')
   })
 }
 
@@ -93,7 +100,7 @@ const goConfigFile = (source) => {
 }
 
 const dialogFormVisible2 = ref(false)
-const dialogTitle2 = ref('导入配置')
+const dialogTitle2 = ref(langData.configProfileImport)
 const importForm = reactive({
   file: null,
   cover: 'N',
@@ -113,7 +120,7 @@ const fileRemove = (uploadFile: UploadFile) => {
 }
 const configImport = () => {
   if (importForm.file == null) {
-    ElMessageBox.alert('请先选择导入的文件', '标题', {
+    ElMessageBox.alert(langData.configProfileImportAlert, langData.msgBoxTitle, {
       confirmButtonText: 'OK',
       type: 'warning',
       showClose: false
@@ -141,11 +148,13 @@ const configImport = () => {
       uploadRef.value!.clearFiles()
       queryAllProfileList()
     } else {
-      msg(res.data.errorMessage, 'warning')
+      let content = res.config.baseURL+res.config.url+': '+res.data.errorMessage;
+      msg(content, "warning")
       uploadRef.value!.clearFiles()
     }
   }).catch((err: Error) => {
-    msg('请求异常', 'error')
+    console.log('',err)
+    msg(langData.axiosRequestErr, 'error')
     uploadRef.value!.clearFiles()
   })
 }
@@ -159,7 +168,7 @@ const showConfigImportDialog = (source) => {
 }
 
 const dialogFormVisible3 = ref(false)
-const dialogTitle3 = ref('下载配置')
+const dialogTitle3 = ref(langData.configProfileDialog3Title)
 const downForm = reactive({
   serviceId: '',
   username: '',
@@ -206,7 +215,27 @@ const downFile = (fileSuffix) => {
       // }
     }
   }).catch((err: Error) => {
-    msg('请求异常', 'error')
+    msg(langData.axiosRequestErr, 'error')
+  })
+}
+
+const backupConfig = (source) => {
+  source.username = router.currentRoute.value.query.username
+  source.serviceId = router.currentRoute.value.query.serviceId
+  axios({
+    url: '/config/backup',
+    method: 'post',
+    data: source
+  }).then((res: any) => {
+    if (res.data.state == 'OK') {
+      msg(res.data.body, 'success')
+    } else {
+      let content = res.config.baseURL+res.config.url+': '+res.data.errorMessage;
+      msg(content, "warning")
+    }
+  }).catch((err: Error) => {
+    console.log('',err)
+    msg(langData.axiosRequestErr, 'error')
   })
 }
 
@@ -235,7 +264,7 @@ const _ = (window as any).ResizeObserver;
   <div class="container">
     <el-page-header :icon="ArrowLeft" @back="router.push({path:'/service'})">
       <template #content>
-        <span class="text-large font-600 mr-3"> 配置管理，创建者：{{ router.currentRoute.value.query.username }}，服务名：{{
+        <span class="text-large font-600 mr-3"> {{langData.configProfileHeaderCreator}}：{{ router.currentRoute.value.query.username }}，{{langData.configProfileHeaderServiceName}}：{{
             router.currentRoute.value.query.serviceName
           }}</span>
       </template>
@@ -243,38 +272,46 @@ const _ = (window as any).ResizeObserver;
     <el-divider content-position="left"></el-divider>
 
     <el-space wrap>
-      <el-card style="max-width: 280px;height: 220px;" v-for="(source,index) in data.profileList">
+      <el-card style="max-width: 300px;height: 220px;" v-for="(source,index) in data.profileList">
         <template #header="scope">
           <div class="card-header" style="display: flex; align-items: center; justify-content: space-between">
             <div style="margin-top: 5px;text-align: center;flex: 1;display: flex; justify-content: left">
               <component is="MenuIcon"/>
             </div>
             <div style="flex: 1; display: flex; justify-content: flex-end">
-              <el-popconfirm title="确认清空此环境配置?" confirm-button-type="danger" @confirm="deleteConfig(source)">
+              <el-popconfirm :title="langData.confirmOpera" confirm-button-type="danger" @confirm="deleteConfig(source)">
                 <template #reference>
-                  <el-button type="info" size="small" circle :icon="Delete" title="清空配置"/>
+                  <el-button type="info" size="small" circle :icon="Delete" :title="langData.configProfileClearConfig"/>
                 </template>
               </el-popconfirm>
               <el-badge :value="0" style="margin-left: 12px" type="danger" :max="500" :hidden="true">
-                <el-tooltip content="导入配置" effect="dark" placement="top">
+                <el-tooltip :content="langData.configProfileImport" effect="dark" placement="top">
                   <el-button type="warning" size="small" :icon="UploadFilled" circle
                              @click="showConfigImportDialog(source)"/>
                 </el-tooltip>
               </el-badge>
               <el-badge :value="0" style="margin-left: 12px" type="danger" :max="500" :hidden="true">
-                <el-tooltip content="下载配置" effect="dark" placement="top">
+                <el-tooltip :content="langData.configProfileDialog3Title" effect="dark" placement="top">
                   <el-button type="success" size="small" :icon="Download" circle
                              @click="showConfigDownloadDialog(source)"/>
                 </el-tooltip>
               </el-badge>
               <el-badge :value="0" style="margin-left: 12px" type="danger" :max="500" :hidden="true">
-                <el-tooltip content="查看YAML" effect="dark" placement="top">
+                <el-tooltip :content="langData.configProfileDetailYaml" effect="dark" placement="top">
                   <el-button type="primary" size="small" circle :icon="DocumentCopy" @click="goConfigFile(source)"/>
                 </el-tooltip>
               </el-badge>
+              <el-badge :value="0" style="margin-left: 12px" type="danger" :max="500" :hidden="true">
+                <el-popconfirm :title="langData.confirmOpera" confirm-button-type="warning"
+                               @confirm="backupConfig(source)">
+                  <template #reference>
+                    <el-button type="warning" size="small" circle :icon="CopyDocument" :title="langData.configProfileBackupConfig"/>
+                  </template>
+                </el-popconfirm>
+              </el-badge>
               <el-badge :value="source.configNum" style="margin-left: 12px" type="danger" :max="500"
                         :hidden="source.configNum==0">
-                <el-tooltip content="查看Properties" effect="dark" placement="top">
+                <el-tooltip :content="langData.configProfileDetailProperties" effect="dark" placement="top">
                   <el-button type="success" size="small" circle :icon="Grid" @click="goConfigList(source)"/>
                 </el-tooltip>
               </el-badge>
@@ -283,11 +320,11 @@ const _ = (window as any).ResizeObserver;
         </template>
         <template #default="scope">
           <el-form size="small" label-position="right" inline-message :inline="false" label-width="100px"
-                   style="width:240px">
-            <el-form-item label="环境名称：">
+                   style="width:260px">
+            <el-form-item :label="langData.configProfileProfileName">
               {{ source.profileName }}
             </el-form-item>
-            <el-form-item label="环境描述：">
+            <el-form-item :label="langData.configProfileProfileDesc">
               {{ source.profileDesc }}
             </el-form-item>
           </el-form>
@@ -316,40 +353,40 @@ const _ = (window as any).ResizeObserver;
               <upload-filled/>
             </el-icon>
             <div class="el-upload__text">
-              拖动文件到这里 或 <em>点击上传图标</em>
+              {{langData.configProfileUploadTips1Prefix}} <em> {{langData.configProfileUploadTips1Suffix}} </em>
             </div>
             <template #tip>
               <div class="el-upload__tip">
-                支持文件格式: yml、yaml、properties，文件大小最大1mb
+                {{langData.configProfileUploadTips2}}
               </div>
             </template>
           </el-upload>
         </div>
         <br/>
-        <el-form-item label="是否覆盖" prop="cover" label-width="80">
+        <el-form-item :label="langData.configProfileIfCover" prop="cover" label-width="80">
           <el-switch
               v-model="importForm.cover"
               inline-prompt
-              active-text="是"
-              inactive-text="否"
+              :active-text="langData.switchYes"
+              :inactive-text="langData.switchNo"
               active-value="Y"
               inactive-value="N"
               @change="importForm.cover=='Y'?importForm.backup='Y':importForm.backup='N'"
           />
         </el-form-item>
-        <el-form-item label="是否备份" prop="cover" label-width="80">
+        <el-form-item :label="langData.configProfileIfBackup" prop="backup" label-width="80">
           <el-switch
               v-model="importForm.backup"
               inline-prompt
-              active-text="是"
-              inactive-text="否"
+              :active-text="langData.switchYes"
+              :inactive-text="langData.switchNo"
               active-value="Y"
               inactive-value="N"
           />
         </el-form-item>
-        <el-form-item label-width="73%">
-          <el-button @click="dialogFormVisible2 = false">取消</el-button>
-          <el-button type="primary" @click="configImport()">保存</el-button>
+        <el-form-item label-width="60%">
+          <el-button @click="dialogFormVisible2 = false">{{langData.btnCancel}}</el-button>
+          <el-button type="primary" @click="configImport()">{{langData.btnSave}}</el-button>
         </el-form-item>
       </el-form>
     </el-dialog>
@@ -361,7 +398,7 @@ const _ = (window as any).ResizeObserver;
       </div>
       <template #footer>
             <span class="dialog-footer">
-              <el-button @click="dialogFormVisible3 = false">取消</el-button>
+              <el-button @click="dialogFormVisible3 = false">{{langData.btnCancel}}</el-button>
             </span>
       </template>
     </el-dialog>

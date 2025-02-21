@@ -2,9 +2,14 @@ package com.github.hbq969.middleware.dbc.service.impl;
 
 import cn.hutool.core.lang.UUID;
 import com.github.hbq969.code.common.spring.context.SpringContext;
+import com.github.hbq969.code.common.spring.i18n.LangInfo;
+import com.github.hbq969.code.common.spring.i18n.LanguageChangeListener;
+import com.github.hbq969.code.common.spring.i18n.LanguageEvent;
 import com.github.hbq969.code.common.utils.FormatTime;
+import com.github.hbq969.code.common.utils.GsonUtils;
 import com.github.hbq969.code.common.utils.InitScriptUtils;
 import com.github.hbq969.code.dict.service.api.impl.MapDictHelperImpl;
+import com.github.hbq969.code.sm.login.event.SMInfoEvent;
 import com.github.hbq969.code.sm.login.service.LoginService;
 import com.github.hbq969.code.sm.login.session.UserContext;
 import com.github.hbq969.middleware.dbc.dao.ServiceDao;
@@ -16,15 +21,20 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.ApplicationEventPublisherAware;
+import org.springframework.context.event.EventListener;
 
 import java.util.List;
+import java.util.Locale;
 
 @org.springframework.stereotype.Service("dbc-ServiceImpl")
 @Slf4j
-public class ServiceImpl implements Service, InitializingBean {
+public class ServiceImpl implements Service, InitializingBean, LanguageChangeListener, ApplicationEventPublisherAware {
 
     @Autowired
     private ServiceDao serviceDao;
@@ -42,12 +52,53 @@ public class ServiceImpl implements Service, InitializingBean {
     @Qualifier("dbc-BackupProxyImpl")
     private BackupService backupService;
 
+    private ApplicationEventPublisher eventCenter;
+
+    @Override
+    public void setApplicationEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
+        this.eventCenter = applicationEventPublisher;
+    }
+
     @Override
     public void afterPropertiesSet() throws Exception {
         tableInitial();
-        if (loginService != null) {
-            loginService.finished(() -> InitScriptUtils.initial(context, "h-dbc-data.sql", () -> dict.reloadImmediately()));
+        initialScript(null);
+    }
+
+    public void initialScript(LangInfo langInfo) {
+        if (langInfo == null) {
+            log.info("h-dbc启动时，初始化脚本数据.");
+        } else {
+            log.info("h-dbc监听到语言变化通知: {}，初始化脚本数据.", GsonUtils.toJson(langInfo));
         }
+        if (loginService != null) {
+            String language = String.join("-", Locale.getDefault().getLanguage(), Locale.getDefault().getCountry());
+            String scriptFile;
+            if (StringUtils.equals("zh-CN", language)) {
+                scriptFile = "h-dbc-data.sql";
+            } else {
+                scriptFile = "h-dbc-data-" + language + ".sql";
+            }
+            loginService.finished(() -> InitScriptUtils.initial(context, scriptFile, () -> {
+                dict.reloadImmediately();
+                loginService.loadSMInfo(new SMInfoEvent("h-dbc"));
+            }));
+        }
+    }
+
+    @Override
+    public String listenerName() {
+        return "h-dbc/service";
+    }
+
+    @Override
+    public int listenerOrder() {
+        return 1;
+    }
+
+    @Override
+    public void onChange(LangInfo langInfo) {
+        initialScript(langInfo);
     }
 
     @Override

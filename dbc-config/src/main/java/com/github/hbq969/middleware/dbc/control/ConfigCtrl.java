@@ -2,6 +2,7 @@ package com.github.hbq969.middleware.dbc.control;
 
 import com.github.hbq969.code.common.restful.ReturnMessage;
 import com.github.hbq969.code.sm.login.session.UserContext;
+import com.github.hbq969.code.sm.perm.api.SMRequiresPermissions;
 import com.github.hbq969.middleware.dbc.dao.entity.ConfigEntity;
 import com.github.hbq969.middleware.dbc.dao.entity.ConfigFileEntity;
 import com.github.hbq969.middleware.dbc.dao.entity.ConfigProfileEntity;
@@ -37,6 +38,7 @@ public class ConfigCtrl {
     @ApiOperation("获取应用配置环境列表")
     @RequestMapping(path = "/profile/list", method = RequestMethod.POST)
     @ResponseBody
+    @SMRequiresPermissions(menu = "Service",apiKey = "queryConfigProfileList",apiDesc = "获取应用配置环境列表")
     public ReturnMessage<PageInfo<ConfigProfileEntity>> queryConfigProfileList(@RequestParam(name = "pageNum", defaultValue = "1") int pageNum, @RequestParam(name = "pageSize", defaultValue = "10") int pageSize, @RequestBody ConfigProfileQuery q) {
         return ReturnMessage.success(configService.queryConfigProfileList(q, pageNum, pageSize));
     }
@@ -44,6 +46,7 @@ public class ConfigCtrl {
     @ApiOperation("保存配置")
     @RequestMapping(path = "", method = RequestMethod.POST)
     @ResponseBody
+    @SMRequiresPermissions(menu = "Service",apiKey = "saveConfig",apiDesc = "保存配置")
     public ReturnMessage<?> saveConfig(@RequestBody ConfigQuery cq) {
         configService.saveConfig(cq.getAsp(), cq.getConfig());
         return ReturnMessage.success("保存成功");
@@ -52,6 +55,7 @@ public class ConfigCtrl {
     @ApiOperation("更新配置")
     @RequestMapping(path = "", method = RequestMethod.PUT)
     @ResponseBody
+    @SMRequiresPermissions(menu = "Service",apiKey = "updateConfig",apiDesc = "更新配置")
     public ReturnMessage<?> updateConfig(@RequestBody ConfigQuery cq) {
         configService.updateConfig(cq.getAsp(), cq.getConfig());
         return ReturnMessage.success("更新成功");
@@ -60,6 +64,7 @@ public class ConfigCtrl {
     @ApiOperation("批量更新配置")
     @RequestMapping(path = "/batch", method = RequestMethod.PUT)
     @ResponseBody
+    @SMRequiresPermissions(menu = "Service",apiKey = "batchUpdateConfig",apiDesc = "批量更新配置")
     public ReturnMessage<?> batchUpdateConfig(@RequestBody List<ServiceConfigEntity> rows) {
         configService.batchUpdateConfig(rows);
       return ReturnMessage.success("更新成功");
@@ -68,6 +73,7 @@ public class ConfigCtrl {
     @ApiOperation("删除配置")
     @RequestMapping(path = "", method = RequestMethod.DELETE)
     @ResponseBody
+    @SMRequiresPermissions(menu = "Service",apiKey = "deleteConfig",apiDesc = "删除配置")
     public ReturnMessage<?> deleteConfig(@RequestBody ConfigQuery cq) {
         configService.deleteConfig(cq.getAsp(), cq.getConfig());
         return ReturnMessage.success("删除成功");
@@ -76,6 +82,7 @@ public class ConfigCtrl {
     @ApiOperation("批量删除配置")
     @RequestMapping(path = "/batch", method = RequestMethod.DELETE)
     @ResponseBody
+    @SMRequiresPermissions(menu = "Service",apiKey = "batchDeleteConfig",apiDesc = "批量删除配置")
     public ReturnMessage<?> batchDeleteConfig(@RequestBody List<ServiceConfigEntity> rows) {
         configService.batchDeleteConfig(rows);
       return ReturnMessage.success("删除成功");
@@ -84,6 +91,7 @@ public class ConfigCtrl {
     @ApiOperation("批量删除配置")
     @RequestMapping(path = "/multiple", method = RequestMethod.DELETE)
     @ResponseBody
+    @SMRequiresPermissions(menu = "Service",apiKey = "deleteConfigMultiple",apiDesc = "批量删除配置")
     public ReturnMessage<?> deleteConfigMultiple(@RequestBody DeleteConfigMultiple dcm) {
         configService.deleteConfigMultiple(dcm);
         return ReturnMessage.success("删除成功");
@@ -92,6 +100,7 @@ public class ConfigCtrl {
     @ApiOperation("分页查询配置列表")
     @RequestMapping(path = "/list", method = RequestMethod.POST)
     @ResponseBody
+    @SMRequiresPermissions(menu = "Service",apiKey = "queryConfigPageList",apiDesc = "分页查询配置列表")
     public ReturnMessage<PageInfo<ConfigEntity>> queryConfigList(@RequestParam(name = "pageNum", defaultValue = "1") int pageNum, @RequestParam(name = "pageSize", defaultValue = "10") int pageSize, @RequestBody ConfigQuery cq) {
         return ReturnMessage.success(configService.queryConfigList(cq.getAsp(), cq.getConfig(), pageNum, pageSize));
     }
@@ -99,6 +108,7 @@ public class ConfigCtrl {
     @ApiOperation("导入配置")
     @RequestMapping(path = "/import", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseBody
+    @SMRequiresPermissions(menu = "Service",apiKey = "configImport",apiDesc = "导入配置")
     public ReturnMessage<?> configImport(
             @RequestParam("username") String username,
             @RequestParam("serviceId") String serviceId,
@@ -121,6 +131,7 @@ public class ConfigCtrl {
     @ApiOperation("查询yml配置文件信息")
     @RequestMapping(path = "/file/info", method = RequestMethod.POST)
     @ResponseBody
+    @SMRequiresPermissions(menu = "Service",apiKey = "getConfigFile",apiDesc = "查询yml配置文件信息")
     public ReturnMessage<ConfigFileEntity> getConfigFile(@RequestBody AccountServiceProfile asp) {
         return ReturnMessage.success(configService.queryConfigFile(asp));
     }
@@ -128,6 +139,7 @@ public class ConfigCtrl {
     @ApiOperation("更新yml配置文件信息")
     @RequestMapping(path = "/file", method = RequestMethod.POST)
     @ResponseBody
+    @SMRequiresPermissions(menu = "Service",apiKey = "updateConfigFile",apiDesc = "更新yml配置文件信息")
     public ReturnMessage<?> updateConfigFile(@RequestBody ConfigFileEntity cfe) {
         configService.updateConfigFile(cfe);
         return ReturnMessage.success("更新成功");
@@ -135,6 +147,7 @@ public class ConfigCtrl {
 
     @ApiOperation("下载配置文件")
     @RequestMapping(path = "/download", method = RequestMethod.POST)
+    @SMRequiresPermissions(menu = "Service",apiKey = "downFile",apiDesc = "下载配置文件")
     public void downFile(HttpServletResponse response, @RequestBody DownFile downFile) {
         configService.downFile(response, downFile);
     }
@@ -142,6 +155,7 @@ public class ConfigCtrl {
     @ApiOperation("精确查询账号下所有服务的指定配置")
     @RequestMapping(path = "/list/services", method = RequestMethod.POST)
     @ResponseBody
+    @SMRequiresPermissions(menu = "Service",apiKey = "queryAllProfilesThisConfig",apiDesc = "精确查询账号下所有服务的指定配置")
     public ReturnMessage<List<ServiceConfigEntity>> queryAllProfilesThisConfig(@RequestBody Map map) {
         return ReturnMessage.success(configService.queryAllProfilesThisConfig(map));
     }
@@ -149,6 +163,7 @@ public class ConfigCtrl {
     @ApiOperation("备份配置")
     @RequestMapping(path = "/backup", method = RequestMethod.POST)
     @ResponseBody
+    @SMRequiresPermissions(menu = "Service",apiKey = "backup",apiDesc = "备份配置")
     public ReturnMessage<?> backup(@RequestBody AccountServiceProfile asp) {
         configService.backup(asp);
       return ReturnMessage.success("备份成功");

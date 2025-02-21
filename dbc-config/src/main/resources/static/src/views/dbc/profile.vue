@@ -7,6 +7,9 @@ import axios from '@/network'
 import {msg} from '@/utils/Utils'
 import type {FormInstance, FormRules} from 'element-plus'
 import router from "@/router";
+import {getLangData} from "@/i18n/locale";
+
+const langData = getLangData()
 
 const user = reactive({
   userName: '',
@@ -21,10 +24,12 @@ const getUserInfo = () => {
       user.userName = res.data.body.userName
       user.roleName = res.data.body.roleName
     } else {
-      msg(res.data.errorMessage, 'warning')
+      let content = res.config.baseURL+res.config.url+': '+res.data.errorMessage;
+      msg(content, "warning")
     }
   }).catch((err: Error) => {
-    msg('请求异常', 'error')
+    console.log('',err)
+    msg(langData.axiosRequestErr, 'error')
   })
 }
 
@@ -63,15 +68,17 @@ const queryProfileList = () => {
       data.total = res.data.body.total
       data.profileList = res.data.body.list
     } else {
-      msg(res.data.errorMessage, 'warning')
+      let content = res.config.baseURL+res.config.url+': '+res.data.errorMessage;
+      msg(content, "warning")
     }
   }).catch((err: Error) => {
-    msg('请求异常', 'error')
+    console.log('',err)
+    msg(langData.axiosRequestErr, 'error')
   })
 }
 
 const dialogFormVisible = ref(false)
-const dialogTitle = ref('新增环境')
+const dialogTitle = ref(langData.dialogTitleAdd)
 const profileForm = reactive({
   username: '',
   profileName: '',
@@ -79,18 +86,18 @@ const profileForm = reactive({
 })
 const profileRef = ref<FormInstance>();
 const profileRules = reactive<FormRules>({
-  profileName: [{required: true, message: '不能为空', trigger: 'blur'}],
+  profileName: [{required: true, message: langData.formValidateNotNull, trigger: 'blur'}],
 })
 const showProfileAddDialog = () => {
   dialogFormVisible.value = true
-  dialogTitle.value = '新增环境'
+  dialogTitle.value = langData.dialogTitleAdd
   profileForm.username = ''
   profileForm.profileName = ''
   profileForm.profileDesc = ''
 }
 const showProfileEditDialog = (scope) => {
   dialogFormVisible.value = true
-  dialogTitle.value = '编辑环境'
+  dialogTitle.value = langData.dialogTitleEdit
   profileForm.username = scope.row.username
   profileForm.profileName = scope.row.profileName
   profileForm.profileDesc = scope.row.profileDesc
@@ -101,17 +108,19 @@ const updateProfile = async (formEl: FormInstance | undefined) => {
     if (valid) {
       axios({
         url: '/profile',
-        method: dialogTitle.value == '新增环境' ? 'post' : 'put',
+        method: dialogTitle.value == langData.dialogTitleAdd ? 'post' : 'put',
         data: profileForm,
       }).then((res: any) => {
         if (res.data.state == 'OK') {
           dialogFormVisible.value = false
           queryProfileList()
         } else {
-          msg(res.data.errorMessage, 'warning')
+          let content = res.config.baseURL+res.config.url+': '+res.data.errorMessage;
+          msg(content, "warning")
         }
       }).catch((err: Error) => {
-        msg('请求异常', 'error')
+        console.log('',err)
+        msg(langData.axiosRequestErr, 'error')
       })
     }
   })
@@ -129,10 +138,12 @@ const deleteProfile = (scope) => {
     if (res.data.state == 'OK') {
       queryProfileList()
     } else {
-      msg(res.data.errorMessage, 'warning')
+      let content = res.config.baseURL+res.config.url+': '+res.data.errorMessage;
+      msg(content, "warning")
     }
   }).catch((err: Error) => {
-    msg('请求异常', 'error')
+    console.log('',err)
+    msg(langData.axiosRequestErr, 'error')
   })
 }
 
@@ -148,10 +159,12 @@ const backup = (scope) => {
     if (res.data.state == 'OK') {
       msg(res.data.body, 'success')
     } else {
-      msg(res.data.errorMessage, 'warning')
+      let content = res.config.baseURL+res.config.url+': '+res.data.errorMessage;
+      msg(content, "warning")
     }
   }).catch((err: Error) => {
-    msg('请求异常', 'error')
+    console.log('',err)
+    msg(langData.axiosRequestErr, 'error')
   })
 }
 
@@ -163,10 +176,12 @@ const backupAll=()=>{
     if (res.data.state == 'OK') {
       msg(res.data.body, 'success')
     } else {
-      msg(res.data.errorMessage, 'warning')
+      let content = res.config.baseURL+res.config.url+': '+res.data.errorMessage;
+      msg(content, "warning")
     }
   }).catch((err: Error) => {
-    msg('请求异常', 'error')
+    console.log('',err)
+    msg(langData.axiosRequestErr, 'error')
   })
 }
 
@@ -194,54 +209,54 @@ const _ = (window as any).ResizeObserver;
 <template>
   <div class="container">
     <el-form :model="form" size="small" label-position="right" inline-message inline>
-      <el-form-item label="环境名称" prop="profileName">
-        <el-input v-model="form.profileName" placeholder="请输入..." type="text" clearable/>
+      <el-form-item :label="langData.tableHeaderName" prop="profileName">
+        <el-input v-model="form.profileName" :placeholder="langData.formInputPlaceholder" type="text" clearable/>
       </el-form-item>
-      <el-form-item label="环境描述" prop="profileDesc">
-        <el-input v-model="form.profileDesc" placeholder="请输入..." type="text" clearable/>
+      <el-form-item :label="langData.tableHeaderDesc" prop="profileDesc">
+        <el-input v-model="form.profileDesc" :placeholder="langData.formInputPlaceholder" type="text" clearable/>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" size="small" @click="queryProfileList()" :icon="Search">查询</el-button>
-        <el-popconfirm title="此操作会备份所有配置，是否确认此操作?" confirm-button-type="warning" @confirm="backupAll">
+        <el-button type="primary" size="small" @click="queryProfileList()" :icon="Search">{{langData.btnSearch}}</el-button>
+        <el-popconfirm :title="langData.profileFormBackupAllTips" confirm-button-type="warning" @confirm="backupAll">
           <template #reference>
-            <el-button type="success" size="small" v-if="user.roleName=='ADMIN'" :icon="CopyDocument">全量备份</el-button>
+            <el-button type="success" size="small" v-if="user.roleName=='ADMIN'" :icon="CopyDocument">{{langData.profileFormBackupAll}}</el-button>
           </template>
         </el-popconfirm>
-        <el-button type="success" :icon="EditPen" @click="showProfileAddDialog()" v-if="user.roleName=='ADMIN'">新增环境</el-button>
+        <el-button type="success" :icon="EditPen" @click="showProfileAddDialog()" v-if="user.roleName=='ADMIN'">{{langData.btnAdd}}</el-button>
       </el-form-item>
     </el-form>
 
     <el-table :data="data.profileList" style="width: 100%" :border="true" table-layout="fixed" :stripe="true"
               size="small" :highlight-current-row="true" :header-cell-style="headerCellStyle">
-      <el-table-column fixed="left" label="操作" width="180" header-align="center" align="center"
+      <el-table-column fixed="left" :label="langData.tableHeaderOp" width="180" header-align="center" align="center"
                        v-if="user.roleName=='ADMIN'">
         <template #default="scope">
-          <el-button circle :icon="EditPen" type="success" size="small" @click="showProfileEditDialog(scope)" title="编辑"/>
-          <el-popconfirm title="此操作会删除本环境关联的所有服务配置?" @confirm="deleteProfile(scope)"
+          <el-button circle :icon="EditPen" type="success" size="small" @click="showProfileEditDialog(scope)" :title="langData.btnEdit"/>
+          <el-popconfirm :title="langData.confirmDelete" @confirm="deleteProfile(scope)"
                          icon-color="red"
                          confirm-button-type="danger">
             <template #reference>
-              <el-button circle :icon="Delete" type="danger" size="small" title="删除"/>
+              <el-button circle :icon="Delete" type="danger" size="small" :title="langData.btnDelete"/>
             </template>
           </el-popconfirm>
-          <el-popconfirm title="此操作会备份环境下所有服务的配置，是否确认备份?" @confirm="backup(scope)"
+          <el-popconfirm :title="langData.confirmOpera" @confirm="backup(scope)"
                          icon-color="red"
                          confirm-button-type="danger">
             <template #reference>
-              <el-button circle :icon="CopyDocument" type="success" size="small" title="备份"/>
+              <el-button circle :icon="CopyDocument" type="success" size="small" :title="langData.profileTableOpBackup"/>
             </template>
           </el-popconfirm>
         </template>
       </el-table-column>
-      <el-table-column prop="profileName" label="环境名称" :show-overflow-tooltip="true" header-align="center"
+      <el-table-column prop="profileName" :label="langData.tableHeaderName" :show-overflow-tooltip="true" header-align="center"
                        align="center"/>
-      <el-table-column prop="profileDesc" label="环境描述" :show-overflow-tooltip="true" header-align="center"
+      <el-table-column prop="profileDesc" :label="langData.tableHeaderDesc" :show-overflow-tooltip="true" header-align="center"
                        align="center"/>
-      <el-table-column prop="username" label="创建账号" :show-overflow-tooltip="true" header-align="center"
+      <el-table-column prop="username" :label="langData.profileTableHeaderCreator" :show-overflow-tooltip="true" header-align="center"
                        align="center"/>
-      <el-table-column prop="fmtCreatedAt" label="创建时间" :show-overflow-tooltip="true" header-align="center"
+      <el-table-column prop="fmtCreatedAt" :label="langData.tableHeaderCreateTime" :show-overflow-tooltip="true" header-align="center"
                        align="center"/>
-      <el-table-column prop="fmtUpdatedAt" label="更新时间" :show-overflow-tooltip="true" header-align="center"
+      <el-table-column prop="fmtUpdatedAt" :label="langData.tableHeaderUpdateTime" :show-overflow-tooltip="true" header-align="center"
                        align="center"/>
     </el-table>
     <el-pagination class="page" v-model:page-size="form.pageSize" v-model:current-page="form.pageNum"
@@ -256,17 +271,17 @@ const _ = (window as any).ResizeObserver;
       <el-form :model="profileForm" label-position="right" size="small" :inline="false" ref="profileRef"
                :rules="profileRules"
                label-width="20%">
-        <el-form-item label="环境名称：" prop="profileName">
+        <el-form-item :label="langData.tableHeaderName" prop="profileName">
           <el-input v-model="profileForm.profileName" type="text" clearable/>
         </el-form-item>
-        <el-form-item label="环境描述：" prop="profileDesc">
+        <el-form-item :label="langData.tableHeaderDesc" prop="profileDesc">
           <el-input v-model="profileForm.profileDesc" type="textarea" rows="5" clearable/>
         </el-form-item>
       </el-form>
       <template #footer>
                 <span class="dialog-footer">
-                  <el-button @click="dialogFormVisible = false">取消</el-button>
-                  <el-button type="primary" @click="updateProfile(profileRef)">保存</el-button>
+                  <el-button @click="dialogFormVisible = false">{{langData.btnCancel}}</el-button>
+                  <el-button type="primary" @click="updateProfile(profileRef)">{{langData.btnSave}}</el-button>
                 </span>
       </template>
     </el-dialog>

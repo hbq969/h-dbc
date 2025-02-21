@@ -7,6 +7,9 @@ import axios from '@/network'
 import {msg} from '@/utils/Utils'
 import type {FormInstance, FormRules} from 'element-plus'
 import router from "@/router";
+import {getLangData} from "@/i18n/locale";
+
+const langData = getLangData()
 
 const user = reactive({
   userName: '',
@@ -22,10 +25,12 @@ onMounted(() => {
       user.userName = res.data.body.userName
       user.roleName = res.data.body.roleName
     } else {
-      msg(res.data.errorMessage, 'warning')
+      let content = res.config.baseURL+res.config.url+': '+res.data.errorMessage;
+      msg(content, "warning")
     }
   }).catch((err: Error) => {
-    msg('请求异常', 'error')
+    console.log('',err)
+    msg(langData.axiosRequestErr, 'error')
   })
   queryServiceList()
 });
@@ -56,15 +61,17 @@ const queryServiceList = () => {
       data.total = res.data.body.total
       data.serviceList = res.data.body.list
     } else {
-      msg(res.data.errorMessage, 'warning')
+      let content = res.config.baseURL+res.config.url+': '+res.data.errorMessage;
+      msg(content, "warning")
     }
   }).catch((err: Error) => {
-    msg('请求异常', 'error')
+    console.log('',err)
+    msg(langData.axiosRequestErr, 'error')
   })
 }
 
 const dialogFormVisible = ref(false)
-const dialogTitle = ref('新增服务')
+const dialogTitle = ref(langData.dialogTitleAdd)
 const serviceForm = reactive({
   username: '',
   serviceId: '',
@@ -73,7 +80,7 @@ const serviceForm = reactive({
 })
 const serviceRef = ref<FormInstance>();
 const serviceRules = reactive<FormRules>({
-  serviceName: [{required: true, message: '不能为空', trigger: 'blur'}],
+  serviceName: [{required: true, message: langData.formValidateNotNull, trigger: 'blur'}],
 })
 const updateService = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
@@ -81,7 +88,7 @@ const updateService = async (formEl: FormInstance | undefined) => {
     if (valid) {
       axios({
         url: '/service',
-        method: dialogTitle.value == '新增服务' ? 'post' : 'put',
+        method: dialogTitle.value == langData.dialogTitleAdd ? 'post' : 'put',
         data: serviceForm,
       }).then((res: any) => {
         if (res.data.state == 'OK') {
@@ -89,17 +96,19 @@ const updateService = async (formEl: FormInstance | undefined) => {
           dialogFormVisible.value = false
           queryServiceList()
         } else {
-          msg(res.data.errorMessage, 'warning')
+          let content = res.config.baseURL+res.config.url+': '+res.data.errorMessage;
+          msg(content, "warning")
         }
       }).catch((err: Error) => {
-        msg('请求异常', 'error')
+        console.log('',err)
+        msg(langData.axiosRequestErr, 'error')
       })
     }
   })
 }
 const showServiceAddDialog = () => {
   dialogFormVisible.value = true
-  dialogTitle.value = '新增服务'
+  dialogTitle.value = langData.dialogTitleAdd
   serviceForm.username=''
   serviceForm.serviceId = ''
   serviceForm.serviceName = ''
@@ -108,7 +117,7 @@ const showServiceAddDialog = () => {
 
 const showServiceEditDialog = (scope) => {
   dialogFormVisible.value = true
-  dialogTitle.value = '编辑服务'
+  dialogTitle.value = langData.dialogTitleEdit
   serviceForm.username=scope.row.username
   serviceForm.serviceId = scope.row.serviceId
   serviceForm.serviceName = scope.row.serviceName
@@ -129,10 +138,12 @@ const deleteService = (scope) => {
       msg(res.data.body, 'success')
       queryServiceList()
     } else {
-      msg(res.data.errorMessage, 'warning')
+      let content = res.config.baseURL+res.config.url+': '+res.data.errorMessage;
+      msg(content, "warning")
     }
   }).catch((err: Error) => {
-    msg('请求异常', 'error')
+    console.log('',err)
+    msg(langData.axiosRequestErr, 'error')
   })
 }
 
@@ -165,18 +176,18 @@ const _ = (window as any).ResizeObserver;
 <template>
   <div class="container">
     <el-form :model="form" size="small" label-position="right" inline-message inline>
-      <el-form-item label="账号名称" prop="username">
-        <el-input v-model="form.username" placeholder="请输入..." type="text" clearable/>
+      <el-form-item :label="langData.serviceFormUsername" prop="username">
+        <el-input v-model="form.username" :placeholder="langData.formInputPlaceholder" type="text" clearable/>
       </el-form-item>
-      <el-form-item label="服务名称" prop="serviceName">
-        <el-input v-model="form.serviceName" placeholder="请输入..." type="text" clearable/>
+      <el-form-item :label="langData.serviceFormServiceName" prop="serviceName">
+        <el-input v-model="form.serviceName" :placeholder="langData.formInputPlaceholder" type="text" clearable/>
       </el-form-item>
-      <el-form-item label="服务描述" prop="serviceDesc">
-        <el-input v-model="form.serviceDesc" placeholder="请输入..." type="text" clearable/>
+      <el-form-item :label="langData.serviceFormServiceDesc" prop="serviceDesc">
+        <el-input v-model="form.serviceDesc" :placeholder="langData.formInputPlaceholder" type="text" clearable/>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" size="small" @click="queryServiceList()" :icon="Search">查询</el-button>
-        <el-button type="success" :icon="EditPen" @click="showServiceAddDialog()">新增服务</el-button>
+        <el-button type="primary" size="small" @click="queryServiceList()" :icon="Search">{{langData.btnSearch}}</el-button>
+        <el-button type="success" :icon="EditPen" @click="showServiceAddDialog()">{{langData.btnAdd}}</el-button>
       </el-form-item>
     </el-form>
 
@@ -184,23 +195,23 @@ const _ = (window as any).ResizeObserver;
               size="small" :highlight-current-row="true" :header-cell-style="headerCellStyle">
       <el-table-column fixed="left" label="操作" width="180" header-align="center" align="center">
         <template #default="scope">
-          <el-button circle :icon="EditPen" title="编辑" type="success" size="small" @click="showServiceEditDialog(scope)" :disabled="user.roleName!='ADMIN' && scope.row.username!=user.userName"/>
-          <el-popconfirm title="你确定要删除本条记录吗?" @confirm="deleteService(scope)"
+          <el-button circle :icon="EditPen" :title="langData.btnEdit" type="success" size="small" @click="showServiceEditDialog(scope)" :disabled="user.roleName!='ADMIN' && scope.row.username!=user.userName"/>
+          <el-popconfirm :title="langData.confirmDelete" @confirm="deleteService(scope)"
                          icon-color="red"
                          confirm-button-type="danger">
             <template #reference>
-              <el-button circle :icon="Delete" title="删除" type="danger" size="small" :disabled="user.roleName!='ADMIN' && scope.row.username!=user.userName"/>
+              <el-button circle :icon="Delete" :title="langData.btnDelete" type="danger" size="small" :disabled="user.roleName!='ADMIN' && scope.row.username!=user.userName"/>
             </template>
           </el-popconfirm>
-          <el-tooltip content="配置管理" effect="dark" placement="top">
+          <el-tooltip :content="langData.serviceTableOpConfigManage" effect="dark" placement="top">
             <el-button circle :icon="Grid" type="success" size="small" @click="router.push({path:'/config/profile',query:scope.row})" :disabled="user.roleName!='ADMIN' && scope.row.username!=user.userName"/>
           </el-tooltip>
-          <el-tooltip content="配置比较" effect="dark" placement="top">
+          <el-tooltip :content="langData.serviceTableOpConfigCompare" effect="dark" placement="top">
             <el-button circle :icon="ZoomIn" type="primary" size="small" @click="router.push({path:'/config/compare',query:scope.row})" :disabled="user.roleName!='ADMIN' && scope.row.username!=user.userName"/>
           </el-tooltip>
         </template>
       </el-table-column>
-      <el-table-column prop="username" label="创建者" :show-overflow-tooltip="true" header-align="center"
+      <el-table-column prop="username" :label="langData.tableHeaderCreator" :show-overflow-tooltip="true" header-align="center"
                        align="center" v-if="user.roleName=='ADMIN'"/>
       <el-table-column prop="serviceId" label="服务ID" :show-overflow-tooltip="true" header-align="center"
                        align="center"/>
@@ -208,11 +219,9 @@ const _ = (window as any).ResizeObserver;
                        align="center"/>
       <el-table-column prop="serviceDesc" label="服务描述" :show-overflow-tooltip="true" header-align="center"
                        align="center"/>
-      <el-table-column prop="username" label="创建者" :show-overflow-tooltip="true" header-align="center"
+      <el-table-column prop="fmtCreatedAt" :label="langData.tableHeaderCreateTime" :show-overflow-tooltip="true" header-align="center"
                        align="center"/>
-      <el-table-column prop="fmtCreatedAt" label="创建时间" :show-overflow-tooltip="true" header-align="center"
-                       align="center"/>
-      <el-table-column prop="fmtUpdatedAt" label="修改时间" :show-overflow-tooltip="true" header-align="center"
+      <el-table-column prop="fmtUpdatedAt" :label="langData.tableHeaderUpdateTime" :show-overflow-tooltip="true" header-align="center"
                        align="center"/>
     </el-table>
     <el-pagination class="page" v-model:page-size="form.pageSize" v-model:current-page="form.pageNum"
@@ -227,17 +236,17 @@ const _ = (window as any).ResizeObserver;
   <el-dialog v-model="dialogFormVisible" :title="dialogTitle" draggable width="400px">
     <el-form :model="serviceForm" label-position="right" size="small" :inline="false" ref="serviceRef"
              :rules="serviceRules" label-width="28%">
-      <el-form-item label="服务名称：" prop="serviceName">
-        <el-input v-model="serviceForm.serviceName" type="text" clearable :disabled="dialogTitle=='编辑服务'"/>
+      <el-form-item :label="langData.serviceTableServiceName" prop="serviceName">
+        <el-input v-model="serviceForm.serviceName" type="text" clearable :disabled="dialogTitle==langData.dialogTitleEdit"/>
       </el-form-item>
-      <el-form-item label="服务描述：" prop="serviceDesc">
+      <el-form-item :label="langData.serviceTableServiceDesc" prop="serviceDesc">
         <el-input v-model="serviceForm.serviceDesc" type="textarea" rows="2" clearable/>
       </el-form-item>
     </el-form>
     <template #footer>
               <span class="dialog-footer">
-                <el-button @click="dialogFormVisible = false">取消</el-button>
-                <el-button type="primary" @click="updateService(serviceRef)">保存</el-button>
+                <el-button @click="dialogFormVisible = false">{{langData.btnCancel}}</el-button>
+                <el-button type="primary" @click="updateService(serviceRef)">{{langData.btnCancel}}</el-button>
               </span>
     </template>
   </el-dialog>

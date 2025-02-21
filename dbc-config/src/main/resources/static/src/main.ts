@@ -39,7 +39,13 @@ import ElasticsearchIcon from "@/components/icon/ElasticsearchIcon.vue";
 import HomeIcon from "@/components/icon/HomeIcon.vue";
 import yaml from "@/components/icon/yaml.vue";
 
-const zhCn = require('element-plus/dist/locale/zh-cn.min.js')
+let lang = require('element-plus/dist/locale/zh-cn.min.js')
+let language = sessionStorage.getItem('h-sm-lang') || 'zh-CN'
+if(language=='en-US'){
+    lang = require('element-plus/dist/locale/en.min.js')
+}else if(language=='ja-JP'){
+    lang = require('element-plus/dist/locale/ja.min.js')
+}
 
 const app = createApp(App)
 app.component('DashboardIcon', DashboardIcon);
@@ -76,7 +82,7 @@ app.component('ElasticsearchIcon', ElasticsearchIcon);
 app.component('HomeIcon', HomeIcon)
 app.component('yaml', yaml)
 
-app.use(ElementPlus, {locale: zhCn})
+app.use(ElementPlus, {locale: lang})
 app.use(store)
 app.use(router)
 app.mount('#app')

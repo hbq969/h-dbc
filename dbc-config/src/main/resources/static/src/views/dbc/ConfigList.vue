@@ -8,6 +8,9 @@ import {msg, notify} from '@/utils/Utils'
 import {ElMessage, ElMessageBox} from 'element-plus'
 import {FormInstance, FormRules, UploadInstance, TableInstance} from 'element-plus'
 import router from "@/router";
+import {getLangData} from "@/i18n/locale";
+
+const langData = getLangData()
 
 onMounted(() => {
   queryConfigList()
@@ -56,37 +59,39 @@ const queryConfigList = () => {
       data.total = res.data.body.total
       data.configList = res.data.body.list
     } else {
-      msg(res.data.errorMessage, 'warning')
+      let content = res.config.baseURL+res.config.url+': '+res.data.errorMessage;
+      msg(content, "warning")
     }
   }).catch((err: Error) => {
-    msg('请求异常', 'error')
+    console.log('',err)
+    msg(langData.axiosRequestErr, 'error')
   })
 }
 
 const dialogFormVisible = ref(false)
-const dialogTitle = ref('新增配置')
+const dialogTitle = ref(langData.dialogTitleAdd)
 const configForm = reactive({
   configKey: '',
   configValue: ''
 })
 const showConfigAddDialog = () => {
   dialogFormVisible.value = true
-  dialogTitle.value = '新增配置'
+  dialogTitle.value = langData.dialogTitleAdd
   configForm.configKey = ''
   configForm.configValue = ''
 }
 
 const showConfigEditDialog = (scope) => {
   dialogFormVisible.value = true
-  dialogTitle.value = '编辑配置'
+  dialogTitle.value = langData.dialogTitleEdit
   configForm.configKey = scope.row.configKey
   configForm.configValue = scope.row.configValue
 }
 
 const configFormRef = ref<FormInstance>();
 const configRules = reactive<FormRules>({
-  configKey: [{required: true, message: '不能为空', trigger: 'blur'}],
-  configValue: [{required: true, message: '不能为空', trigger: 'blur'}]
+  configKey: [{required: true, message: langData.formValidateNotNull, trigger: 'blur'}],
+  configValue: [{required: true, message: langData.formValidateNotNull, trigger: 'blur'}]
 })
 
 const updateConfig = async (formEl: FormInstance | undefined) => {
@@ -95,7 +100,7 @@ const updateConfig = async (formEl: FormInstance | undefined) => {
     if (valid) {
       axios({
         url: '/config',
-        method: dialogTitle.value == '新增配置' ? 'post' : 'put',
+        method: dialogTitle.value == langData.dialogTitleAdd ? 'post' : 'put',
         data: {
           asp: router.currentRoute.value.query,
           config: configForm
@@ -105,10 +110,12 @@ const updateConfig = async (formEl: FormInstance | undefined) => {
           dialogFormVisible.value = false
           queryConfigList()
         } else {
-          msg(res.data.errorMessage, 'warning')
+          let content = res.config.baseURL+res.config.url+': '+res.data.errorMessage;
+          msg(content, "warning")
         }
       }).catch((err: Error) => {
-        msg('请求异常', 'error')
+        console.log('',err)
+        msg(langData.axiosRequestErr, 'error')
       })
     }
   })
@@ -127,10 +134,12 @@ const deleteConfig = (scope) => {
       msg(res.data.body, 'success')
       queryConfigList()
     } else {
-      msg(res.data.errorMessage, 'warning')
+      let content = res.config.baseURL+res.config.url+': '+res.data.errorMessage;
+      msg(content, "warning")
     }
   }).catch((err: Error) => {
-    msg('请求异常', 'error')
+    console.log('',err)
+    msg(langData.axiosRequestErr, 'error')
   })
 }
 
@@ -139,7 +148,7 @@ const selectAll = ref(false)
 const deleteMultipleConfig = () => {
   let selectionRows = multipleTableRef.value?.getSelectionRows()
   if (!selectionRows || selectionRows.length == 0) {
-    ElMessageBox.alert('请选择需要删除的配置', '标题', {
+    ElMessageBox.alert(langData.configListMsgBoxAlert, langData.msgBoxTitle, {
       confirmButtonText: 'OK',
       type: 'warning',
       showClose: false
@@ -159,10 +168,12 @@ const deleteMultipleConfig = () => {
       msg(res.data.body, 'success')
       queryConfigList()
     } else {
-      msg(res.data.errorMessage, 'warning')
+      let content = res.config.baseURL+res.config.url+': '+res.data.errorMessage;
+      msg(content, "warning")
     }
   }).catch((err: Error) => {
-    msg('请求异常', 'error')
+    console.log('',err)
+    msg(langData.axiosRequestErr, 'error')
   })
 }
 
@@ -181,10 +192,12 @@ const backupConfig=()=>{
     if (res.data.state == 'OK') {
       msg(res.data.body, 'success')
     } else {
-      msg(res.data.errorMessage, 'warning')
+      let content = res.config.baseURL+res.config.url+': '+res.data.errorMessage;
+      msg(content, "warning")
     }
   }).catch((err: Error) => {
-    msg('请求异常', 'error')
+    console.log('',err)
+    msg(langData.axiosRequestErr, 'error')
   })
 }
 
@@ -213,9 +226,9 @@ const _ = (window as any).ResizeObserver;
   <div class="container">
     <el-page-header :icon="ArrowLeft" @back="goConfigProfile">
       <template #content>
-        <span class="text-large font-600 mr-3"> 配置管理，创建者：{{ router.currentRoute.value.query.username }}，服务: {{
+        <span class="text-large font-600 mr-3"> {{ langData.configProfileHeaderCreator }}：{{ router.currentRoute.value.query.username }}，{{langData.configProfileHeaderServiceName}}: {{
             router.currentRoute.value.query.serviceName
-          }}，环境: {{
+          }}，{{langData.configProfileProfileName}}: {{
             router.currentRoute.value.query.profileName
           }}({{ router.currentRoute.value.query.profileDesc }}) </span>
       </template>
@@ -223,23 +236,18 @@ const _ = (window as any).ResizeObserver;
     <el-divider content-position="left"></el-divider>
 
     <el-form :model="form" size="small" label-position="right" inline-message inline>
-      <el-form-item label="属性名称" prop="configKey">
-        <el-input v-model="form.configKey" placeholder="请输入..." type="text" clearable/>
+      <el-form-item :label="langData.configListTableConfigKey" prop="configKey">
+        <el-input v-model="form.configKey" :placeholder="langData.formInputPlaceholder" type="text" clearable/>
       </el-form-item>
-      <el-form-item label="属性值" prop="configValue">
-        <el-input v-model="form.configValue" placeholder="请输入..." type="text" clearable/>
+      <el-form-item :label="langData.configListTableConfigValue" prop="configValue">
+        <el-input v-model="form.configValue" :placeholder="langData.formInputPlaceholder" type="text" clearable/>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" size="small" @click="queryConfigList()" :icon="Search">查询</el-button>
-        <el-popconfirm title="确定要备份吗?" confirm-button-type="danger" @confirm="backupConfig()">
+        <el-button type="primary" size="small" @click="queryConfigList()" :icon="Search">{{langData.btnSearch}}</el-button>
+        <el-button type="success" :icon="EditPen" @click="showConfigAddDialog()">{{langData.btnAdd}}</el-button>
+        <el-popconfirm :title="langData.confirmDelete" confirm-button-type="danger" @confirm="deleteMultipleConfig()">
           <template #reference>
-            <el-button type="primary" :icon="CopyDocument">备份</el-button>
-          </template>
-        </el-popconfirm>
-        <el-button type="success" :icon="EditPen" @click="showConfigAddDialog()">新增配置</el-button>
-        <el-popconfirm title="确认是否批量删除这些配置?" confirm-button-type="danger" @confirm="deleteMultipleConfig()">
-          <template #reference>
-            <el-button type="danger" :icon="Delete">批量删除配置</el-button>
+            <el-button type="danger" :icon="Delete">{{langData.configListTableBatchDelete}}</el-button>
           </template>
         </el-popconfirm>
       </el-form-item>
@@ -249,28 +257,28 @@ const _ = (window as any).ResizeObserver;
               :border="true" table-layout="fixed" :stripe="true"
               size="small" :highlight-current-row="true" :header-cell-style="headerCellStyle">
       <el-table-column type="selection" header-align="center" align="center"/>
-      <el-table-column fixed="left" label="操作" width="130" header-align="center" align="center">
+      <el-table-column fixed="left" :label="langData.tableHeaderOp" width="130" header-align="center" align="center">
         <template #default="scope">
-          <el-button circle :icon="Edit" title="编辑" type="primary" size="small" @click="showConfigEditDialog(scope)"/>
-          <el-popconfirm title="你确定要删除本条记录吗?" @confirm="deleteConfig(scope)"
+          <el-button circle :icon="Edit" :title="langData.btnEdit" type="primary" size="small" @click="showConfigEditDialog(scope)"/>
+          <el-popconfirm :title="langData.confirmDelete" @confirm="deleteConfig(scope)"
                          icon-color="red"
                          confirm-button-type="danger">
             <template #reference>
-              <el-button circle :icon="Delete" title="删除" type="danger" size="small"/>
+              <el-button circle :icon="Delete" :title="langData.btnDelete" type="danger" size="small"/>
             </template>
           </el-popconfirm>
-          <el-tooltip content="批量管理" effect="dark" placement="top">
+          <el-tooltip :content="langData.configListTableBatchManage" effect="dark" placement="top">
             <el-button circle :icon="DocumentCopy" type="warning" size="small" @click="goConfigQuery(scope)"/>
           </el-tooltip>
         </template>
       </el-table-column>
-      <el-table-column prop="configKey" label="属性名称" :show-overflow-tooltip="true" header-align="center"
+      <el-table-column prop="configKey" :label="langData.configListTableConfigKey" :show-overflow-tooltip="true" header-align="center"
                        align="left"/>
-      <el-table-column prop="configValue" label="属性值" :show-overflow-tooltip="true" header-align="center"
+      <el-table-column prop="configValue" :label="langData.configListTableConfigValue" :show-overflow-tooltip="true" header-align="center"
                        align="left"/>
-      <el-table-column prop="fmtCreatedAt" label="创建时间" :show-overflow-tooltip="true" header-align="center"
+      <el-table-column prop="fmtCreatedAt" :label="langData.tableHeaderCreateTime" :show-overflow-tooltip="true" header-align="center"
                        align="center" width="180"/>
-      <el-table-column prop="fmtUpdatedAt" label="修改时间" :show-overflow-tooltip="true" header-align="center"
+      <el-table-column prop="fmtUpdatedAt" :label="langData.tableHeaderUpdateTime" :show-overflow-tooltip="true" header-align="center"
                        align="center" width="180"/>
     </el-table>
     <el-pagination class="page" v-model:page-size="form.pageSize" v-model:current-page="form.pageNum"
@@ -284,17 +292,17 @@ const _ = (window as any).ResizeObserver;
       <el-form :model="configForm" label-position="right" size="small" :inline="false" ref="configFormRef"
                :rules="configRules"
                label-width="30%">
-        <el-form-item label="属性名称：" prop="configKey">
-          <el-input v-model="configForm.configKey" type="textarea" rows="2" :disabled="dialogTitle == '编辑配置'"/>
+        <el-form-item :label="langData.configListTableConfigKey" prop="configKey">
+          <el-input v-model="configForm.configKey" type="textarea" rows="2" :disabled="dialogTitle == langData.dialogTitleEdit"/>
         </el-form-item>
-        <el-form-item label="属性值：" prop="url">
+        <el-form-item :label="langData.configListTableConfigValue" prop="url">
           <el-input v-model="configForm.configValue" type="textarea" rows="5"/>
         </el-form-item>
       </el-form>
       <template #footer>
                 <span class="dialog-footer">
-                  <el-button @click="dialogFormVisible = false">取消</el-button>
-                  <el-button type="primary" @click="updateConfig(configFormRef)">保存</el-button>
+                  <el-button @click="dialogFormVisible = false">{{langData.btnCancel}}</el-button>
+                  <el-button type="primary" @click="updateConfig(configFormRef)">{{langData.btnSave}}</el-button>
                 </span>
       </template>
     </el-dialog>

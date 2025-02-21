@@ -8,6 +8,9 @@ import {msg} from '@/utils/Utils'
 import router from "@/router";
 import * as monaco from 'monaco-editor';
 import {ElMessage, ElMessageBox} from 'element-plus'
+import {getLangData} from "@/i18n/locale";
+
+const langData = getLangData()
 
 // 获取编辑器容器的引用
 const editorContainer = ref<HTMLElement | null>(null);
@@ -56,16 +59,17 @@ const queryConfigFile = () => {
         data.configFile = res.data.body
         initialEditor()
       } else {
-        msg('无配置数据', 'info')
+        msg(langData.configFileNoConfigData, 'info')
         initialEditor()
       }
     } else {
-      msg(res.data.errorMessage, 'warning')
+      let content = res.config.baseURL+res.config.url+': '+res.data.errorMessage;
+      msg(content, "warning")
       initialEditor()
     }
   }).catch((err: Error) => {
     console.log('', err)
-    msg('请求异常', 'error')
+    msg(langData.axiosRequestErr, 'error')
   })
 }
 
@@ -109,7 +113,7 @@ const backup = ref('N')
 const saveConfigFile = () => {
   let content = editor?.getValue()
   if (!content || content.trim() == '') {
-    ElMessageBox.alert('配置文件内容不能为空', '标题', {
+    ElMessageBox.alert(langData.configFileMsgBoxAlert, langData.msgBoxTitle, {
       confirmButtonText: 'OK',
       type: 'warning',
       showClose: false
@@ -125,7 +129,7 @@ const saveConfigFile = () => {
     data: form,
   }).then((res: any) => {
     if (res.data.state == 'OK') {
-      ElMessageBox.alert(res.data.body, '标题', {
+      ElMessageBox.alert(res.data.body, langData.msgBoxTitle, {
         confirmButtonText: 'OK',
         type: 'warning',
         showClose: false
@@ -133,10 +137,12 @@ const saveConfigFile = () => {
       originalModel.setValue(form.fileContent)
       modifiedModel.setValue(form.fileContent)
     } else {
-      msg(res.data.errorMessage, 'warning')
+      let content = res.config.baseURL+res.config.url+': '+res.data.errorMessage;
+      msg(content, "warning")
     }
   }).catch((err: Error) => {
-    msg('请求异常', 'error')
+    console.log('',err)
+    msg(langData.axiosRequestErr, 'error')
   });
 }
 
@@ -165,9 +171,9 @@ const _ = (window as any).ResizeObserver;
   <div class="container">
     <el-page-header :icon="ArrowLeft" @back="goConfigProfile">
       <template #content>
-        <span class="text-large font-600 mr-3"> 配置管理，创建者：{{ router.currentRoute.value.query.username }}，服务: {{
+        <span class="text-large font-600 mr-3"> {{ langData.configProfileHeaderCreator }}：{{ router.currentRoute.value.query.username }}，{{langData.configProfileHeaderServiceName}}: {{
             router.currentRoute.value.query.serviceName
-          }}，环境: {{
+          }}，{{ langData.configProfileProfileName }}: {{
             router.currentRoute.value.query.profileName
           }}({{ router.currentRoute.value.query.profileDesc }}) </span>
       </template>
@@ -176,18 +182,18 @@ const _ = (window as any).ResizeObserver;
     <div ref="editorContainer" style="height: 300px; width: 90%;"></div>
     <div ref="diffEditorContainer" style="height: 300px; width: 92%; margin-top: 20px;"></div>
     <el-form-item style="margin-top: 10px">
-      <el-button type="primary" size="small" @click="saveConfigFile()">保存配置</el-button>
-      <el-form-item label="是否备份" prop="backup" style="margin-left: 10px">
+      <el-button type="primary" size="small" @click="saveConfigFile()">{{langData.btnSave}}</el-button>
+      <el-form-item :label="langData.configProfileIfBackup" prop="backup" style="margin-left: 10px">
         <el-switch
             v-model="backup"
             inline-prompt
-            active-text="是"
-            inactive-text="否"
+            :active-text="langData.switchYes"
+            :inactive-text="langData.switchNo"
             active-value="Y"
             inactive-value="N"
         />
       </el-form-item>
-      <span style="margin-left: 5px;color: red">* 仅支持yml、yaml文件</span>
+      <span style="margin-left: 5px;color: red">* {{langData.configFileValidateSupportYaml}}</span>
     </el-form-item>
   </div>
 </template>

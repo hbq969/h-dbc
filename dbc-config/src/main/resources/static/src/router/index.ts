@@ -36,6 +36,10 @@ const routes = [
     {
         path: '/config/compare',
         component: () => import((`@/views/dbc/ConfigCompare.vue`))
+    },
+    {
+        path: '/guide',
+        component: () => import((`@/views/dbc/Guide.vue`))
     }
 ]
 

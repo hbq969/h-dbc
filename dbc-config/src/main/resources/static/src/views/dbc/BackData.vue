@@ -8,6 +8,9 @@ import {msg} from '@/utils/Utils'
 import {ElMessage, ElMessageBox} from 'element-plus'
 import type {FormInstance, FormRules, TableInstance} from 'element-plus'
 import router from "@/router";
+import {getLangData} from "@/i18n/locale";
+
+const langData = getLangData()
 
 const user = reactive({
   userName: '',
@@ -23,10 +26,12 @@ const queryUserInfo = () => {
       user.userName = res.data.body.userName
       user.roleName = res.data.body.roleName
     } else {
-      msg(res.data.errorMessage, 'warning')
+      let content = res.config.baseURL+res.config.url+': '+res.data.errorMessage;
+      msg(content, "warning")
     }
   }).catch((err: Error) => {
-    msg('请求异常', 'error')
+    console.log('',err)
+    msg(langData.axiosRequestErr, 'error')
   })
 }
 
@@ -61,10 +66,12 @@ const queryProfileList = () => {
     if (res.data.state == 'OK') {
       data.profiles = res.data.body
     } else {
-      msg(res.data.errorMessage, 'warning')
+      let content = res.config.baseURL+res.config.url+': '+res.data.errorMessage;
+      msg(content, "warning")
     }
   }).catch((err: Error) => {
-    msg('请求异常', 'error')
+    console.log('',err)
+    msg(langData.axiosRequestErr, 'error')
   })
 }
 
@@ -84,10 +91,12 @@ const queryBackupList = () => {
       data.total = res.data.body.total
       data.backups = res.data.body.list
     } else {
-      msg(res.data.errorMessage, 'warning')
+      let content = res.config.baseURL+res.config.url+': '+res.data.errorMessage;
+      msg(content, "warning")
     }
   }).catch((err: Error) => {
-    msg('请求异常', 'error')
+    console.log('',err)
+    msg(langData.axiosRequestErr, 'error')
   })
 }
 
@@ -100,10 +109,12 @@ const recovery = (scope) => {
     if (res.data.state == 'OK') {
       msg(res.data.body, 'success')
     } else {
-      msg(res.data.errorMessage, 'warning')
+      let content = res.config.baseURL+res.config.url+': '+res.data.errorMessage;
+      msg(content, "warning")
     }
   }).catch((err: Error) => {
-    msg('请求异常', 'error')
+    console.log('',err)
+    msg(langData.axiosRequestErr, 'error')
   })
 }
 
@@ -117,17 +128,19 @@ const deleteBackup = (scope) => {
       msg(res.data.body, 'success')
       queryBackupList()
     } else {
-      msg(res.data.errorMessage, 'warning')
+      let content = res.config.baseURL+res.config.url+': '+res.data.errorMessage;
+      msg(content, "warning")
     }
   }).catch((err: Error) => {
-    msg('请求异常', 'error')
+    console.log('',err)
+    msg(langData.axiosRequestErr, 'error')
   })
 }
 
 const batchDeleteBackup = () => {
   let rows = tableRef.value?.getSelectionRows()
   if (!rows || rows.length == 0) {
-    ElMessageBox.alert('请选择需要删除的备份记录', '标题', {
+    ElMessageBox.alert(langData.backupMsgBoxAlert1, langData.msgBoxTitle, {
       confirmButtonText: 'OK',
       type: 'warning',
       showClose: false
@@ -146,17 +159,19 @@ const batchDeleteBackup = () => {
       msg(res.data.body, 'success')
       queryBackupList()
     } else {
-      msg(res.data.errorMessage, 'warning')
+      let content = res.config.baseURL+res.config.url+': '+res.data.errorMessage;
+      msg(content, "warning")
     }
   }).catch((err: Error) => {
-    msg('请求异常', 'error')
+    console.log('',err)
+    msg(langData.axiosRequestErr, 'error')
   })
 }
 
 const batchRecovery = () => {
   let rows = tableRef.value?.getSelectionRows()
   if (!rows || rows.length == 0) {
-    ElMessageBox.alert('请选择需要恢复的备份记录', '标题', {
+    ElMessageBox.alert(langData.backupMsgBoxAlert2, langData.msgBoxTitle, {
       confirmButtonText: 'OK',
       type: 'warning',
       showClose: false
@@ -175,10 +190,12 @@ const batchRecovery = () => {
       msg(res.data.body, 'success')
       queryBackupList()
     } else {
-      msg(res.data.errorMessage, 'warning')
+      let content = res.config.baseURL+res.config.url+': '+res.data.errorMessage;
+      msg(content, "warning")
     }
   }).catch((err: Error) => {
-    msg('请求异常', 'error')
+    console.log('',err)
+    msg(langData.axiosRequestErr, 'error')
   })
 }
 
@@ -206,26 +223,26 @@ const _ = (window as any).ResizeObserver;
 <template>
   <div class="container">
     <el-form :model="form" size="small" label-position="right" inline-message inline>
-      <el-form-item label="服务名称" prop="serviceName">
-        <el-input v-model="form.serviceName" placeholder="请输入..." type="text" clearable/>
+      <el-form-item :label="langData.configProfileHeaderServiceName" prop="serviceName">
+        <el-input v-model="form.serviceName" :placeholder="langData.formInputPlaceholder" type="text" clearable/>
       </el-form-item>
-      <el-form-item label="环境名称" prop="profileName">
-        <el-select v-model="form.profileName" placeholder="请选择" size="small" clearable filterable
+      <el-form-item :label="langData.configProfileProfileName" prop="profileName">
+        <el-select v-model="form.profileName" :placeholder="langData.formSelectPlaceholder" size="small" clearable filterable
                    style="width:120px">
           <el-option :key="item.profileName" :label="item.profileName+'('+item.profileDesc+')'"
                      :value="item.profileName" v-for="item in data.profiles"/>
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" size="small" @click="queryBackupList()" :icon="Search">查询</el-button>
-        <el-popconfirm title="确认是否删除?" confirm-button-type="danger" @confirm="batchDeleteBackup">
+        <el-button type="primary" size="small" @click="queryBackupList()" :icon="Search">{{langData.btnSearch}}</el-button>
+        <el-popconfirm :title="langData.confirmDelete" confirm-button-type="danger" @confirm="batchDeleteBackup">
           <template #reference>
-            <el-button type="danger" size="small" :icon="Delete">批量删除</el-button>
+            <el-button type="danger" size="small" :icon="Delete">{{langData.configListTableBatchDelete}}</el-button>
           </template>
         </el-popconfirm>
-        <el-popconfirm title="确认是否恢复?" confirm-button-type="danger" @confirm="batchRecovery">
+        <el-popconfirm :title="langData.confirmOpera" confirm-button-type="danger" @confirm="batchRecovery">
           <template #reference>
-            <el-button type="warning" size="small" :icon="RefreshRight">批量恢复</el-button>
+            <el-button type="warning" size="small" :icon="RefreshRight">{{ langData.backupBatchRecovery }}</el-button>
           </template>
         </el-popconfirm>
       </el-form-item>
@@ -234,37 +251,37 @@ const _ = (window as any).ResizeObserver;
     <el-table ref="tableRef" :data="data.backups" style="width: 100%" :border="true" table-layout="fixed" :stripe="true"
               size="small" :highlight-current-row="true" :header-cell-style="headerCellStyle">
       <el-table-column type="selection" header-align="center" align="center"/>
-      <el-table-column fixed="left" label="操作" width="100" header-align="center" align="center">
+      <el-table-column fixed="left" :label="langData.tableHeaderOp" width="100" header-align="center" align="center">
         <template #default="scope">
-          <el-popconfirm title="此操作会覆盖原有配置，请确认?" confirm-button-type="warning" @confirm="recovery(scope)">
+          <el-popconfirm :title="langData.confirmOpera" confirm-button-type="warning" @confirm="recovery(scope)">
             <template #reference>
               <el-button circle :icon="RefreshRight" type="warning" size="small"
-                         :disabled="user.roleName!='ADMIN' && user.userName!=scope.row.username" title="恢复"/>
+                         :disabled="user.roleName!='ADMIN' && user.userName!=scope.row.username" :title="langData.backupRecovery"/>
             </template>
           </el-popconfirm>
-          <el-popconfirm title="你确定要删除本条记录吗?" @confirm="deleteBackup(scope)"
+          <el-popconfirm :title="langData.confirmDelete" @confirm="deleteBackup(scope)"
                          icon-color="red"
                          confirm-button-type="danger">
             <template #reference>
               <el-button circle :icon="Delete" type="danger" size="small"
-                         :disabled="user.roleName!='ADMIN' && user.userName!=scope.row.username" title="删除"/>
+                         :disabled="user.roleName!='ADMIN' && user.userName!=scope.row.username" :title="langData.btnDelete"/>
             </template>
           </el-popconfirm>
         </template>
       </el-table-column>
       <el-table-column prop="id" label="ID" :show-overflow-tooltip="true" header-align="center"
                        align="center"/>
-      <el-table-column prop="username" label="配置创建者" :show-overflow-tooltip="true" header-align="center"
+      <el-table-column prop="username" :label="langData.tableHeaderCreator" :show-overflow-tooltip="true" header-align="center"
                        align="center"/>
-      <el-table-column prop="serviceName" label="服务名称" :show-overflow-tooltip="true" header-align="center"
+      <el-table-column prop="serviceName" :label="langData.configProfileHeaderServiceName" :show-overflow-tooltip="true" header-align="center"
                        align="center"/>
-      <el-table-column prop="serviceDesc" label="服务描述" :show-overflow-tooltip="true" header-align="center"
+      <el-table-column prop="serviceDesc" :label="langData.serviceFormServiceDesc" :show-overflow-tooltip="true" header-align="center"
                        align="center"/>
-      <el-table-column prop="profileName" label="环境名称" :show-overflow-tooltip="true" header-align="center"
+      <el-table-column prop="profileName" :label="langData.configProfileProfileName" :show-overflow-tooltip="true" header-align="center"
                        align="center"/>
-      <el-table-column prop="profileDesc" label="环境描述" :show-overflow-tooltip="true" header-align="center"
+      <el-table-column prop="profileDesc" :label="langData.configProfileProfileDesc" :show-overflow-tooltip="true" header-align="center"
                        align="center"/>
-      <el-table-column prop="fmtCreatedAt" label="备份时间" :show-overflow-tooltip="true" header-align="center"
+      <el-table-column prop="fmtCreatedAt" :label="langData.backupTableHeaderBackupTime" :show-overflow-tooltip="true" header-align="center"
                        align="center"/>
     </el-table>
     <el-pagination class="page" v-model:page-size="form.pageSize" v-model:current-page="form.pageNum"

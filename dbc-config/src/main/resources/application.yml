@@ -75,6 +75,8 @@ spring:
           - "/hbq969-sm/**/*.map"
           - "/hbq969-sm/**/*.ico"
           - "/hbq969-sm/**/login"
+          - "/hbq969-sm/i18n/lang"
+          - "/hbq969-sm/i18n/lang/data"
         session-key: h-dbc-sid
 
   datasource:

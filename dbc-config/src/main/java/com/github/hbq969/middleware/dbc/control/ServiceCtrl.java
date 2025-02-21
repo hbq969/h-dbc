@@ -1,6 +1,7 @@
 package com.github.hbq969.middleware.dbc.control;
 
 import com.github.hbq969.code.common.restful.ReturnMessage;
+import com.github.hbq969.code.sm.perm.api.SMRequiresPermissions;
 import com.github.hbq969.middleware.dbc.dao.entity.ServiceEntity;
 import com.github.hbq969.middleware.dbc.service.Service;
 import com.github.pagehelper.PageInfo;
@@ -22,6 +23,7 @@ public class ServiceCtrl {
     @ApiOperation("保存服务")
     @RequestMapping(path = "", method = RequestMethod.POST)
     @ResponseBody
+    @SMRequiresPermissions(menu = "Service",apiKey = "saveService",apiDesc = "保存服务")
     public ReturnMessage<?> saveService(@RequestBody ServiceEntity service) {
         this.service.saveService(service);
         return ReturnMessage.success("保存成功");
@@ -30,6 +32,7 @@ public class ServiceCtrl {
     @ApiOperation("更新服务")
     @RequestMapping(path = "", method = RequestMethod.PUT)
     @ResponseBody
+    @SMRequiresPermissions(menu = "Service",apiKey = "updateService",apiDesc = "更新服务")
     public ReturnMessage<?> updateService(@RequestBody ServiceEntity service) {
         this.service.updateService(service);
         return ReturnMessage.success("更新成功");
@@ -38,6 +41,7 @@ public class ServiceCtrl {
     @ApiOperation("删除服务")
     @RequestMapping(path = "", method = RequestMethod.DELETE)
     @ResponseBody
+    @SMRequiresPermissions(menu = "Service",apiKey = "deleteService",apiDesc = "删除服务")
     public ReturnMessage<?> deleteService(@RequestBody ServiceEntity entity) {
         this.service.deleteService(entity);
         return ReturnMessage.success("删除成功");
@@ -46,6 +50,7 @@ public class ServiceCtrl {
     @ApiOperation("分页查询服务列表")
     @RequestMapping(path = "/list", method = RequestMethod.POST)
     @ResponseBody
+    @SMRequiresPermissions(menu = "Service",apiKey = "queryServicePageList",apiDesc = "分页查询服务列表")
     public ReturnMessage<PageInfo<ServiceEntity>> queryServiceList(
             @RequestParam(name = "pageNum", defaultValue = "1") int pageNum,
             @RequestParam(name = "pageSize", defaultValue = "10") int pageSize,

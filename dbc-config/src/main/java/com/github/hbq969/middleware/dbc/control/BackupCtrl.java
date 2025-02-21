@@ -1,6 +1,7 @@
 package com.github.hbq969.middleware.dbc.control;
 
 import com.github.hbq969.code.common.restful.ReturnMessage;
+import com.github.hbq969.code.sm.perm.api.SMRequiresPermissions;
 import com.github.hbq969.middleware.dbc.dao.entity.BackupEntity;
 import com.github.hbq969.middleware.dbc.dao.entity.ProfileEntity;
 import com.github.hbq969.middleware.dbc.model.AccountServiceProfile;
@@ -30,6 +31,7 @@ public class BackupCtrl {
     @ApiOperation("分页查询备份列表")
     @RequestMapping(path = "/list", method = RequestMethod.POST)
     @ResponseBody
+    @SMRequiresPermissions(menu = "Backup",apiKey = "queryBackupList",apiDesc = "分页查询备份列表")
     public ReturnMessage<PageInfo<BackupEntity>> queryBackupList(
             @RequestParam(name = "pageNum", defaultValue = "1") int pageNum,
             @RequestParam(name = "pageSize", defaultValue = "10") int pageSize,
@@ -40,6 +42,7 @@ public class BackupCtrl {
     @ApiOperation("获取环境列表")
     @RequestMapping(path = "/profile/list", method = RequestMethod.GET)
     @ResponseBody
+    @SMRequiresPermissions(menu = "Backup",apiKey = "queryProfileList",apiDesc = "获取环境列表")
     public ReturnMessage<List<ProfileEntity>> queryProfileList() {
         return ReturnMessage.success(backupService.queryProfileList());
     }
@@ -47,6 +50,7 @@ public class BackupCtrl {
     @ApiOperation("恢复配置")
     @RequestMapping(path = "/recovery", method = RequestMethod.POST)
     @ResponseBody
+    @SMRequiresPermissions(menu = "Backup",apiKey = "recovery",apiDesc = "恢复配置")
     public ReturnMessage<?> recovery(@RequestBody BackupEntity bk) {
         backupService.recoveryBackup(bk);
         return ReturnMessage.success("恢复成功");
@@ -55,6 +59,7 @@ public class BackupCtrl {
     @ApiOperation("批量恢复配置")
     @RequestMapping(path = "/recovery/batch", method = RequestMethod.POST)
     @ResponseBody
+    @SMRequiresPermissions(menu = "Backup",apiKey = "batchRecovery",apiDesc = "批量恢复配置")
     public ReturnMessage<?> batchRecovery(@RequestBody BatchDeleteRecovery bdr) {
         backupService.recoveryBackups(bdr);
         return ReturnMessage.success("恢复成功");
@@ -63,6 +68,7 @@ public class BackupCtrl {
     @ApiOperation("删除备份记录")
     @RequestMapping(path = "", method = RequestMethod.DELETE)
     @ResponseBody
+    @SMRequiresPermissions(menu = "Backup",apiKey = "deleteBackup",apiDesc = "删除备份记录")
     public ReturnMessage<?> deleteBackup(@RequestBody BackupEntity bk) {
         backupService.deleteBackup(bk);
         return ReturnMessage.success("删除成功");
@@ -71,6 +77,7 @@ public class BackupCtrl {
     @ApiOperation("删除备份记录")
     @RequestMapping(path = "/batch", method = RequestMethod.DELETE)
     @ResponseBody
+    @SMRequiresPermissions(menu = "Backup",apiKey = "batchDeleteBackup",apiDesc = "批量删除备份记录")
     public ReturnMessage<?> deleteBackups(@RequestBody BatchDeleteBackup bdb) {
         backupService.deleteBackups(bdb);
         return ReturnMessage.success("删除成功");

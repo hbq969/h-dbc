@@ -3,6 +3,7 @@ package com.github.hbq969.middleware.dbc.driver.api;
 import cn.hutool.core.lang.Pair;
 import com.github.hbq969.code.common.encrypt.ext.utils.AESUtil;
 import com.github.hbq969.code.common.utils.GsonUtils;
+import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import feign.FeignException;
 import feign.Response;
@@ -13,13 +14,13 @@ import org.apache.commons.io.IOUtils;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
 import java.nio.charset.Charset;
 import java.util.List;
 
 @Slf4j
 public class Decoder implements feign.codec.Decoder {
+    private final static Gson gson = new Gson();
     private String apiSecret;
 
     private String apiCharset;
@@ -51,9 +52,11 @@ public class Decoder implements feign.codec.Decoder {
         if (log.isTraceEnabled()) {
             log.trace("解码后: {}", decryptBody);
         }
-        if(!decryptBody.startsWith("[")){
-            throw new UnsupportedEncodingException("不支持的配置格式");
+        if (decryptBody.startsWith("[")) {
+            return GsonUtils.parseArray(decryptBody, new TypeToken<List<Pair>>() {
+            });
+        } else {
+            return gson.fromJson(decryptBody, type);
         }
-        return GsonUtils.parseArray(decryptBody, new TypeToken<List<Pair>>(){});
     }
 }
