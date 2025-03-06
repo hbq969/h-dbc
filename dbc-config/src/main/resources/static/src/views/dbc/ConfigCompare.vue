@@ -5,7 +5,6 @@ import {
 import {ref, reactive, onMounted, computed, provide, inject, onBeforeUnmount} from 'vue'
 import axios from '@/network'
 import {msg} from '@/utils/Utils'
-import type {FormInstance, FormRules} from 'element-plus'
 import router from "@/router";
 import * as monaco from 'monaco-editor';
 import {ITextModel} from "monaco-editor";
@@ -39,6 +38,8 @@ const initialEditor = () => {
   diffEditor = monaco.editor.createDiffEditor(diffEditorContainer.value, {
     theme: 'vs-dark',
     readOnly: true,
+    fontSize: 10,
+    wordWrap: 'on'
   });
   profile1Model = monaco.editor.createModel('', 'yaml');
   profile2Model = monaco.editor.createModel('', 'yaml');
@@ -145,10 +146,10 @@ const _ = (window as any).ResizeObserver;
   <div class="container">
     <el-page-header :icon="ArrowLeft" @back="router.back()">
       <template #content>
-        <span class="text-large font-600 mr-3"> {{langData.configCompareHeaderTitle}} </span>
+        <span class="text-large font-600 mr-3" style="font-size: 15px"> {{langData.configCompareHeaderTitle}} </span>
       </template>
     </el-page-header>
-    <el-divider content-position="left"></el-divider>
+    <el-divider content-position="left" style="margin: 10px 0"></el-divider>
     <el-row>
       <el-col :span="12">
         <el-radio-group v-model="form.profile1" size="small" @change="profile1Change">
@@ -165,7 +166,7 @@ const _ = (window as any).ResizeObserver;
     </el-row>
     <el-row>
       <el-col :span="24">
-        <div ref="diffEditorContainer" style="height: 600px; width: 100%; margin-top: 10px;"></div>
+        <div ref="diffEditorContainer" style="height: 500px; width: 100%; margin-top: 10px;"></div>
       </el-col>
     </el-row>
   </div>

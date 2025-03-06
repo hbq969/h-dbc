@@ -18,12 +18,12 @@ public class ConfigServiceImpl extends FeignFactoryBean<ConfigService> {
 
     @Override
     protected feign.codec.Encoder encoder() {
-        return new Encoder(this.api.getSecret(), this.api.getCharset());
+        return new Encoder(this.api);
     }
 
     @Override
     protected feign.codec.Decoder decoder() {
-        return new Decoder(this.api.getSecret(), this.api.getCharset());
+        return new Decoder(this.api);
     }
 
     @Override
@@ -34,8 +34,8 @@ public class ConfigServiceImpl extends FeignFactoryBean<ConfigService> {
     @Override
     protected LinkedList<RequestInterceptor> interceptors() {
         LinkedList<RequestInterceptor> ins = super.interceptors();
-        if(api.getAuth().isEnabled()){
-            ins.addLast(new BasicAuthRequestInterceptor(api));
+        if (api.getAuth().isEnabled()) {
+            ins.addFirst(new BasicAuthRequestInterceptor(api));
         }
         return ins;
     }

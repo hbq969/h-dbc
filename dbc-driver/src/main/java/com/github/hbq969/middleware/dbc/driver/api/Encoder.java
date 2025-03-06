@@ -2,6 +2,7 @@ package com.github.hbq969.middleware.dbc.driver.api;
 
 import com.github.hbq969.code.common.encrypt.ext.utils.AESUtil;
 import com.github.hbq969.code.common.utils.GsonUtils;
+import com.github.hbq969.middleware.dbc.driver.config.ApiInfo;
 import feign.RequestTemplate;
 import feign.codec.EncodeException;
 import lombok.extern.slf4j.Slf4j;
@@ -12,13 +13,10 @@ import java.nio.charset.Charset;
 @Slf4j
 public class Encoder implements feign.codec.Encoder {
 
-    private String apiSecret;
+    private ApiInfo api;
 
-    private String apiCharset;
-
-    public Encoder(String apiSecret, String apiCharset) {
-        this.apiSecret = apiSecret;
-        this.apiCharset = apiCharset;
+    public Encoder(ApiInfo api) {
+        this.api = api;
     }
 
     @Override
@@ -27,7 +25,7 @@ public class Encoder implements feign.codec.Encoder {
         if (log.isTraceEnabled()) {
             log.trace("加密前: {}", content);
         }
-        String encryptBody = AESUtil.encrypt(content, apiSecret, Charset.forName(apiCharset));
+        String encryptBody = AESUtil.encrypt(content, this.api.getSecret(), this.api.getIv(), Charset.forName(this.api.getCharset()));
         if (log.isTraceEnabled()) {
             log.trace("加密后: {}", encryptBody);
         }

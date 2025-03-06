@@ -38,5 +38,14 @@
                 <exclude>application-dev.yml</exclude>
             </excludes>
         </fileSet>
+        <fileSet>
+            <directory>..</directory>
+            <outputDirectory>deploy/bootstrap</outputDirectory>
+            <directoryMode>0755</directoryMode>
+            <fileMode>0755</fileMode>
+            <includes>
+                <include>.h2/*.db</include>
+            </includes>
+        </fileSet>
     </fileSets>
 </assembly>

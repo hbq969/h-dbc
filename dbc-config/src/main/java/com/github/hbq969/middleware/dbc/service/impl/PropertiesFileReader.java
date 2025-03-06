@@ -3,6 +3,8 @@ package com.github.hbq969.middleware.dbc.service.impl;
 import cn.hutool.core.lang.Pair;
 import com.github.hbq969.code.common.decorde.OptionalFacade;
 import com.github.hbq969.code.common.decorde.OptionalFacadeAware;
+import com.github.hbq969.code.common.spring.context.SpringContext;
+import com.github.hbq969.code.common.utils.I18nUtils;
 import com.github.hbq969.middleware.dbc.service.FileReader;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,9 @@ public class PropertiesFileReader implements OptionalFacadeAware<String, FileRea
 
     @Autowired
     private FileReaderFacade facade;
+
+    @Autowired
+    private SpringContext context;
 
     @Override
     public OptionalFacade<String, FileReader> getOptionalFacade() {
@@ -36,7 +41,7 @@ public class PropertiesFileReader implements OptionalFacadeAware<String, FileRea
             p.load(in);
         } catch (IOException e) {
             log.error("读取properties文件异常",e);
-            throw new RuntimeException("读取");
+            throw new RuntimeException(I18nUtils.getMessage(context,"PropertiesFileReader.read.msg1"));
         }
         List<Pair<String,Object>> pairs = new ArrayList<>();
         for (Map.Entry<Object, Object> entry : p.entrySet()) {

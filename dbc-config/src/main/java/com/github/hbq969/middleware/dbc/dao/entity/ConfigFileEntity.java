@@ -50,4 +50,8 @@ public class ConfigFileEntity implements DictModel, DictAware {
             this.fmtUpdatedAt = FormatTime.YYYYMMDDHHMISS.withSecs(updatedAt.longValue());
         }
     }
+
+    public boolean ifBackup() {
+        return StringUtils.equals("Y", backup);
+    }
 }

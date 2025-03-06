@@ -1,11 +1,11 @@
 <script lang="ts" setup>
 import {
-  Edit, ArrowLeft, EditPen, Delete, Search
+  ArrowLeft, EditPen, Delete, Search
 } from '@element-plus/icons-vue'
 import {ref, reactive, onMounted, computed, provide, inject} from 'vue'
 import axios from '@/network'
 import {msg} from '@/utils/Utils'
-import {ElMessage, ElMessageBox} from 'element-plus'
+import {ElMessageBox} from 'element-plus'
 import type {FormInstance, FormRules, TableInstance, Action} from 'element-plus'
 import router from "@/router";
 import {getLangData} from "@/i18n/locale";
@@ -109,6 +109,7 @@ const updateConfig = async (formEl: FormInstance | undefined) => {
         data: configForm,
       }).then((res: any) => {
         if (res.data.state == 'OK') {
+          msg(res.data.body,"success")
           dialogFormVisible.value = false
           queryConfigList2()
         } else {
@@ -197,6 +198,7 @@ const batchUpdateConfig = async (formEl: FormInstance | undefined) => {
         data: configForm2.rows,
       }).then((res: any) => {
         if (res.data.state == 'OK') {
+          msg(res.data.body,"success")
           dialogFormVisible2.value = false
           queryConfigList2()
         } else {
@@ -227,6 +229,7 @@ const batchDeleteConfig = () => {
     data: rows,
   }).then((res: any) => {
     if (res.data.state == 'OK') {
+      msg(res.data.body,"success")
       queryConfigList2()
     } else {
       let content = res.config.baseURL+res.config.url+': '+res.data.errorMessage;
@@ -263,10 +266,10 @@ const _ = (window as any).ResizeObserver;
   <div class="container">
     <el-page-header :icon="ArrowLeft" @back="router.back()">
       <template #content>
-        <span class="text-large font-600 mr-3"> {{ langData.configQueryHeaderTitle }} </span>
+        <span class="text-large font-600 mr-3" style="font-size: 15px"> {{ langData.configQueryHeaderTitle }} </span>
       </template>
     </el-page-header>
-    <el-divider content-position="left"></el-divider>
+    <el-divider content-position="left" style="margin: 10px 0"></el-divider>
     <el-form :model="form" size="small" label-position="right" inline-message inline ref="formRef" :rules="rules">
       <el-form-item :label="langData.configListTableConfigKey" prop="configKey">
         <el-input v-model="form.configKey" :placeholder="langData.configQueryInputAccurateMatch" type="text" clearable style="width: 400px"/>

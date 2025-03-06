@@ -1,19 +1,14 @@
 <script lang="ts" setup>
-import {
-  Edit, ArrowLeft
-} from '@element-plus/icons-vue'
-import {ref, reactive, onMounted, computed, provide, inject} from 'vue'
+import {ref, reactive, onMounted, computed} from 'vue'
 import axios from '@/network'
 import {msg} from '@/utils/Utils'
-import {ElMessage, ElMessageBox} from 'element-plus'
-import type {FormInstance, FormRules} from 'element-plus'
-import router from "@/router";
 import MarkdownIt from 'markdown-it';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/default.css'; // 引入 highlight.js 样式
 import mk from 'markdown-it-katex';
 
 const showContent = ref('')
+const language = sessionStorage.getItem('h-sm-lang') || 'zh-CN'
 
 const md = new MarkdownIt({
   highlight: function (str, lang) {
@@ -32,7 +27,7 @@ const renderedHTML = computed(() => {
 
 onMounted(() => {
   axios({
-    url: '/md/README.md',
+    url: '/md/README_' + language + '.md',
     method: 'get',
   }).then((res: any) => {
     showContent.value = res.data
@@ -89,10 +84,10 @@ const _ = (window as any).ResizeObserver;
   background-color: #f9f9f9;
   font-family: "Times New Roman", Times, serif;
   line-height: 1.5;
-  width: 60%;  /* 可以调整为适合你设计的宽度 */
-  max-width: 100%;  /* 让容器在需要时自适应更宽的内容 */
-  word-wrap: break-word;  /* 确保长单词能断开换行 */
-  white-space: normal;  /* 允许自动换行 */
-  overflow-wrap: break-word;  /* 防止长单词溢出 */
+  width: 60%; /* 可以调整为适合你设计的宽度 */
+  max-width: 100%; /* 让容器在需要时自适应更宽的内容 */
+  word-wrap: break-word; /* 确保长单词能断开换行 */
+  white-space: normal; /* 允许自动换行 */
+  overflow-wrap: break-word; /* 防止长单词溢出 */
 }
 </style>

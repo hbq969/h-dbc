@@ -32,13 +32,11 @@ public class DatabasePropertySource extends MapPropertySource {
     }
 
     private void loadConfig() {
-        log.info("通过db方式从h-dbc配置中心读取配置。");
         try {
             JdbcTemplate jt = conf.configSet(environment).getJt();
             String serviceName = conf.getServiceName();
             String profileName = conf.getProfileName();
             Object[] paras = new Object[]{conf.getDbcKey(), serviceName, profileName};
-            log.info("加载服务配置, {}, {}", SQL, GsonUtils.toJson(paras));
             List<Pair<String, Object>> pairs = jt.query(SQL, paras, TYPES,
                     (rs, rowNum) -> new Pair<>(rs.getString(1), rs.getString(2)));
             this.configMap = new HashMap<>();

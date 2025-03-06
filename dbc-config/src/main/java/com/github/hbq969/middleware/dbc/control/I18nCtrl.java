@@ -1,7 +1,9 @@
 package com.github.hbq969.middleware.dbc.control;
 
 import com.github.hbq969.code.common.restful.ReturnMessage;
+import com.github.hbq969.code.common.spring.context.SpringContext;
 import com.github.hbq969.code.dict.service.api.impl.MapDictHelperImpl;
+import com.github.hbq969.code.sm.login.utils.I18nUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +30,9 @@ public class I18nCtrl {
     @Value("${spring.application.name}")
     private String app;
 
+    @Autowired
+    private SpringContext context;
+
     @ApiOperation("设置语言")
     @RequestMapping(path = "/lang", method = RequestMethod.PUT)
     @ResponseBody
@@ -39,8 +44,7 @@ public class I18nCtrl {
     @RequestMapping(path = "/lang", method = RequestMethod.GET)
     @ResponseBody
     public ReturnMessage<String> getLang() {
-        return ReturnMessage.success(String.join("-",
-                Locale.getDefault().getLanguage(), Locale.getDefault().getCountry()));
+        return ReturnMessage.success(I18nUtils.getFullLanguage(context));
     }
 
     @ApiOperation("获取语言数据")
@@ -48,13 +52,13 @@ public class I18nCtrl {
     @ResponseBody
     public ReturnMessage<Map<String, String>> getLangData() {
         Map<String, String> data = new HashMap<>();
-        String key = String.join("", "lang", ",", Locale.getDefault().getLanguage(), "-", Locale.getDefault().getCountry());
+        String key = I18nUtils.getFullLanguage(context);
         log.info("查询 {} 数据", key);
         Map<String, String> pairs = dict.queryPairs(key);
         if (pairs != null) {
             data.putAll(pairs);
         }
-        key = String.join("", app, ",", "lang", ",", Locale.getDefault().getLanguage(), "-", Locale.getDefault().getCountry());
+        key = String.join("", app, ",", "lang", ",", I18nUtils.getFullLanguage(context));
         log.info("查询 {} 数据", key);
         pairs = dict.queryPairs(key);
         if (pairs != null) {

@@ -8,7 +8,6 @@ import com.github.hbq969.code.common.utils.*;
 import com.github.hbq969.code.dict.service.api.impl.MapDictHelperImpl;
 import com.github.hbq969.code.sm.login.session.UserContext;
 import com.github.hbq969.middleware.dbc.dao.ConfigDao;
-import com.github.hbq969.middleware.dbc.dao.ProfileDao;
 import com.github.hbq969.middleware.dbc.dao.entity.ConfigEntity;
 import com.github.hbq969.middleware.dbc.dao.entity.ConfigFileEntity;
 import com.github.hbq969.middleware.dbc.dao.entity.ConfigProfileEntity;
@@ -74,7 +73,7 @@ public class ConfigServiceImpl implements ConfigService {
             pg.getList().forEach(e -> e.convertDict(context));
             return pg;
         } else {
-            throw new UnsupportedOperationException("账号无此操作权限");
+            throw new UnsupportedOperationException(I18nUtils.getMessage(context, "BackupServiceImpl.msg1"));
         }
     }
 
@@ -85,7 +84,7 @@ public class ConfigServiceImpl implements ConfigService {
             config.setCreatedAt(FormatTime.nowSecs());
             configDao.saveConfig(asp, config);
         } else {
-            throw new UnsupportedOperationException("账号无此操作权限");
+            throw new UnsupportedOperationException(I18nUtils.getMessage(context, "BackupServiceImpl.msg1"));
         }
     }
 
@@ -96,13 +95,13 @@ public class ConfigServiceImpl implements ConfigService {
             asp.userInitial(context);
             configDao.updateConfig(asp, config);
         } else {
-            throw new UnsupportedOperationException("账号无此操作权限");
+            throw new UnsupportedOperationException(I18nUtils.getMessage(context, "BackupServiceImpl.msg1"));
         }
     }
 
     @Override
     public void batchUpdateConfig(List<ServiceConfigEntity> rows) {
-        Assert.notNull(rows, "批量更新的配置为空");
+        Assert.notNull(rows, I18nUtils.getMessage(context, "ConfigServiceImpl.batchUpdateConfig.msg1"));
         String sql = "update h_dbc_config set config_value=?, updated_at=? where app=? and username=? and service_id=? and profile_name=? and config_key=?";
         String app = context.getProperty("spring.application.name");
         log.info("批量更新配置, {}, [username,serviceId,profileName,configKey,configValue] => {}",
@@ -136,13 +135,13 @@ public class ConfigServiceImpl implements ConfigService {
             asp.userInitial(context);
             configDao.deleteConfig(asp, q);
         } else {
-            throw new UnsupportedOperationException("账号无此操作权限");
+            throw new UnsupportedOperationException(I18nUtils.getMessage(context, "BackupServiceImpl.msg1"));
         }
     }
 
     @Override
     public void batchDeleteConfig(List<ServiceConfigEntity> rows) {
-        Assert.notNull(rows, "批量更新的配置为空");
+        Assert.notNull(rows, I18nUtils.getMessage(context, "ConfigServiceImpl.batchUpdateConfig.msg1"));
         String sql = "delete from h_dbc_config where app=? and username=? and service_id=? and profile_name=? and config_key=?";
         String app = context.getProperty("spring.application.name");
         log.info("批量删除配置, {}, [username,serviceId,profileName,configKey] => {}",
@@ -173,7 +172,7 @@ public class ConfigServiceImpl implements ConfigService {
             dcm.getAsp().userInitial(context);
             deleteConfigMultiple(dcm, true);
         } else {
-            throw new UnsupportedOperationException("账号无此操作权限");
+            throw new UnsupportedOperationException(I18nUtils.getMessage(context, "BackupServiceImpl.msg1"));
         }
     }
 
@@ -210,7 +209,7 @@ public class ConfigServiceImpl implements ConfigService {
             pg.getList().forEach(e -> e.convertDict(context));
             return pg;
         } else {
-            throw new UnsupportedOperationException("账号无此操作权限");
+            throw new UnsupportedOperationException(I18nUtils.getMessage(context, "BackupServiceImpl.msg1"));
         }
     }
 
@@ -218,12 +217,14 @@ public class ConfigServiceImpl implements ConfigService {
     public void configImport(AccountServiceProfile asp, MultipartFile file, String cover, String backup) {
         asp.userInitial(context);
         if (!UserContext.permitAllow(asp.getUsername())) {
-            throw new UnsupportedOperationException("账号无此操作权限");
+            throw new UnsupportedOperationException(I18nUtils.getMessage(context, "BackupServiceImpl.msg1"));
         }
-        backupService.backupOnConfigImport(asp);
+        if (StringUtils.equals(backup, "Y")) {
+            backupService.backupOnConfigImport(asp);
+        }
         String fileType = FileUtil.getSuffix(file.getOriginalFilename());
         if (!dict.isDictKey("import,file,type", fileType)) {
-            throw new UnsupportedOperationException(String.format("不支持的导入文件类型: %s", fileType));
+            throw new UnsupportedOperationException(String.format("%s: %s", I18nUtils.getMessage(context, "ConfigServiceImpl.configImport.msg1"), fileType));
         }
         List<Pair<String, Object>> pairs = null;
         try {
@@ -257,7 +258,7 @@ public class ConfigServiceImpl implements ConfigService {
             result.setFileContent(fileContent);
             return result;
         } else {
-            throw new UnsupportedOperationException("账号无此操作权限");
+            throw new UnsupportedOperationException(I18nUtils.getMessage(context, "BackupServiceImpl.msg1"));
         }
     }
 
@@ -265,10 +266,12 @@ public class ConfigServiceImpl implements ConfigService {
     public void updateConfigFile(ConfigFileEntity cfe) {
         cfe.setApp(context.getProperty("spring.application.name"));
         if (!UserContext.permitAllow(cfe.getUsername())) {
-            throw new UnsupportedOperationException("账号无此操作权限");
+            throw new UnsupportedOperationException(I18nUtils.getMessage(context, "BackupServiceImpl.msg1"));
         }
         cfe.setUpdatedAt(FormatTime.nowSecs());
-        backupService.backupOnUpdateConfigFile(cfe);
+        if(cfe.ifBackup()){
+            backupService.backupOnUpdateConfigFile(cfe);
+        }
         // 比较和properties的差异
         List<Pair<String, Object>> yamlParis = YamlPropertiesFileConverter.yamlToProperties(cfe.getFileContent());
         Map<String, Pair<String, Object>> yamlPairMap = yamlParis.stream()
@@ -340,7 +343,7 @@ public class ConfigServiceImpl implements ConfigService {
         try {
             downFile.userInitial(context);
             if (!UserContext.permitAllow(downFile.getUsername())) {
-                throw new UnsupportedOperationException("账号无此操作权限");
+                throw new UnsupportedOperationException(I18nUtils.getMessage(context, "BackupServiceImpl.msg1"));
             }
             String filename = downFile.getFilename();
             AccountServiceProfile asp = downFile.propertySet();
@@ -361,7 +364,7 @@ public class ConfigServiceImpl implements ConfigService {
                 }
                 FileCopyUtils.copy(out.toByteArray(), response.getOutputStream());
             } else {
-                throw new UnsupportedOperationException("不支持的文件类型");
+                throw new UnsupportedOperationException(I18nUtils.getMessage(context, "ConfigServiceImpl.downFile.msg1"));
             }
         } catch (Exception e) {
             log.error("下载文件异常", e);

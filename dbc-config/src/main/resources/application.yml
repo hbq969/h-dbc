@@ -28,7 +28,7 @@ spring:
   main:
     allow-bean-definition-overriding: true
   messages:
-    basename: i18n/message
+    basename: i18n/messages
     encoding: UTF-8
   mvc:
     interceptors:
@@ -78,6 +78,14 @@ spring:
           - "/hbq969-sm/i18n/lang"
           - "/hbq969-sm/i18n/lang/data"
         session-key: h-dbc-sid
+        sm-initial-script:
+          prefix: sm-initial
+          language: zh-CN
+          charset: utf-8
+        service-initial-script:
+          prefix: dbc-initial
+          language: zh-CN
+          charset: utf-8
 
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
@@ -125,8 +133,9 @@ encrypt:
   restful:
     enabled: true
     aes:
-      key: ENC(OpRRNfzeB0cKPdoQ3BLEc+WoW83lR9LHmRRN9xd/6nokMnYav1QBYNBLvxMyAsbUMlNVpfbVAD4f/E6WtTLaFw==)
-      show-log: true
+      show-log: false
+      key: ENC(PhsjjLFsZX5eNgvGh72ZGbf4boGXwdrpzb+od/vfPQ13lBgjil9MU/rdrigeweDcHFpYCEZPe241Xn81rWpHsg==)
+      iv: ENC(Avu8L7a3mG/3dD8zSrQLEcSguU51vOS0KGluDsRakOttDyZJBRpC0l313nXRmFQ65lVMO5nJDKzho25mKRz8zg==)
     advice-packages:
       - com.github.hbq969.middleware
       - com.github.hbq969.code.sm

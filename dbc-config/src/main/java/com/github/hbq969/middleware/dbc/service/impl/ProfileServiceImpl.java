@@ -2,6 +2,7 @@ package com.github.hbq969.middleware.dbc.service.impl;
 
 import com.github.hbq969.code.common.spring.context.SpringContext;
 import com.github.hbq969.code.common.utils.FormatTime;
+import com.github.hbq969.code.common.utils.I18nUtils;
 import com.github.hbq969.code.sm.login.session.UserContext;
 import com.github.hbq969.middleware.dbc.dao.BackupDao;
 import com.github.hbq969.middleware.dbc.dao.ProfileDao;
@@ -37,11 +38,11 @@ public class ProfileServiceImpl implements ProfileService {
     @Override
     public void saveProfile(ProfileEntity profile) {
         if (!UserContext.get().isAdmin()) {
-            throw new UnsupportedOperationException("此操作只允许admin");
+            throw new UnsupportedOperationException(I18nUtils.getMessage(context,"ProfileServiceImpl.saveProfile.msg1"));
         }
         List<ProfileEntity> pes = profileDao.queryProfileByName(profile.getProfileName());
         if (CollectionUtils.isNotEmpty(pes)) {
-            throw new IllegalArgumentException(String.format("该环境已经被 [%s] 创建", pes.get(0).getUsername()));
+            throw new IllegalArgumentException(String.format(I18nUtils.getMessage(context,"ProfileServiceImpl.saveProfile.msg2"), pes.get(0).getUsername()));
         }
         profile.setCreatedAt(FormatTime.nowSecs());
         profileDao.saveProfile(profile);
@@ -54,20 +55,20 @@ public class ProfileServiceImpl implements ProfileService {
     @Override
     public void updateProfile(ProfileEntity profile) {
         if (!UserContext.get().isAdmin()) {
-            throw new UnsupportedOperationException("此操作只允许admin");
+            throw new UnsupportedOperationException(I18nUtils.getMessage(context,"ProfileServiceImpl.saveProfile.msg1"));
         }
         if (UserContext.permitAllow(profile.getUsername())) {
             profile.setUpdatedAt(FormatTime.nowSecs());
             profileDao.updateProfile(profile);
         } else {
-            throw new UnsupportedOperationException("账号无此操作权限");
+            throw new UnsupportedOperationException(I18nUtils.getMessage(context,"BackupServiceImpl.msg1"));
         }
     }
 
     @Override
     public void deleteProfile(ProfileEntity profile) {
         if (!UserContext.get().isAdmin()) {
-            throw new UnsupportedOperationException("此操作只允许admin");
+            throw new UnsupportedOperationException(I18nUtils.getMessage(context,"ProfileServiceImpl.saveProfile.msg1"));
         }
         backupService.backupOnDeleteProfile(profile);
         profileDao.deleteProfileOnAdmin(profile.getProfileName());
@@ -97,7 +98,7 @@ public class ProfileServiceImpl implements ProfileService {
             }
             return all;
         } else {
-            throw new UnsupportedOperationException("账号无此操作权限");
+            throw new UnsupportedOperationException(I18nUtils.getMessage(context,"BackupServiceImpl.msg1"));
         }
     }
 
@@ -109,14 +110,14 @@ public class ProfileServiceImpl implements ProfileService {
             profileDao.deleteProfileConfig(asp);
             profileDao.deleteProfileConfileFile2(asp);
         } else {
-            throw new UnsupportedOperationException("账号无此操作权限");
+            throw new UnsupportedOperationException(I18nUtils.getMessage(context,"BackupServiceImpl.msg1"));
         }
     }
 
     @Override
     public void backup(ProfileEntity profile) {
         if (!UserContext.get().isAdmin()) {
-            throw new UnsupportedOperationException("此操作只允许admin");
+            throw new UnsupportedOperationException(I18nUtils.getMessage(context,"ProfileServiceImpl.saveProfile.msg1"));
         }
         backupService.backupOnDeleteProfile(profile);
     }
@@ -124,7 +125,7 @@ public class ProfileServiceImpl implements ProfileService {
     @Override
     public void backupAll() {
         if (!UserContext.get().isAdmin()) {
-            throw new UnsupportedOperationException("此操作只允许admin");
+            throw new UnsupportedOperationException(I18nUtils.getMessage(context,"ProfileServiceImpl.saveProfile.msg1"));
         }
         List<ProfileEntity> profiles = profileDao.queryAllProfileList();
         for (ProfileEntity profile : profiles) {

@@ -28,7 +28,6 @@ public class APIPropertySource extends MapPropertySource {
     }
 
     private void loadConfig() {
-        log.info("通过api方式从h-dbc配置中心读取配置。");
         try {
             ConfigService api = conf.configSet(environment).getApiProxy();
             ConfigInfo model = new ConfigInfo();
@@ -74,7 +73,6 @@ public class APIPropertySource extends MapPropertySource {
         if (encryptor != null) {
             return;
         }
-        log.info("springboot应用初始化阶段，创建自定义的 jasyptStringEncryptor.");
         encryptor = new PooledPBEStringEncryptor();
         SimpleStringPBEConfig config = new SimpleStringPBEConfig();
         String pwd = environment.getProperty("jasypt.encryptor.password", "U(^3ia)*v2$");
@@ -93,8 +91,8 @@ public class APIPropertySource extends MapPropertySource {
         initialStringEncryptor(environment);
         if (encode.startsWith("ENC(") && encode.endsWith(")")) {
             String value = encryptor.decrypt(encode.substring(4, encode.length() - 1));
-            if (log.isDebugEnabled()) {
-                log.debug("springboot初始化阶段属性解密处理, 属性名: {}, 原始值: {}, 解密后: {}", key, encode, value);
+            if (log.isTraceEnabled()) {
+                log.trace("springboot初始化阶段属性解密处理, 属性名: {}, 原始值: {}, 解密后: {}", key, encode, value);
             }
             return value;
         } else {

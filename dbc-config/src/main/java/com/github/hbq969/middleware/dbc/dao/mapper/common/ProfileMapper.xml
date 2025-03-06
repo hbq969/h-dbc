@@ -35,16 +35,14 @@
         b.username AS "username"
         from h_dbc_profiles a,h_dbc_acc_profiles b
         where a.profile_name=b.profile_name
-        <where>
-            <if test="profileName!=null and profileName!=''">
-                <bind name="profileNameLike" value="'%' + profileName + '%'"/>
-                and a.profile_name like #{profileNameLike}
-            </if>
-            <if test="profileDesc!=null and profileDesc!=''">
-                <bind name="profileDescLike" value="'%' + profileDesc + '%'"/>
-                and a.profile_desc like #{profileDescLike}
-            </if>
-        </where>
+        <if test="profileName!=null and profileName!=''">
+            <bind name="profileNameLike" value="'%' + profileName + '%'"/>
+            and a.profile_name like #{profileNameLike}
+        </if>
+        <if test="profileDesc!=null and profileDesc!=''">
+            <bind name="profileDescLike" value="'%' + profileDesc + '%'"/>
+            and a.profile_desc like #{profileDescLike}
+        </if>
         order by a.profile_name
     </select>
 

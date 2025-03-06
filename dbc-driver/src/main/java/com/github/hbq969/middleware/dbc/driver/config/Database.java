@@ -77,6 +77,5 @@ public class Database {
         hds.setMaxLifetime(this.maxLifetime);
         hds.setConnectionTestQuery(this.connectionTestQuery);
         this.jt = new JdbcTemplate(hds);
-        log.debug("初始化配置中心db加载器");
     }
 }

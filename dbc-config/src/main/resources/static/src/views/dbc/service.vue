@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import {
-  Edit, ArrowLeft, Delete,Grid, ZoomIn, EditPen, Search
+  Delete,Grid, ZoomIn, EditPen, Search
 } from '@element-plus/icons-vue'
-import {ref, reactive, onMounted, computed, provide, inject} from 'vue'
+import {ref, reactive, onMounted} from 'vue'
 import axios from '@/network'
 import {msg} from '@/utils/Utils'
 import type {FormInstance, FormRules} from 'element-plus'
@@ -246,7 +246,7 @@ const _ = (window as any).ResizeObserver;
     <template #footer>
               <span class="dialog-footer">
                 <el-button @click="dialogFormVisible = false">{{langData.btnCancel}}</el-button>
-                <el-button type="primary" @click="updateService(serviceRef)">{{langData.btnCancel}}</el-button>
+                <el-button type="primary" @click="updateService(serviceRef)">{{langData.btnSave}}</el-button>
               </span>
     </template>
   </el-dialog>

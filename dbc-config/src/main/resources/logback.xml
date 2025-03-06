@@ -104,7 +104,7 @@
     </appender>
 
     <!-- 定义应用INFO及以下级别日志输出 -->
-    <logger name="com" level="INFO">
+    <logger name="com.github.hbq969" level="INFO">
         <appender-ref ref="info"/>
     </logger>
     <logger name="org" level="INFO">
@@ -112,7 +112,7 @@
     </logger>
 
     <!-- 定义应用DEBUG及级别日志输出 -->
-    <logger name="com" level="DEBUG">
+    <logger name="com.github.hbq969" level="DEBUG">
         <appender-ref ref="ibatis-file"/>
         <appender-ref ref="debug-console"/>
         <appender-ref ref="debug-file"/>

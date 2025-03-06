@@ -1,12 +1,12 @@
 <script lang="ts" setup>
 import {
-  Edit, ArrowLeft, Delete, Grid, DocumentCopy, UploadFilled, Download, CopyDocument
+  ArrowLeft, Delete, Grid, DocumentCopy, UploadFilled, Download, CopyDocument
 } from '@element-plus/icons-vue'
-import {ref, reactive, onMounted, computed, provide, inject} from 'vue'
+import {ref, reactive, onMounted} from 'vue'
 import axios from '@/network'
 import {msg} from '@/utils/Utils'
-import {ElMessage, ElMessageBox} from 'element-plus'
-import type {FormInstance, FormRules, UploadInstance} from 'element-plus'
+import {ElMessageBox} from 'element-plus'
+import type {UploadInstance} from 'element-plus'
 import router from "@/router";
 import {getLangData} from "@/i18n/locale";
 
@@ -264,12 +264,12 @@ const _ = (window as any).ResizeObserver;
   <div class="container">
     <el-page-header :icon="ArrowLeft" @back="router.push({path:'/service'})">
       <template #content>
-        <span class="text-large font-600 mr-3"> {{langData.configProfileHeaderCreator}}：{{ router.currentRoute.value.query.username }}，{{langData.configProfileHeaderServiceName}}：{{
+        <span class="text-large font-600 mr-3" style="font-size: 15px"> {{langData.configProfileHeaderCreator}}：{{ router.currentRoute.value.query.username }}，{{langData.configProfileHeaderServiceName}}：{{
             router.currentRoute.value.query.serviceName
           }}</span>
       </template>
     </el-page-header>
-    <el-divider content-position="left"></el-divider>
+    <el-divider content-position="left" style="margin: 10px 0"></el-divider>
 
     <el-space wrap>
       <el-card style="max-width: 300px;height: 220px;" v-for="(source,index) in data.profileList">

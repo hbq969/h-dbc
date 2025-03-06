@@ -58,7 +58,9 @@ public class DbcConfig {
                 env.getProperty("spring.cloud.config.h-dbc.profile-name", String.class, "default"));
         this.db.configSet(env);
         this.api.configSet(env);
-        log.debug("配置中心对应配置: {}", GsonUtils.toJson(this));
+        if (log.isTraceEnabled()) {
+            log.trace("配置中心对应配置: {}", GsonUtils.toJson(this));
+        }
         return this;
     }
 

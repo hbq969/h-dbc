@@ -1,12 +1,11 @@
 <script lang="ts" setup>
 import {
-  Edit, ArrowLeft, Delete,EditPen,Search, CopyDocument
+  Delete,EditPen,Search, CopyDocument
 } from '@element-plus/icons-vue'
-import {ref, reactive, onMounted, computed, provide, inject} from 'vue'
+import {ref, reactive, onMounted} from 'vue'
 import axios from '@/network'
 import {msg} from '@/utils/Utils'
 import type {FormInstance, FormRules} from 'element-plus'
-import router from "@/router";
 import {getLangData} from "@/i18n/locale";
 
 const langData = getLangData()
@@ -113,6 +112,7 @@ const updateProfile = async (formEl: FormInstance | undefined) => {
       }).then((res: any) => {
         if (res.data.state == 'OK') {
           dialogFormVisible.value = false
+          msg(res.data.body, "success")
           queryProfileList()
         } else {
           let content = res.config.baseURL+res.config.url+': '+res.data.errorMessage;
@@ -136,6 +136,7 @@ const deleteProfile = (scope) => {
     }
   }).then((res: any) => {
     if (res.data.state == 'OK') {
+      msg(res.data.body, "success")
       queryProfileList()
     } else {
       let content = res.config.baseURL+res.config.url+': '+res.data.errorMessage;
@@ -272,7 +273,7 @@ const _ = (window as any).ResizeObserver;
                :rules="profileRules"
                label-width="20%">
         <el-form-item :label="langData.tableHeaderName" prop="profileName">
-          <el-input v-model="profileForm.profileName" type="text" clearable/>
+          <el-input v-model="profileForm.profileName" type="text" clearable :disabled="dialogTitle==langData.dialogTitleEdit"/>
         </el-form-item>
         <el-form-item :label="langData.tableHeaderDesc" prop="profileDesc">
           <el-input v-model="profileForm.profileDesc" type="textarea" rows="5" clearable/>

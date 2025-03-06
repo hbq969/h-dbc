@@ -1,6 +1,7 @@
 package com.github.hbq969.middleware.dbc.model;
 
 import com.github.hbq969.code.common.spring.context.SpringContext;
+import com.github.hbq969.code.common.utils.I18nUtils;
 import com.github.hbq969.code.sm.login.session.UserContext;
 import com.github.hbq969.middleware.dbc.dao.entity.ConfigFileEntity;
 import lombok.Data;
@@ -21,7 +22,7 @@ public class AccountServiceProfile {
     public void userInitial(SpringContext context) {
         this.app = context.getProperty("spring.application.name");
         if (StringUtils.isEmpty(username)) {
-            throw new IllegalArgumentException("账号名不能为空");
+            throw new IllegalArgumentException(I18nUtils.getMessage(context,"AccountServiceProfile.msg1"));
         }
     }
 

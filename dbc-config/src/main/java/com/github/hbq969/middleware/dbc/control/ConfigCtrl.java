@@ -1,6 +1,8 @@
 package com.github.hbq969.middleware.dbc.control;
 
 import com.github.hbq969.code.common.restful.ReturnMessage;
+import com.github.hbq969.code.common.spring.context.SpringContext;
+import com.github.hbq969.code.common.utils.I18nUtils;
 import com.github.hbq969.code.sm.login.session.UserContext;
 import com.github.hbq969.code.sm.perm.api.SMRequiresPermissions;
 import com.github.hbq969.middleware.dbc.dao.entity.ConfigEntity;
@@ -35,6 +37,9 @@ public class ConfigCtrl {
     @Autowired
     private ConfigService configService;
 
+    @Autowired
+    private SpringContext context;
+
     @ApiOperation("获取应用配置环境列表")
     @RequestMapping(path = "/profile/list", method = RequestMethod.POST)
     @ResponseBody
@@ -49,7 +54,7 @@ public class ConfigCtrl {
     @SMRequiresPermissions(menu = "Service",apiKey = "saveConfig",apiDesc = "保存配置")
     public ReturnMessage<?> saveConfig(@RequestBody ConfigQuery cq) {
         configService.saveConfig(cq.getAsp(), cq.getConfig());
-        return ReturnMessage.success("保存成功");
+        return ReturnMessage.success(I18nUtils.getMessage(context,"save.result"));
     }
 
     @ApiOperation("更新配置")
@@ -58,7 +63,7 @@ public class ConfigCtrl {
     @SMRequiresPermissions(menu = "Service",apiKey = "updateConfig",apiDesc = "更新配置")
     public ReturnMessage<?> updateConfig(@RequestBody ConfigQuery cq) {
         configService.updateConfig(cq.getAsp(), cq.getConfig());
-        return ReturnMessage.success("更新成功");
+        return ReturnMessage.success(I18nUtils.getMessage(context,"update.result"));
     }
 
     @ApiOperation("批量更新配置")
@@ -67,7 +72,7 @@ public class ConfigCtrl {
     @SMRequiresPermissions(menu = "Service",apiKey = "batchUpdateConfig",apiDesc = "批量更新配置")
     public ReturnMessage<?> batchUpdateConfig(@RequestBody List<ServiceConfigEntity> rows) {
         configService.batchUpdateConfig(rows);
-      return ReturnMessage.success("更新成功");
+      return ReturnMessage.success(I18nUtils.getMessage(context,"update.result"));
     }
 
     @ApiOperation("删除配置")
@@ -76,7 +81,7 @@ public class ConfigCtrl {
     @SMRequiresPermissions(menu = "Service",apiKey = "deleteConfig",apiDesc = "删除配置")
     public ReturnMessage<?> deleteConfig(@RequestBody ConfigQuery cq) {
         configService.deleteConfig(cq.getAsp(), cq.getConfig());
-        return ReturnMessage.success("删除成功");
+        return ReturnMessage.success(I18nUtils.getMessage(context,"delete.result"));
     }
 
     @ApiOperation("批量删除配置")
@@ -85,7 +90,7 @@ public class ConfigCtrl {
     @SMRequiresPermissions(menu = "Service",apiKey = "batchDeleteConfig",apiDesc = "批量删除配置")
     public ReturnMessage<?> batchDeleteConfig(@RequestBody List<ServiceConfigEntity> rows) {
         configService.batchDeleteConfig(rows);
-      return ReturnMessage.success("删除成功");
+      return ReturnMessage.success(I18nUtils.getMessage(context,"delete.result"));
     }
 
     @ApiOperation("批量删除配置")
@@ -94,7 +99,7 @@ public class ConfigCtrl {
     @SMRequiresPermissions(menu = "Service",apiKey = "deleteConfigMultiple",apiDesc = "批量删除配置")
     public ReturnMessage<?> deleteConfigMultiple(@RequestBody DeleteConfigMultiple dcm) {
         configService.deleteConfigMultiple(dcm);
-        return ReturnMessage.success("删除成功");
+        return ReturnMessage.success(I18nUtils.getMessage(context,"delete.result"));
     }
 
     @ApiOperation("分页查询配置列表")
@@ -122,9 +127,9 @@ public class ConfigCtrl {
             asp.setServiceId(serviceId);
             asp.setProfileName(profileName);
             configService.configImport(asp, file, cover,backup);
-            return ReturnMessage.success("导入成功");
+            return ReturnMessage.success(I18nUtils.getMessage(context,"import.result"));
         } else {
-            throw new UnsupportedOperationException("账号无此操作权限");
+            throw new UnsupportedOperationException(I18nUtils.getMessage(context,"BackupServiceImpl.msg1"));
         }
     }
 
@@ -142,7 +147,7 @@ public class ConfigCtrl {
     @SMRequiresPermissions(menu = "Service",apiKey = "updateConfigFile",apiDesc = "更新yml配置文件信息")
     public ReturnMessage<?> updateConfigFile(@RequestBody ConfigFileEntity cfe) {
         configService.updateConfigFile(cfe);
-        return ReturnMessage.success("更新成功");
+        return ReturnMessage.success(I18nUtils.getMessage(context,"update.result"));
     }
 
     @ApiOperation("下载配置文件")
@@ -166,7 +171,7 @@ public class ConfigCtrl {
     @SMRequiresPermissions(menu = "Service",apiKey = "backup",apiDesc = "备份配置")
     public ReturnMessage<?> backup(@RequestBody AccountServiceProfile asp) {
         configService.backup(asp);
-      return ReturnMessage.success("备份成功");
+      return ReturnMessage.success(I18nUtils.getMessage(context,"ConfigCtrl.backup.result"));
     }
 
 }

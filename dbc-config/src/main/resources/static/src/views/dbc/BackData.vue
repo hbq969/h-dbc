@@ -5,9 +5,8 @@ import {
 import {ref, reactive, onMounted, computed, provide, inject} from 'vue'
 import axios from '@/network'
 import {msg} from '@/utils/Utils'
-import {ElMessage, ElMessageBox} from 'element-plus'
-import type {FormInstance, FormRules, TableInstance} from 'element-plus'
-import router from "@/router";
+import {ElMessageBox} from 'element-plus'
+import type {TableInstance} from 'element-plus'
 import {getLangData} from "@/i18n/locale";
 
 const langData = getLangData()

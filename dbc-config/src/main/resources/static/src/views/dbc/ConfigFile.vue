@@ -1,13 +1,13 @@
 <script lang="ts" setup xmlns="http://www.w3.org/1999/html">
 import {
-  Edit, ArrowLeft, UploadFilled, Delete
+   ArrowLeft, ArrowUp, ArrowDown
 } from '@element-plus/icons-vue'
 import {ref, reactive, onMounted, onBeforeUnmount} from 'vue'
 import axios from '@/network'
 import {msg} from '@/utils/Utils'
 import router from "@/router";
 import * as monaco from 'monaco-editor';
-import {ElMessage, ElMessageBox} from 'element-plus'
+import {ElMessageBox} from 'element-plus'
 import {getLangData} from "@/i18n/locale";
 
 const langData = getLangData()
@@ -16,6 +16,7 @@ const langData = getLangData()
 const editorContainer = ref<HTMLElement | null>(null);
 const diffEditorContainer = ref<HTMLElement | null>(null);
 let editor: monaco.editor.IStandaloneCodeEditor | null = null;
+let diffEditor: monaco.editor.IStandaloneCodeEditor | null = null;
 let originalModel = monaco.editor.createModel('', 'yaml');
 let modifiedModel = monaco.editor.createModel('', 'yaml');
 
@@ -80,14 +81,18 @@ const initialEditor = () => {
       value: '',
       language: 'yaml',
       theme: 'vs-dark',
+      fontSize: 10,
+      wordWrap: 'on'
     });
 
     editor?.setValue(data.configFile.fileContent ? data.configFile.fileContent : '')
 
     // 创建 DiffEditor
-    const diffEditor = monaco.editor.createDiffEditor(diffEditorContainer.value, {
+    diffEditor = monaco.editor.createDiffEditor(diffEditorContainer.value, {
       theme: 'vs-dark',
       readOnly: true,
+      fontSize: 10,
+      wordWrap: 'on'
     });
 
     // 设置初始的原始和修改后的内容
@@ -129,11 +134,7 @@ const saveConfigFile = () => {
     data: form,
   }).then((res: any) => {
     if (res.data.state == 'OK') {
-      ElMessageBox.alert(res.data.body, langData.msgBoxTitle, {
-        confirmButtonText: 'OK',
-        type: 'warning',
-        showClose: false
-      })
+      msg(res.data.body,'success')
       originalModel.setValue(form.fileContent)
       modifiedModel.setValue(form.fileContent)
     } else {
@@ -171,16 +172,18 @@ const _ = (window as any).ResizeObserver;
   <div class="container">
     <el-page-header :icon="ArrowLeft" @back="goConfigProfile">
       <template #content>
-        <span class="text-large font-600 mr-3"> {{ langData.configProfileHeaderCreator }}：{{ router.currentRoute.value.query.username }}，{{langData.configProfileHeaderServiceName}}: {{
+        <span class="text-large font-600 mr-3" style="font-size: 15px"> {{ langData.configProfileHeaderCreator }}：{{ router.currentRoute.value.query.username }}，{{langData.configProfileHeaderServiceName}}: {{
             router.currentRoute.value.query.serviceName
           }}，{{ langData.configProfileProfileName }}: {{
             router.currentRoute.value.query.profileName
           }}({{ router.currentRoute.value.query.profileDesc }}) </span>
       </template>
     </el-page-header>
-    <el-divider content-position="left"></el-divider>
-    <div ref="editorContainer" style="height: 300px; width: 90%;"></div>
-    <div ref="diffEditorContainer" style="height: 300px; width: 92%; margin-top: 20px;"></div>
+    <el-divider content-position="left" style="margin: 10px 0"></el-divider>
+    <div style="display: flex; width: 100%">
+      <div id="editorContainer" ref="editorContainer" style="flex:1; height: 500px;width: 50%"></div>
+      <div id="diffEditorContainer" ref="diffEditorContainer" style="flex:1; height: 500px;width: 50%; margin-left: 5px"></div>
+    </div>
     <el-form-item style="margin-top: 10px">
       <el-button type="primary" size="small" @click="saveConfigFile()">{{langData.btnSave}}</el-button>
       <el-form-item :label="langData.configProfileIfBackup" prop="backup" style="margin-left: 10px">

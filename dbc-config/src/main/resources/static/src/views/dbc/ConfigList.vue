@@ -1,12 +1,12 @@
 <script lang="ts" setup xmlns="http://www.w3.org/1999/html">
 import {
-  Edit, ArrowLeft, UploadFilled, EditPen, Delete, Search,CopyDocument, DocumentCopy
+  Edit, ArrowLeft, EditPen, Delete, Search, DocumentCopy
 } from '@element-plus/icons-vue'
-import {ref, reactive, onMounted, computed, provide, inject} from 'vue'
+import {ref, reactive, onMounted} from 'vue'
 import axios from '@/network'
-import {msg, notify} from '@/utils/Utils'
-import {ElMessage, ElMessageBox} from 'element-plus'
-import {FormInstance, FormRules, UploadInstance, TableInstance} from 'element-plus'
+import {msg} from '@/utils/Utils'
+import {ElMessageBox} from 'element-plus'
+import {FormInstance, FormRules, TableInstance} from 'element-plus'
 import router from "@/router";
 import {getLangData} from "@/i18n/locale";
 
@@ -107,6 +107,7 @@ const updateConfig = async (formEl: FormInstance | undefined) => {
         },
       }).then((res: any) => {
         if (res.data.state == 'OK') {
+          msg(res.data.body,"success")
           dialogFormVisible.value = false
           queryConfigList()
         } else {
@@ -226,14 +227,14 @@ const _ = (window as any).ResizeObserver;
   <div class="container">
     <el-page-header :icon="ArrowLeft" @back="goConfigProfile">
       <template #content>
-        <span class="text-large font-600 mr-3"> {{ langData.configProfileHeaderCreator }}：{{ router.currentRoute.value.query.username }}，{{langData.configProfileHeaderServiceName}}: {{
+        <span class="text-large font-600 mr-3" style="font-size: 15px"> {{ langData.configProfileHeaderCreator }}：{{ router.currentRoute.value.query.username }}，{{langData.configProfileHeaderServiceName}}: {{
             router.currentRoute.value.query.serviceName
           }}，{{langData.configProfileProfileName}}: {{
             router.currentRoute.value.query.profileName
           }}({{ router.currentRoute.value.query.profileDesc }}) </span>
       </template>
     </el-page-header>
-    <el-divider content-position="left"></el-divider>
+    <el-divider content-position="left" style="margin: 10px 0"></el-divider>
 
     <el-form :model="form" size="small" label-position="right" inline-message inline>
       <el-form-item :label="langData.configListTableConfigKey" prop="configKey">

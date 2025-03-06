@@ -5,6 +5,7 @@ import com.github.hbq969.code.common.spring.context.SpringContext;
 import com.github.hbq969.code.common.utils.DigitSplit;
 import com.github.hbq969.code.common.utils.FormatTime;
 import com.github.hbq969.code.common.utils.GsonUtils;
+import com.github.hbq969.code.common.utils.I18nUtils;
 import com.github.hbq969.code.sm.login.session.UserContext;
 import com.github.hbq969.middleware.dbc.dao.BackupDao;
 import com.github.hbq969.middleware.dbc.dao.ProfileDao;
@@ -120,16 +121,16 @@ public class BackupServiceImpl implements BackupService {
         if (UserContext.permitAllow(bk.getUsername())) {
             backupDao.deleteBackup(bk);
         } else {
-            throw new UnsupportedOperationException("账号无此操作权限");
+            throw new UnsupportedOperationException(I18nUtils.getMessage(context,"BackupServiceImpl.msg1"));
         }
     }
 
     @Override
     public void deleteBackups(BatchDeleteBackup bdb) {
         if (!UserContext.permitAllow(bdb.getUsername())) {
-            throw new UnsupportedOperationException("账号无此操作权限");
+            throw new UnsupportedOperationException(I18nUtils.getMessage(context,"BackupServiceImpl.msg1"));
         }
-        bdb.check();
+        bdb.check(context);
         String sql = "delete from h_dbc_config_bk where id=?";
         log.info("批量删除备份数据, {}, {}", sql, bdb.getBackups());
         context.getBean(JdbcTemplate.class).batchUpdate(sql, new BatchPreparedStatementSetter() {
@@ -149,7 +150,7 @@ public class BackupServiceImpl implements BackupService {
     @Override
     public void recoveryBackup(BackupEntity bk) {
         if (!UserContext.permitAllow(bk.getUsername())) {
-            throw new UnsupportedOperationException("账号无此操作权限");
+            throw new UnsupportedOperationException(I18nUtils.getMessage(context,"BackupServiceImpl.msg1"));
         }
         BackupEntity entity = backupDao.queryBackup(bk);
         String sql = "select service_id AS \"serviceId\",service_name AS \"serviceName\" from h_dbc_service where service_name=?";
@@ -253,9 +254,9 @@ public class BackupServiceImpl implements BackupService {
     @Override
     public void recoveryBackups(BatchDeleteRecovery bdr) {
         if (!UserContext.permitAllow(bdr.getUsername())) {
-            throw new UnsupportedOperationException("账号无此操作权限");
+            throw new UnsupportedOperationException(I18nUtils.getMessage(context,"BackupServiceImpl.msg1"));
         }
-        bdr.check();
+        bdr.check(context);
         for (BackupEntity bk : bdr.getRecoveries()) {
             recoveryBackup(bk);
         }

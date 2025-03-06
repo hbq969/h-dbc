@@ -1,6 +1,7 @@
 package com.github.hbq969.middleware.dbc.view.request;
 
 import com.github.hbq969.code.common.spring.context.SpringContext;
+import com.github.hbq969.code.common.utils.I18nUtils;
 import com.github.hbq969.middleware.dbc.model.AccountServiceProfile;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
@@ -16,14 +17,14 @@ public class DownFile {
     public void userInitial(SpringContext context) {
         this.app = context.getProperty("spring.application.name");
         if (StringUtils.isEmpty(this.username)) {
-            throw new IllegalArgumentException("用户名不能为空");
+            throw new IllegalArgumentException(I18nUtils.getMessage(context, "DownFile.message1"));
         }
         if (StringUtils.isEmpty(this.serviceId)) {
-            throw new IllegalArgumentException("服务id不能为空");
+            throw new IllegalArgumentException(I18nUtils.getMessage(context, "DownFile.message2"));
         }
     }
 
-    public AccountServiceProfile propertySet(){
+    public AccountServiceProfile propertySet() {
         AccountServiceProfile asp = new AccountServiceProfile();
         asp.setUsername(this.username);
         asp.setServiceId(this.serviceId);

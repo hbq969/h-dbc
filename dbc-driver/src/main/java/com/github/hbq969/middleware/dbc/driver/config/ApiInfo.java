@@ -24,9 +24,14 @@ public class ApiInfo {
     private int retry = 3;
 
     /**
-     * api接口私钥
+     * api接口私钥，参考配置中心配置
      */
     private String secret;
+
+    /**
+     * api接口加密iv随机数，长度和secret一致，参考配置中心配置
+     */
+    private String iv;
 
     /**
      * api接口编码
@@ -42,11 +47,13 @@ public class ApiInfo {
                 env.getProperty("spring.cloud.config.h-dbc.api.url", this.url));
         this.secret = APIPropertySource.decode(env, "spring.cloud.config.h-dbc.api.secret",
                 env.getProperty("spring.cloud.config.h-dbc.api.secret"));
+        this.iv = APIPropertySource.decode(env, "spring.cloud.config.h-dbc.api.iv",
+                env.getProperty("spring.cloud.config.h-dbc.api.iv"));
         this.charset = env.getProperty("spring.cloud.config.h-dbc.api.charset", this.charset);
-        this.auth.setEnabled(env.getProperty("spring.cloud.config.h-dbc.api.auth.enabled",Boolean.class,true));
-        this.auth.getBasic().setKey(APIPropertySource.decode(env,"spring.cloud.config.h-dbc.api.auth.basic.key",env.getProperty("spring.cloud.config.h-dbc.api.auth.basic.key",this.auth.getBasic().getKey())));
-        this.auth.getBasic().setUsername(APIPropertySource.decode(env,"spring.cloud.config.h-dbc.api.auth.basic.username",env.getProperty("spring.cloud.config.h-dbc.api.auth.basic.username")));
-        this.auth.getBasic().setPassword(APIPropertySource.decode(env,"spring.cloud.config.h-dbc.api.auth.basic.password",env.getProperty("spring.cloud.config.h-dbc.api.auth.basic.password")));
+        this.auth.setEnabled(env.getProperty("spring.cloud.config.h-dbc.api.auth.enabled", Boolean.class, true));
+        this.auth.getBasic().setKey(APIPropertySource.decode(env, "spring.cloud.config.h-dbc.api.auth.basic.key", env.getProperty("spring.cloud.config.h-dbc.api.auth.basic.key", this.auth.getBasic().getKey())));
+        this.auth.getBasic().setUsername(APIPropertySource.decode(env, "spring.cloud.config.h-dbc.api.auth.basic.username", env.getProperty("spring.cloud.config.h-dbc.api.auth.basic.username")));
+        this.auth.getBasic().setPassword(APIPropertySource.decode(env, "spring.cloud.config.h-dbc.api.auth.basic.password", env.getProperty("spring.cloud.config.h-dbc.api.auth.basic.password")));
         return this;
     }
 
@@ -59,7 +66,6 @@ public class ApiInfo {
         csi.setInter(ConfigService.class);
         csi.afterPropertiesSet();
         this.api = csi.getObject();
-        log.debug("初始化配置中心api加载器");
         return this.api;
     }
 }

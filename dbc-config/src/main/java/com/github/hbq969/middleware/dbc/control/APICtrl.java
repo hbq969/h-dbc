@@ -3,6 +3,7 @@ package com.github.hbq969.middleware.dbc.control;
 import cn.hutool.core.lang.Pair;
 import com.github.hbq969.code.common.encrypt.ext.config.Decrypt;
 import com.github.hbq969.code.common.encrypt.ext.config.Encrypt;
+import com.github.hbq969.code.common.spring.advice.log.LogSet;
 import com.github.hbq969.middleware.dbc.model.APIModel;
 import com.github.hbq969.middleware.dbc.model.ConfigModel;
 import com.github.hbq969.middleware.dbc.service.APIService;
@@ -28,6 +29,7 @@ public class APICtrl {
     @ResponseBody
     @Encrypt
     @Decrypt
+    @LogSet(printIn = false, printResult = false)
     public List<Pair> getConfigList(@RequestBody APIModel model) {
         return apiService.getConfigList(model);
     }

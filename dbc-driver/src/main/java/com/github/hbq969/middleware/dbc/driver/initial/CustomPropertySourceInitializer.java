@@ -26,7 +26,6 @@ public class CustomPropertySourceInitializer implements ApplicationContextInitia
 
     @Override
     public void initialize(ConfigurableApplicationContext applicationContext) {
-        log.info("刷新spring上下文.");
         ConfigurableEnvironment environment = applicationContext.getEnvironment();
         boolean enabled = environment.getProperty("spring.cloud.config.h-dbc.enabled", Boolean.class, false);
         if (enabled) {

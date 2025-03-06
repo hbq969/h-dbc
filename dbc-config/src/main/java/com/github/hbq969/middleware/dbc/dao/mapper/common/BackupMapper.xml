@@ -98,7 +98,7 @@
                 and profile_name = #{profileName}
             </if>
         </where>
-        order by createdAt desc
+        order by created_at desc
     </select>
 
     <delete id="deleteBackup" parameterType="com.github.hbq969.middleware.dbc.dao.entity.BackupEntity">

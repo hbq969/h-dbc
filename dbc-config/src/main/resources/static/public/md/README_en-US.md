@@ -1,26 +1,24 @@
-一个基于数据库(mysql、oracle)的配置中心实现。
-
-A configuration center implementation based on database (mysql, oracle).
+A configuration center implementation based on database.
 
 
 
-## 快速开始 (Quick Start)
-### 安装
+## Quick Start
+### Install
 ```bash
 git clone https://github.com/hbq969/h-dbc.git
-# 打包UI页面
+# Packaging UI pages
 cd h-dbc/dbc-config/src/main/resources/static
 nvm use 16 
 npm i && npm run build
-# 构建配置中心服务端
+# Build the configuration center server
 cd h-dbc 
 mvn -U -DskipTests=true clean
-# 构建配置中心依赖
+# Build configuration center dependencies
 cd h-dbc/dbc-driver
 mvn install
 ```
 
-### 部署
+### Deploy
 ```bash
 cd h-dbc/dbc-config/target
 tar xvf dbc-config-1.0-SNAPSHOT.tar.gz
@@ -32,8 +30,8 @@ sh start.sh
 
 
 
-## 配置 (Config)
-### 配置中心配置
+## Configuration
+### Configuration Center
 > application-mysql.yml
 ```yaml
 spring:
@@ -44,10 +42,10 @@ spring:
       base-packages: com.github.hbq969
       default-lookup-key: hikari
     hikari:
-      jdbc-url: 数据库url
+      jdbc-url: Database url
       driver-class-name: com.mysql.cj.jdbc.Driver
-      username: 账号
-      password: 密码
+      username: Database username
+      password: Database password
       maximum-pool-size: 10
       minimum-idle: 2
       max-lifetime: 1800000
@@ -66,9 +64,9 @@ mybatis:
   config-location: classpath:jpaConfig-mysql.xml
 ```
 
-### 服务配置
+### Service Configuration
 
-> 服务依赖
+> Maven Configuration
 ```xml
 <dependency>
     <groupId>com.github.hbq969</groupId>
@@ -77,7 +75,7 @@ mybatis:
 </dependency>
 ```
 
-> bootstrap.yml （api方式拉取配置）
+> bootstrap.yml （api pull way）
 ```yaml
 spring:
   cloud:
@@ -89,15 +87,15 @@ spring:
         profile-name: default
         strategy: api
         api:
-          secret: api加密传输秘钥，参考配置中心配置
+          secret: API encryption transmission key, refer to the configuration center configuration
           auth:
             basic:
-              username: api认证账号
-              password: api认证密码
+              username: API authentication account
+              password: API authentication password
             enabled: true
 ```
 
-> bootstrap.yml （db方式拉取配置）
+> bootstrap.yml （database read way）
 ```yaml
 spring:
   cloud:
@@ -110,14 +108,14 @@ spring:
         strategy: db
         db:
           driver-class-name: com.mysql.cj.jdbc.Driver
-          username: 数据库账号
-          password: 数据库密码
-          jdbc-url: 数据库url
+          username: Database Account
+          password: Database password
+          jdbc-url: Database url
 ```
 
 
 
-## 非java程序接入指南
+## Non-Java Program Access Guide
 
 ```bash
 curl -XPOST 'http://user:pwd@ip:port/h-dbc/api/config/list' \
@@ -125,9 +123,10 @@ curl -XPOST 'http://user:pwd@ip:port/h-dbc/api/config/list' \
 -H 'Content-Type:application/json'
 ```
 
+![](./example.png)
 
 
-> 请求体加密
+> Request body encryption
 
 ```javascript
 import CryptoJS from "crypto-js";
@@ -142,12 +141,12 @@ function encrypt(word: any, key: any, iv: any): string {
     return CryptoJS.enc.Base64.stringify(encrypted.ciphertext);
 }
 let query = {"serviceName":"h-example","profileName":"default"}
-let body = encrypt(JSON.stringify(query),加密密码,iv)
+let body = encrypt(JSON.stringify(query),key,iv)
 ```
 
 
 
-> 响应体解密
+> Response body decryption
 
 ```javascript
 import CryptoJS from "crypto-js";
