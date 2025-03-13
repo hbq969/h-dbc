@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-  ArrowLeft, Delete, Grid, DocumentCopy, UploadFilled, Download, CopyDocument
+  ArrowLeft, Delete, Grid, DocumentCopy, UploadFilled, Download, CopyDocument, RefreshRight
 } from '@element-plus/icons-vue'
 import {ref, reactive, onMounted} from 'vue'
 import axios from '@/network'
@@ -47,11 +47,11 @@ const queryAllProfileList = () => {
     if (res.data.state == 'OK') {
       data.profileList = res.data.body
     } else {
-      let content = res.config.baseURL+res.config.url+': '+res.data.errorMessage;
+      let content = res.config.baseURL + res.config.url + ': ' + res.data.errorMessage;
       msg(content, "warning")
     }
   }).catch((err: Error) => {
-    console.log('',err)
+    console.log('', err)
     msg(langData.axiosRequestErr, 'error')
   })
 }
@@ -70,11 +70,11 @@ const deleteConfig = (source) => {
       msg(res.data.body, 'success')
       queryAllProfileList()
     } else {
-      let content = res.config.baseURL+res.config.url+': '+res.data.errorMessage;
+      let content = res.config.baseURL + res.config.url + ': ' + res.data.errorMessage;
       msg(content, "warning")
     }
   }).catch((err: Error) => {
-    console.log('',err)
+    console.log('', err)
     msg(langData.axiosRequestErr, 'error')
   })
 }
@@ -148,12 +148,12 @@ const configImport = () => {
       uploadRef.value!.clearFiles()
       queryAllProfileList()
     } else {
-      let content = res.config.baseURL+res.config.url+': '+res.data.errorMessage;
+      let content = res.config.baseURL + res.config.url + ': ' + res.data.errorMessage;
       msg(content, "warning")
       uploadRef.value!.clearFiles()
     }
   }).catch((err: Error) => {
-    console.log('',err)
+    console.log('', err)
     msg(langData.axiosRequestErr, 'error')
     uploadRef.value!.clearFiles()
   })
@@ -219,6 +219,51 @@ const downFile = (fileSuffix) => {
   })
 }
 
+const downIntegrated = (source, filename) => {
+  axios({
+    url: '/config/bootstrap/download',
+    method: 'post',
+    data: {
+      filename: filename,
+      serviceName: router.currentRoute.value.query.serviceName,
+      profileName: source.profileName
+    },
+  }).then((res: any) => {
+    const blob = new Blob([res.data]);
+    const fileName = filename;
+    if ('download' in document.createElement('a')) { // 非IE下载
+      const elink = document.createElement('a');
+      elink.download = fileName
+      elink.style.display = 'none';
+      elink.href = URL.createObjectURL(blob);
+      document.body.appendChild(elink);
+      elink.click();
+      URL.revokeObjectURL(elink.href);// 释放URL 对象
+      document.body.removeChild(elink);
+    } else {
+      // IE10+下载
+      // if (navigator) {
+      //   navigator.msSaveBlob(blob, fileName);
+      // }
+    }
+  }).catch((err: Error) => {
+    console.log('', err)
+    msg('请求异常', 'error')
+  })
+}
+
+const dialogFormVisible4 = ref(false)
+const dialogTitle4 = ref(langData.configProfileDialogTitle4)
+const httpIntegrated=reactive({
+  serviceName: '',
+  profileName:''
+})
+const showHttpIntegrated = (source) => {
+  dialogFormVisible4.value = true
+  httpIntegrated.serviceName=router.currentRoute.value.query.serviceName
+  httpIntegrated.profileName=source.profileName
+}
+
 const backupConfig = (source) => {
   source.username = router.currentRoute.value.query.username
   source.serviceId = router.currentRoute.value.query.serviceId
@@ -230,13 +275,18 @@ const backupConfig = (source) => {
     if (res.data.state == 'OK') {
       msg(res.data.body, 'success')
     } else {
-      let content = res.config.baseURL+res.config.url+': '+res.data.errorMessage;
+      let content = res.config.baseURL + res.config.url + ': ' + res.data.errorMessage;
       msg(content, "warning")
     }
   }).catch((err: Error) => {
-    console.log('',err)
+    console.log('', err)
     msg(langData.axiosRequestErr, 'error')
   })
+}
+
+const goRecoveryPage = (source) => {
+  source.serviceName = router.currentRoute.value.query.serviceName
+  router.push({path: '/back/data', query: source})
 }
 
 const debounce = (callback: (...args: any[]) => void, delay: number) => {
@@ -264,7 +314,9 @@ const _ = (window as any).ResizeObserver;
   <div class="container">
     <el-page-header :icon="ArrowLeft" @back="router.push({path:'/service'})">
       <template #content>
-        <span class="text-large font-600 mr-3" style="font-size: 15px"> {{langData.configProfileHeaderCreator}}：{{ router.currentRoute.value.query.username }}，{{langData.configProfileHeaderServiceName}}：{{
+        <span class="text-large font-600 mr-3" style="font-size: 15px"> {{ langData.configProfileHeaderCreator }}：{{
+            router.currentRoute.value.query.username
+          }}，{{ langData.configProfileHeaderServiceName }}：{{
             router.currentRoute.value.query.serviceName
           }}</span>
       </template>
@@ -279,7 +331,8 @@ const _ = (window as any).ResizeObserver;
               <component is="MenuIcon"/>
             </div>
             <div style="flex: 1; display: flex; justify-content: flex-end">
-              <el-popconfirm :title="langData.confirmOpera" confirm-button-type="danger" @confirm="deleteConfig(source)">
+              <el-popconfirm :title="langData.configProfileDeleteConfirmTitle" confirm-button-type="danger"
+                             @confirm="deleteConfig(source)">
                 <template #reference>
                   <el-button type="info" size="small" circle :icon="Delete" :title="langData.configProfileClearConfig"/>
                 </template>
@@ -290,10 +343,15 @@ const _ = (window as any).ResizeObserver;
                              @click="showConfigImportDialog(source)"/>
                 </el-tooltip>
               </el-badge>
+              <!--              <el-badge :value="0" style="margin-left: 12px" type="danger" :max="500" :hidden="true">-->
+              <!--                <el-tooltip :content="langData.configProfileDialog3Title" effect="dark" placement="top">-->
+              <!--                  <el-button type="success" size="small" :icon="Download" circle-->
+              <!--                             @click="showConfigDownloadDialog(source)"/>-->
+              <!--                </el-tooltip>-->
+              <!--              </el-badge>-->
               <el-badge :value="0" style="margin-left: 12px" type="danger" :max="500" :hidden="true">
-                <el-tooltip :content="langData.configProfileDialog3Title" effect="dark" placement="top">
-                  <el-button type="success" size="small" :icon="Download" circle
-                             @click="showConfigDownloadDialog(source)"/>
+                <el-tooltip :content="langData.configProfileRecoveryTitle" effect="dark" placement="top">
+                  <el-button circle :icon="RefreshRight" type="warning" size="small" @click="goRecoveryPage(source)"/>
                 </el-tooltip>
               </el-badge>
               <el-badge :value="0" style="margin-left: 12px" type="danger" :max="500" :hidden="true">
@@ -302,10 +360,11 @@ const _ = (window as any).ResizeObserver;
                 </el-tooltip>
               </el-badge>
               <el-badge :value="0" style="margin-left: 12px" type="danger" :max="500" :hidden="true">
-                <el-popconfirm :title="langData.confirmOpera" confirm-button-type="warning"
+                <el-popconfirm :title="langData.configProfileBackupConfirmTitle" confirm-button-type="warning"
                                @confirm="backupConfig(source)">
                   <template #reference>
-                    <el-button type="warning" size="small" circle :icon="CopyDocument" :title="langData.configProfileBackupConfig"/>
+                    <el-button type="warning" size="small" circle :icon="CopyDocument"
+                               :title="langData.configProfileBackupConfig"/>
                   </template>
                 </el-popconfirm>
               </el-badge>
@@ -319,13 +378,27 @@ const _ = (window as any).ResizeObserver;
           </div>
         </template>
         <template #default="scope">
-          <el-form size="small" label-position="right" inline-message :inline="false" label-width="100px"
+          <el-form size="small" label-position="right" inline-message :inline="false" label-width="150px"
                    style="width:260px">
             <el-form-item :label="langData.configProfileProfileName">
               {{ source.profileName }}
             </el-form-item>
             <el-form-item :label="langData.configProfileProfileDesc">
               {{ source.profileDesc }}
+            </el-form-item>
+            <el-form-item :label="langData.configProfileServiceIntegrated">
+              <el-tooltip :content="langData.configProfileJavaIntegrated" effect="dark" placement="top">
+                <el-link type="success" style="font-size: 1em; margin-right: 5px"
+                         @click="downIntegrated(source,'bootstrap'+(source.profileName == 'default' ? '' : '-' + source.profileName)+'.yml')">
+                  java
+                </el-link>
+              </el-tooltip>
+              |
+              <el-tooltip :content="langData.configProfileHttpIntegrated" effect="dark" placement="top">
+                <el-link type="success" style="font-size: 1em; margin-left: 5px" @click="showHttpIntegrated(source)">
+                  http
+                </el-link>
+              </el-tooltip>
             </el-form-item>
           </el-form>
         </template>
@@ -353,11 +426,11 @@ const _ = (window as any).ResizeObserver;
               <upload-filled/>
             </el-icon>
             <div class="el-upload__text">
-              {{langData.configProfileUploadTips1Prefix}} <em> {{langData.configProfileUploadTips1Suffix}} </em>
+              {{ langData.configProfileUploadTips1Prefix }} <em> {{ langData.configProfileUploadTips1Suffix }} </em>
             </div>
             <template #tip>
               <div class="el-upload__tip">
-                {{langData.configProfileUploadTips2}}
+                {{ langData.configProfileUploadTips2 }}
               </div>
             </template>
           </el-upload>
@@ -385,8 +458,8 @@ const _ = (window as any).ResizeObserver;
           />
         </el-form-item>
         <el-form-item label-width="60%">
-          <el-button @click="dialogFormVisible2 = false">{{langData.btnCancel}}</el-button>
-          <el-button type="primary" @click="configImport()">{{langData.btnSave}}</el-button>
+          <el-button @click="dialogFormVisible2 = false">{{ langData.btnCancel }}</el-button>
+          <el-button type="primary" @click="configImport()">{{ langData.btnSave }}</el-button>
         </el-form-item>
       </el-form>
     </el-dialog>
@@ -398,9 +471,84 @@ const _ = (window as any).ResizeObserver;
       </div>
       <template #footer>
             <span class="dialog-footer">
-              <el-button @click="dialogFormVisible3 = false">{{langData.btnCancel}}</el-button>
+              <el-button @click="dialogFormVisible3 = false">{{ langData.btnCancel }}</el-button>
             </span>
       </template>
+    </el-dialog>
+
+    <el-dialog v-model="dialogFormVisible4" :title="dialogTitle4" draggable width="50%" style="margin-top: 20px;height: 90%;overflow-y: auto">
+      <el-timeline>
+        <el-timeline-item :timestamp="langData.configProfileDialog4Step1" placement="top">
+          <el-card>
+            <h4>{{langData.configProfileDialog4Step1H4}}</h4>
+            <p>
+              <pre style="font-size: 0.8em">{"serviceName":"{{httpIntegrated.serviceName}}", "profileName": "{{httpIntegrated.profileName}}", "type": "YAML"}</pre>
+            </p>
+          </el-card>
+        </el-timeline-item>
+        <el-timeline-item :timestamp="langData.configProfileDialog4Step2" placement="top">
+          <el-card>
+            <h4>{{ langData.configProfileDialog4Step2H4 }}</h4>
+            <img :src="require('@/assets/img/request_encrypt.png')" style="width: 80%;height: 80%">
+          </el-card>
+        </el-timeline-item>
+        <el-timeline-item :timestamp="langData.configProfileDialog4Step3" placement="top">
+          <el-card>
+            <h4>{{ langData.configProfileDialog4Step3H4 }}</h4>
+            <p>Basic认证参数</p>
+            <img :src="require('@/assets/img/request_send1.png')" style="width: 80%;height: 80%">
+            <p>请求响应</p>
+            <img :src="require('@/assets/img/request_send2.png')" style="width: 80%;height: 80%">
+          </el-card>
+        </el-timeline-item>
+        <el-timeline-item :timestamp="langData.configProfileDialog4Step4" placement="top">
+          <el-card>
+            <h4>{{ langData.configProfileDialog4Step4H4 }}</h4>
+            <img :src="require('@/assets/img/request_decrypt.png')" style="width: 80%;height: 80%">
+            <h4>{{ langData.configProfileDialog4Step4JavascriptExample }}</h4>
+            <p><pre style="font-size: 0.8em">import CryptoJS from "crypto-js";
+
+function encrypt(word: any, key: any, iv: any): string {
+    let srcs = CryptoJS.enc.Utf8.parse(word);
+    let encrypted = CryptoJS.AES.encrypt(srcs, key, {
+        iv: iv,
+        mode: CryptoJS.mode.CBC,
+        padding: CryptoJS.pad.Pkcs7
+    });
+    return CryptoJS.enc.Base64.stringify(encrypted.ciphertext);
+}
+let body = {"serviceName":"{{httpIntegrated.serviceName}}", "profileName": "{{httpIntegrated.profileName}}", "type": "YAML"}
+let body = encrypt(JSON.stringify(body),key,iv)</pre></p>
+
+
+
+            <p><pre style="font-size: 0.8em;word-wrap: break-word; white-space: pre-wrap;">curl --location 'http://账号:密码@localhost:30170/h-dbc/api/config/list' \
+--header 'Accept: */*' \
+--header 'Content-Type: application/json' \
+--data 'hBT29zeISxtLm+......1wxypWIXBzL+fACvVd34Q=='
+            </pre></p>
+            <h4>{{langData.configProfileDialog4Step3H4Response}}</h4>
+            <p><pre style="font-size: 0.8em;word-wrap: break-word; white-space: pre-wrap;">"X6stS92xkYcnKNYYXDaCGvVV/2KQ8W5hQYR7HM6wIWmWZnb8p1UsrOVaZL.....r2If3yYKNbwjUYg17zS96NLZvl8QA30lcNPfFvk20ilvhw=="</pre></p>
+
+
+            <p><pre style="font-size: 0.8em;word-wrap: break-word; white-space: pre-wrap;">import CryptoJS from "crypto-js";
+
+function decrypt(word: any, key: any, iv: any): string {
+    let base64 = CryptoJS.enc.Base64.parse(word);
+    let src = CryptoJS.enc.Base64.stringify(base64);
+    let decrypt = CryptoJS.AES.decrypt(src, key, {
+        iv: iv,
+        mode: CryptoJS.mode.CBC,
+        padding: CryptoJS.pad.Pkcs7
+    });
+    var decryptedStr = decrypt.toString(CryptoJS.enc.Utf8);
+    return decryptedStr.toString();
+}
+let response = "X6stS92xkYcnKNYYXDaCGvVV/2KQ8W5hQYR7HM6wIWmWZnb8p1UsrOVaZL.....r2If3yYKNbwjUYg17zS96NLZvl8QA30lcNPfFvk20ilvhw=="
+let config = decrypt(response,key,iv)</pre></p>
+          </el-card>
+        </el-timeline-item>
+      </el-timeline>
     </el-dialog>
   </div>
 </template>

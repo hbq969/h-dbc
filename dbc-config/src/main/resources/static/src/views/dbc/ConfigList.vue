@@ -11,10 +11,28 @@ import router from "@/router";
 import {getLangData} from "@/i18n/locale";
 
 const langData = getLangData()
-
+const dataType = ref([])
 onMounted(() => {
   queryConfigList()
+  queryInitial()
 });
+
+const queryInitial = () => {
+  axios({
+    url: '/config/initial',
+    method: 'get',
+  }).then((res: any) => {
+    if (res.data.state == 'OK') {
+      dataType.value = res.data.body.dataType || []
+    } else {
+      let content = res.config.baseURL + res.config.url + ': ' + res.data.errorMessage;
+      msg(content, "warning")
+    }
+  }).catch((err: Error) => {
+    console.log('', err)
+    msg(langData.axiosRequestErr, 'error')
+  })
+}
 
 const headerCellStyle = () => {
   // 添加表头颜色
@@ -59,11 +77,11 @@ const queryConfigList = () => {
       data.total = res.data.body.total
       data.configList = res.data.body.list
     } else {
-      let content = res.config.baseURL+res.config.url+': '+res.data.errorMessage;
+      let content = res.config.baseURL + res.config.url + ': ' + res.data.errorMessage;
       msg(content, "warning")
     }
   }).catch((err: Error) => {
-    console.log('',err)
+    console.log('', err)
     msg(langData.axiosRequestErr, 'error')
   })
 }
@@ -72,13 +90,15 @@ const dialogFormVisible = ref(false)
 const dialogTitle = ref(langData.dialogTitleAdd)
 const configForm = reactive({
   configKey: '',
-  configValue: ''
+  configValue: '',
+  dataType: 'java.lang.String',
 })
 const showConfigAddDialog = () => {
   dialogFormVisible.value = true
   dialogTitle.value = langData.dialogTitleAdd
   configForm.configKey = ''
   configForm.configValue = ''
+  configForm.dataType='java.lang.String'
 }
 
 const showConfigEditDialog = (scope) => {
@@ -86,6 +106,7 @@ const showConfigEditDialog = (scope) => {
   dialogTitle.value = langData.dialogTitleEdit
   configForm.configKey = scope.row.configKey
   configForm.configValue = scope.row.configValue
+  configForm.dataType=scope.row.dataType
 }
 
 const configFormRef = ref<FormInstance>();
@@ -107,15 +128,15 @@ const updateConfig = async (formEl: FormInstance | undefined) => {
         },
       }).then((res: any) => {
         if (res.data.state == 'OK') {
-          msg(res.data.body,"success")
+          msg(res.data.body, "success")
           dialogFormVisible.value = false
           queryConfigList()
         } else {
-          let content = res.config.baseURL+res.config.url+': '+res.data.errorMessage;
+          let content = res.config.baseURL + res.config.url + ': ' + res.data.errorMessage;
           msg(content, "warning")
         }
       }).catch((err: Error) => {
-        console.log('',err)
+        console.log('', err)
         msg(langData.axiosRequestErr, 'error')
       })
     }
@@ -135,11 +156,11 @@ const deleteConfig = (scope) => {
       msg(res.data.body, 'success')
       queryConfigList()
     } else {
-      let content = res.config.baseURL+res.config.url+': '+res.data.errorMessage;
+      let content = res.config.baseURL + res.config.url + ': ' + res.data.errorMessage;
       msg(content, "warning")
     }
   }).catch((err: Error) => {
-    console.log('',err)
+    console.log('', err)
     msg(langData.axiosRequestErr, 'error')
   })
 }
@@ -169,22 +190,22 @@ const deleteMultipleConfig = () => {
       msg(res.data.body, 'success')
       queryConfigList()
     } else {
-      let content = res.config.baseURL+res.config.url+': '+res.data.errorMessage;
+      let content = res.config.baseURL + res.config.url + ': ' + res.data.errorMessage;
       msg(content, "warning")
     }
   }).catch((err: Error) => {
-    console.log('',err)
+    console.log('', err)
     msg(langData.axiosRequestErr, 'error')
   })
 }
 
 const goConfigQuery = (scope) => {
   let query = scope.row;
-  query.fromPage='configList'
+  query.fromPage = 'configList'
   router.push({path: '/config/query', query: query})
 }
 
-const backupConfig=()=>{
+const backupConfig = () => {
   axios({
     url: '/config/backup',
     method: 'post',
@@ -193,11 +214,11 @@ const backupConfig=()=>{
     if (res.data.state == 'OK') {
       msg(res.data.body, 'success')
     } else {
-      let content = res.config.baseURL+res.config.url+': '+res.data.errorMessage;
+      let content = res.config.baseURL + res.config.url + ': ' + res.data.errorMessage;
       msg(content, "warning")
     }
   }).catch((err: Error) => {
-    console.log('',err)
+    console.log('', err)
     msg(langData.axiosRequestErr, 'error')
   })
 }
@@ -227,9 +248,11 @@ const _ = (window as any).ResizeObserver;
   <div class="container">
     <el-page-header :icon="ArrowLeft" @back="goConfigProfile">
       <template #content>
-        <span class="text-large font-600 mr-3" style="font-size: 15px"> {{ langData.configProfileHeaderCreator }}：{{ router.currentRoute.value.query.username }}，{{langData.configProfileHeaderServiceName}}: {{
+        <span class="text-large font-600 mr-3" style="font-size: 15px"> {{
+            langData.configProfileHeaderCreator
+          }}：{{ router.currentRoute.value.query.username }}，{{ langData.configProfileHeaderServiceName }}: {{
             router.currentRoute.value.query.serviceName
-          }}，{{langData.configProfileProfileName}}: {{
+          }}，{{ langData.configProfileProfileName }}: {{
             router.currentRoute.value.query.profileName
           }}({{ router.currentRoute.value.query.profileDesc }}) </span>
       </template>
@@ -244,11 +267,12 @@ const _ = (window as any).ResizeObserver;
         <el-input v-model="form.configValue" :placeholder="langData.formInputPlaceholder" type="text" clearable/>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" size="small" @click="queryConfigList()" :icon="Search">{{langData.btnSearch}}</el-button>
-        <el-button type="success" :icon="EditPen" @click="showConfigAddDialog()">{{langData.btnAdd}}</el-button>
+        <el-button type="primary" size="small" @click="queryConfigList()" :icon="Search">{{ langData.btnSearch }}
+        </el-button>
+        <el-button type="success" :icon="EditPen" @click="showConfigAddDialog()">{{ langData.btnAdd }}</el-button>
         <el-popconfirm :title="langData.confirmDelete" confirm-button-type="danger" @confirm="deleteMultipleConfig()">
           <template #reference>
-            <el-button type="danger" :icon="Delete">{{langData.configListTableBatchDelete}}</el-button>
+            <el-button type="danger" :icon="Delete">{{ langData.configListTableBatchDelete }}</el-button>
           </template>
         </el-popconfirm>
       </el-form-item>
@@ -260,7 +284,8 @@ const _ = (window as any).ResizeObserver;
       <el-table-column type="selection" header-align="center" align="center"/>
       <el-table-column fixed="left" :label="langData.tableHeaderOp" width="130" header-align="center" align="center">
         <template #default="scope">
-          <el-button circle :icon="Edit" :title="langData.btnEdit" type="primary" size="small" @click="showConfigEditDialog(scope)"/>
+          <el-button circle :icon="Edit" :title="langData.btnEdit" type="primary" size="small"
+                     @click="showConfigEditDialog(scope)"/>
           <el-popconfirm :title="langData.confirmDelete" @confirm="deleteConfig(scope)"
                          icon-color="red"
                          confirm-button-type="danger">
@@ -273,13 +298,17 @@ const _ = (window as any).ResizeObserver;
           </el-tooltip>
         </template>
       </el-table-column>
-      <el-table-column prop="configKey" :label="langData.configListTableConfigKey" :show-overflow-tooltip="true" header-align="center"
+      <el-table-column prop="configKey" :label="langData.configListTableConfigKey" :show-overflow-tooltip="true"
+                       header-align="center"
                        align="left"/>
-      <el-table-column prop="configValue" :label="langData.configListTableConfigValue" :show-overflow-tooltip="true" header-align="center"
+      <el-table-column prop="configValue" :label="langData.configListTableConfigValue" :show-overflow-tooltip="true"
+                       header-align="center"
                        align="left"/>
-      <el-table-column prop="fmtCreatedAt" :label="langData.tableHeaderCreateTime" :show-overflow-tooltip="true" header-align="center"
+      <el-table-column prop="fmtCreatedAt" :label="langData.tableHeaderCreateTime" :show-overflow-tooltip="true"
+                       header-align="center"
                        align="center" width="180"/>
-      <el-table-column prop="fmtUpdatedAt" :label="langData.tableHeaderUpdateTime" :show-overflow-tooltip="true" header-align="center"
+      <el-table-column prop="fmtUpdatedAt" :label="langData.tableHeaderUpdateTime" :show-overflow-tooltip="true"
+                       header-align="center"
                        align="center" width="180"/>
     </el-table>
     <el-pagination class="page" v-model:page-size="form.pageSize" v-model:current-page="form.pageNum"
@@ -294,16 +323,22 @@ const _ = (window as any).ResizeObserver;
                :rules="configRules"
                label-width="30%">
         <el-form-item :label="langData.configListTableConfigKey" prop="configKey">
-          <el-input v-model="configForm.configKey" type="textarea" rows="2" :disabled="dialogTitle == langData.dialogTitleEdit"/>
+          <el-input v-model="configForm.configKey" type="textarea" rows="2"
+                    :disabled="dialogTitle == langData.dialogTitleEdit"/>
         </el-form-item>
         <el-form-item :label="langData.configListTableConfigValue" prop="url">
           <el-input v-model="configForm.configValue" type="textarea" rows="5"/>
         </el-form-item>
+        <el-form-item :label="langData.configListTableDataType" prop="dataType">
+          <el-select v-model="configForm.dataType" size="small" clearable filterable style="width: 100%">
+            <el-option :key="item.key" :label="item.value" :value="item.key" v-for="item in dataType"/>
+          </el-select>
+        </el-form-item>
       </el-form>
       <template #footer>
                 <span class="dialog-footer">
-                  <el-button @click="dialogFormVisible = false">{{langData.btnCancel}}</el-button>
-                  <el-button type="primary" @click="updateConfig(configFormRef)">{{langData.btnSave}}</el-button>
+                  <el-button @click="dialogFormVisible = false">{{ langData.btnCancel }}</el-button>
+                  <el-button type="primary" @click="updateConfig(configFormRef)">{{ langData.btnSave }}</el-button>
                 </span>
       </template>
     </el-dialog>

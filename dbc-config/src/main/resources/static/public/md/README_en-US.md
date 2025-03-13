@@ -1,6 +1,4 @@
-A configuration center implementation based on database.
-
-
+A configuration center implementation based on a database.
 
 ## Quick Start
 ### Install
@@ -8,17 +6,17 @@ A configuration center implementation based on database.
 git clone https://github.com/hbq969/h-dbc.git
 # Packaging UI pages
 cd h-dbc/dbc-config/src/main/resources/static
-nvm use 16 
+nvm use 16
 npm i && npm run build
-# Build the configuration center server
-cd h-dbc 
+#Build the configuration center server
+cd h-dbc
 mvn -U -DskipTests=true clean
 # Build configuration center dependencies
 cd h-dbc/dbc-driver
 mvn install
 ```
 
-### Deploy
+### Deployment
 ```bash
 cd h-dbc/dbc-config/target
 tar xvf dbc-config-1.0-SNAPSHOT.tar.gz
@@ -64,56 +62,65 @@ mybatis:
   config-location: classpath:jpaConfig-mysql.xml
 ```
 
-### Service Configuration
+### Service configuration
 
-> Maven Configuration
+> Maven configuration
 ```xml
 <dependency>
     <groupId>com.github.hbq969</groupId>
-    <artifactId>dbc-driver</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <artifactId>spring-cloud-starter-hdbc-config</artifactId>
+    <version>1.0</version>
 </dependency>
 ```
 
-> bootstrap.yml （api pull way）
+> bootstrap.yml (strategy: mix, use api method to pull first, switch to db method if api method is not available)
 ```yaml
 spring:
   cloud:
     config:
       h-dbc:
         enabled: true
-        dbc-key: h-dbc
+        profile-name: dev
         service-name: h-example
-        profile-name: default
-        strategy: api
+        dbc-key: h-dbc
+        strategy: mix
         api:
-          secret: API encryption transmission key, refer to the configuration center configuration
           auth:
             basic:
-              username: API authentication account
-              password: API authentication password
+              password: Basic Auth Password
+              username: Basic Auth Account
             enabled: true
-```
-
-> bootstrap.yml （database read way）
-```yaml
-spring:
-  cloud:
-    config:
-      h-dbc:
-        enabled: true
-        dbc-key: h-dbc
-        service-name: h-example
-        profile-name: dev
-        strategy: db
+          url: http://localhost:30170
+          charset: utf-8
+          secret: API Access SecretKey
+          iv: API Access IV
         db:
           driver-class-name: com.mysql.cj.jdbc.Driver
-          username: Database Account
-          password: Database password
-          jdbc-url: Database url
+          jdbc-url: Config Center Jdbc URL
+          username: Config Center Jdbc User
+          password: Config Center Jdbc Password
+          connection-test-query: SELECT 1
+          max-lifetime: 1800000
+          maximum-pool-size: 2
+          minimum-idle: 1
 ```
 
+## Non-Java access method
+1. Construct request parameters
+> Here, `type` supports `PROP` (property key-value pair) and `YAML` formats
+```json
+{
+    "serviceName": "h-example",
+    "profileName": "dev",
+    "type": "PROP"
+}
+```
 
+2. Encrypt request parameters
+
+![](./request_encrypt.png)
+
+3. Call the configuration center API interface to pull configuration
 
 ## Non-Java Program Access Guide
 

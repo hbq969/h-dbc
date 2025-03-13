@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-  Edit, ArrowLeft, RefreshRight, Search, Delete
+  Edit, ArrowLeft, RefreshRight, Search, Delete, ZoomIn
 } from '@element-plus/icons-vue'
 import {ref, reactive, onMounted, computed, provide, inject} from 'vue'
 import axios from '@/network'
@@ -8,6 +8,7 @@ import {msg} from '@/utils/Utils'
 import {ElMessageBox} from 'element-plus'
 import type {TableInstance} from 'element-plus'
 import {getLangData} from "@/i18n/locale";
+import router from "@/router";
 
 const langData = getLangData()
 
@@ -25,17 +26,18 @@ const queryUserInfo = () => {
       user.userName = res.data.body.userName
       user.roleName = res.data.body.roleName
     } else {
-      let content = res.config.baseURL+res.config.url+': '+res.data.errorMessage;
+      let content = res.config.baseURL + res.config.url + ': ' + res.data.errorMessage;
       msg(content, "warning")
     }
   }).catch((err: Error) => {
-    console.log('',err)
+    console.log('', err)
     msg(langData.axiosRequestErr, 'error')
   })
 }
 
 onMounted(() => {
   queryProfileList()
+  backfillByQuery()
   queryBackupList()
   queryUserInfo()
 });
@@ -65,13 +67,21 @@ const queryProfileList = () => {
     if (res.data.state == 'OK') {
       data.profiles = res.data.body
     } else {
-      let content = res.config.baseURL+res.config.url+': '+res.data.errorMessage;
+      let content = res.config.baseURL + res.config.url + ': ' + res.data.errorMessage;
       msg(content, "warning")
     }
   }).catch((err: Error) => {
-    console.log('',err)
+    console.log('', err)
     msg(langData.axiosRequestErr, 'error')
   })
+}
+
+const backfillByQuery = () => {
+  let info = router.currentRoute.value.query
+  if (info) {
+    form.serviceName = info.serviceName
+    form.profileName = info.profileName
+  }
 }
 
 const tableRef = ref<TableInstance>()
@@ -90,11 +100,11 @@ const queryBackupList = () => {
       data.total = res.data.body.total
       data.backups = res.data.body.list
     } else {
-      let content = res.config.baseURL+res.config.url+': '+res.data.errorMessage;
+      let content = res.config.baseURL + res.config.url + ': ' + res.data.errorMessage;
       msg(content, "warning")
     }
   }).catch((err: Error) => {
-    console.log('',err)
+    console.log('', err)
     msg(langData.axiosRequestErr, 'error')
   })
 }
@@ -108,11 +118,11 @@ const recovery = (scope) => {
     if (res.data.state == 'OK') {
       msg(res.data.body, 'success')
     } else {
-      let content = res.config.baseURL+res.config.url+': '+res.data.errorMessage;
+      let content = res.config.baseURL + res.config.url + ': ' + res.data.errorMessage;
       msg(content, "warning")
     }
   }).catch((err: Error) => {
-    console.log('',err)
+    console.log('', err)
     msg(langData.axiosRequestErr, 'error')
   })
 }
@@ -127,11 +137,11 @@ const deleteBackup = (scope) => {
       msg(res.data.body, 'success')
       queryBackupList()
     } else {
-      let content = res.config.baseURL+res.config.url+': '+res.data.errorMessage;
+      let content = res.config.baseURL + res.config.url + ': ' + res.data.errorMessage;
       msg(content, "warning")
     }
   }).catch((err: Error) => {
-    console.log('',err)
+    console.log('', err)
     msg(langData.axiosRequestErr, 'error')
   })
 }
@@ -158,11 +168,11 @@ const batchDeleteBackup = () => {
       msg(res.data.body, 'success')
       queryBackupList()
     } else {
-      let content = res.config.baseURL+res.config.url+': '+res.data.errorMessage;
+      let content = res.config.baseURL + res.config.url + ': ' + res.data.errorMessage;
       msg(content, "warning")
     }
   }).catch((err: Error) => {
-    console.log('',err)
+    console.log('', err)
     msg(langData.axiosRequestErr, 'error')
   })
 }
@@ -189,11 +199,11 @@ const batchRecovery = () => {
       msg(res.data.body, 'success')
       queryBackupList()
     } else {
-      let content = res.config.baseURL+res.config.url+': '+res.data.errorMessage;
+      let content = res.config.baseURL + res.config.url + ': ' + res.data.errorMessage;
       msg(content, "warning")
     }
   }).catch((err: Error) => {
-    console.log('',err)
+    console.log('', err)
     msg(langData.axiosRequestErr, 'error')
   })
 }
@@ -221,25 +231,33 @@ const _ = (window as any).ResizeObserver;
 
 <template>
   <div class="container">
+    <el-page-header :icon="ArrowLeft" @back="router.back()" v-if="router.currentRoute.value.query && router.currentRoute.value.query.serviceName">
+      <template #content>
+        <span class="text-large font-600 mr-3" style="font-size: 15px"> 配置还原 </span>
+      </template>
+    </el-page-header>
+    <el-divider content-position="left" style="margin: 10px 0" v-if="router.currentRoute.value.query && router.currentRoute.value.query.serviceName"></el-divider>
     <el-form :model="form" size="small" label-position="right" inline-message inline>
       <el-form-item :label="langData.configProfileHeaderServiceName" prop="serviceName">
         <el-input v-model="form.serviceName" :placeholder="langData.formInputPlaceholder" type="text" clearable/>
       </el-form-item>
       <el-form-item :label="langData.configProfileProfileName" prop="profileName">
-        <el-select v-model="form.profileName" :placeholder="langData.formSelectPlaceholder" size="small" clearable filterable
+        <el-select v-model="form.profileName" :placeholder="langData.formSelectPlaceholder" size="small" clearable
+                   filterable
                    style="width:120px">
           <el-option :key="item.profileName" :label="item.profileName+'('+item.profileDesc+')'"
                      :value="item.profileName" v-for="item in data.profiles"/>
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" size="small" @click="queryBackupList()" :icon="Search">{{langData.btnSearch}}</el-button>
-        <el-popconfirm :title="langData.confirmDelete" confirm-button-type="danger" @confirm="batchDeleteBackup">
+        <el-button type="primary" size="small" @click="queryBackupList()" :icon="Search">{{ langData.btnSearch }}
+        </el-button>
+        <el-popconfirm :title="langData.backupBatchDeleteConfirmTitle" confirm-button-type="danger" @confirm="batchDeleteBackup">
           <template #reference>
-            <el-button type="danger" size="small" :icon="Delete">{{langData.configListTableBatchDelete}}</el-button>
+            <el-button type="danger" size="small" :icon="Delete">{{ langData.configListTableBatchDelete }}</el-button>
           </template>
         </el-popconfirm>
-        <el-popconfirm :title="langData.confirmOpera" confirm-button-type="danger" @confirm="batchRecovery">
+        <el-popconfirm :title="langData.backupBatchRecoveryConfirmTitle" confirm-button-type="danger" @confirm="batchRecovery">
           <template #reference>
             <el-button type="warning" size="small" :icon="RefreshRight">{{ langData.backupBatchRecovery }}</el-button>
           </template>
@@ -250,12 +268,18 @@ const _ = (window as any).ResizeObserver;
     <el-table ref="tableRef" :data="data.backups" style="width: 100%" :border="true" table-layout="fixed" :stripe="true"
               size="small" :highlight-current-row="true" :header-cell-style="headerCellStyle">
       <el-table-column type="selection" header-align="center" align="center"/>
-      <el-table-column fixed="left" :label="langData.tableHeaderOp" width="100" header-align="center" align="center">
+      <el-table-column fixed="left" :label="langData.tableHeaderOp" width="120" header-align="center" align="center">
         <template #default="scope">
-          <el-popconfirm :title="langData.confirmOpera" confirm-button-type="warning" @confirm="recovery(scope)">
+          <el-tooltip :content="langData.serviceTableOpConfigCompare" effect="dark" placement="top">
+            <el-button circle :icon="ZoomIn" type="primary" size="small"
+                       @click="router.push({path:'/config/compareBackup',query:scope.row})"
+                       :disabled="user.roleName!='ADMIN' && user.userName!=scope.row.username"/>
+          </el-tooltip>
+          <el-popconfirm :title="langData.backupConfirmTitle" confirm-button-type="warning" @confirm="recovery(scope)">
             <template #reference>
               <el-button circle :icon="RefreshRight" type="warning" size="small"
-                         :disabled="user.roleName!='ADMIN' && user.userName!=scope.row.username" :title="langData.backupRecovery"/>
+                         :disabled="user.roleName!='ADMIN' && user.userName!=scope.row.username"
+                         :title="langData.backupRecovery"/>
             </template>
           </el-popconfirm>
           <el-popconfirm :title="langData.confirmDelete" @confirm="deleteBackup(scope)"
@@ -263,24 +287,31 @@ const _ = (window as any).ResizeObserver;
                          confirm-button-type="danger">
             <template #reference>
               <el-button circle :icon="Delete" type="danger" size="small"
-                         :disabled="user.roleName!='ADMIN' && user.userName!=scope.row.username" :title="langData.btnDelete"/>
+                         :disabled="user.roleName!='ADMIN' && user.userName!=scope.row.username"
+                         :title="langData.btnDelete"/>
             </template>
           </el-popconfirm>
         </template>
       </el-table-column>
       <el-table-column prop="id" label="ID" :show-overflow-tooltip="true" header-align="center"
                        align="center"/>
-      <el-table-column prop="username" :label="langData.tableHeaderCreator" :show-overflow-tooltip="true" header-align="center"
+      <el-table-column prop="username" :label="langData.tableHeaderCreator" :show-overflow-tooltip="true"
+                       header-align="center"
                        align="center"/>
-      <el-table-column prop="serviceName" :label="langData.configProfileHeaderServiceName" :show-overflow-tooltip="true" header-align="center"
+      <el-table-column prop="serviceName" :label="langData.configProfileHeaderServiceName" :show-overflow-tooltip="true"
+                       header-align="center"
                        align="center"/>
-      <el-table-column prop="serviceDesc" :label="langData.serviceFormServiceDesc" :show-overflow-tooltip="true" header-align="center"
+      <el-table-column prop="serviceDesc" :label="langData.serviceFormServiceDesc" :show-overflow-tooltip="true"
+                       header-align="center"
                        align="center"/>
-      <el-table-column prop="profileName" :label="langData.configProfileProfileName" :show-overflow-tooltip="true" header-align="center"
+      <el-table-column prop="profileName" :label="langData.configProfileProfileName" :show-overflow-tooltip="true"
+                       header-align="center"
                        align="center"/>
-      <el-table-column prop="profileDesc" :label="langData.configProfileProfileDesc" :show-overflow-tooltip="true" header-align="center"
+      <el-table-column prop="profileDesc" :label="langData.configProfileProfileDesc" :show-overflow-tooltip="true"
+                       header-align="center"
                        align="center"/>
-      <el-table-column prop="fmtCreatedAt" :label="langData.backupTableHeaderBackupTime" :show-overflow-tooltip="true" header-align="center"
+      <el-table-column prop="fmtCreatedAt" :label="langData.backupTableHeaderBackupTime" :show-overflow-tooltip="true"
+                       header-align="center"
                        align="center"/>
     </el-table>
     <el-pagination class="page" v-model:page-size="form.pageSize" v-model:current-page="form.pageNum"

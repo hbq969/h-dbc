@@ -71,35 +71,35 @@ public class BackupProxyImpl implements BackupService {
 
     @Override
     public void deleteBackup(BackupEntity bk) {
-        if(conf.isBackup()){
+        if (conf.isBackup()) {
             target.deleteBackup(bk);
         }
     }
 
     @Override
     public void deleteBackups(BatchDeleteBackup bdb) {
-        if(conf.isBackup()){
+        if (conf.isBackup()) {
             target.deleteBackups(bdb);
         }
     }
 
     @Override
     public void recoveryBackup(BackupEntity bk) {
-        if(conf.isBackup()){
+        if (conf.isBackup()) {
             target.recoveryBackup(bk);
         }
     }
 
     @Override
     public void recoveryBackups(BatchDeleteRecovery bdr) {
-        if(conf.isBackup()){
+        if (conf.isBackup()) {
             target.recoveryBackups(bdr);
         }
     }
 
     @Override
     public List<ProfileEntity> queryProfileList() {
-        if(conf.isBackup()){
+        if (conf.isBackup()) {
             return target.queryProfileList();
         }
         throw new UnsupportedOperationException();

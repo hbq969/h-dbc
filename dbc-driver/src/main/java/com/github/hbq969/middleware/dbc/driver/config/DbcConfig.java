@@ -1,7 +1,6 @@
 package com.github.hbq969.middleware.dbc.driver.config;
 
 import cn.hutool.core.lang.Assert;
-import com.github.hbq969.code.common.utils.GsonUtils;
 import com.github.hbq969.middleware.dbc.driver.api.APIPropertySource;
 import com.github.hbq969.middleware.dbc.driver.api.ConfigService;
 import lombok.Data;
@@ -39,6 +38,7 @@ public class DbcConfig {
      * <ul>
      *     <li>api</li>
      *     <li>db</li>
+     *     <li>mix</li>
      * </ul>
      */
     private String strategy = "api";
@@ -59,7 +59,7 @@ public class DbcConfig {
         this.db.configSet(env);
         this.api.configSet(env);
         if (log.isTraceEnabled()) {
-            log.trace("配置中心对应配置: {}", GsonUtils.toJson(this));
+            log.trace("配置中心对应配置: {}", this);
         }
         return this;
     }

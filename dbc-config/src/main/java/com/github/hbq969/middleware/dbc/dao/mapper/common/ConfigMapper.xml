@@ -41,14 +41,16 @@
     </select>
 
     <insert id="saveConfig">
-        insert into h_dbc_config(app, username, service_id, profile_name, config_key, config_value, created_at)
+        insert into h_dbc_config(app, username, service_id, profile_name, config_key, config_value, data_type,
+                                 created_at)
         values (#{asp.app}, #{asp.username}, #{asp.serviceId}, #{asp.profileName}, #{config.configKey},
-                #{config.configValue}, #{config.createdAt})
+                #{config.configValue}, #{config.dataType}, #{config.createdAt})
     </insert>
 
     <update id="updateConfig">
         update h_dbc_config
         set config_value=#{config.configValue},
+            data_type=#{config.dataType},
             updated_at  = #{config.updatedAt}
         where app = #{asp.app}
           and username = #{asp.username}
@@ -70,6 +72,7 @@
     <select id="queryConfigList" resultType="com.github.hbq969.middleware.dbc.dao.entity.ConfigEntity">
         select config_key AS "configKey",
         config_value AS "configValue",
+        data_type AS "dataType",
         created_at AS "createdAt",
         updated_at AS "updatedAt"
         from h_dbc_config
@@ -137,6 +140,7 @@
         a.profile_name AS "profileName",
         a.config_key AS "configKey",
         a.config_value AS "configValue",
+        a.data_type AS "dataType",
         a.created_at AS "createdAt",
         a.updated_at AS "updatedAt"
         from h_dbc_config a,h_dbc_service b

@@ -2,7 +2,6 @@ package com.github.hbq969.middleware.dbc.model;
 
 import com.github.hbq969.code.common.spring.context.SpringContext;
 import com.github.hbq969.code.common.utils.I18nUtils;
-import com.github.hbq969.code.sm.login.session.UserContext;
 import com.github.hbq969.middleware.dbc.dao.entity.ConfigFileEntity;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;

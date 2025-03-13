@@ -4,8 +4,8 @@ import com.github.hbq969.code.common.spring.context.SpringContext;
 import com.github.hbq969.code.common.utils.FormatTime;
 import com.github.hbq969.code.common.utils.I18nUtils;
 import com.github.hbq969.code.sm.login.session.UserContext;
-import com.github.hbq969.middleware.dbc.dao.BackupDao;
 import com.github.hbq969.middleware.dbc.dao.ProfileDao;
+import com.github.hbq969.middleware.dbc.dao.ServiceDao;
 import com.github.hbq969.middleware.dbc.dao.entity.ProfileEntity;
 import com.github.hbq969.middleware.dbc.model.AccountProfile;
 import com.github.hbq969.middleware.dbc.model.AccountService;
@@ -16,10 +16,10 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -32,17 +32,18 @@ public class ProfileServiceImpl implements ProfileService {
     @Autowired
     private SpringContext context;
     @Autowired
-    @Qualifier("dbc-BackupProxyImpl")
+    @Qualifier("dbc-BackupServiceRBACImpl")
     private BackupService backupService;
+    @Qualifier("dbc-ServiceDao")
+    @Autowired
+    private ServiceDao serviceDao;
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void saveProfile(ProfileEntity profile) {
-        if (!UserContext.get().isAdmin()) {
-            throw new UnsupportedOperationException(I18nUtils.getMessage(context,"ProfileServiceImpl.saveProfile.msg1"));
-        }
         List<ProfileEntity> pes = profileDao.queryProfileByName(profile.getProfileName());
         if (CollectionUtils.isNotEmpty(pes)) {
-            throw new IllegalArgumentException(String.format(I18nUtils.getMessage(context,"ProfileServiceImpl.saveProfile.msg2"), pes.get(0).getUsername()));
+            throw new IllegalArgumentException(String.format(I18nUtils.getMessage(context, "ProfileServiceImpl.saveProfile.msg2"), pes.get(0).getUsername()));
         }
         profile.setCreatedAt(FormatTime.nowSecs());
         profileDao.saveProfile(profile);
@@ -54,22 +55,12 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     public void updateProfile(ProfileEntity profile) {
-        if (!UserContext.get().isAdmin()) {
-            throw new UnsupportedOperationException(I18nUtils.getMessage(context,"ProfileServiceImpl.saveProfile.msg1"));
-        }
-        if (UserContext.permitAllow(profile.getUsername())) {
-            profile.setUpdatedAt(FormatTime.nowSecs());
-            profileDao.updateProfile(profile);
-        } else {
-            throw new UnsupportedOperationException(I18nUtils.getMessage(context,"BackupServiceImpl.msg1"));
-        }
+        profileDao.updateProfile(profile);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void deleteProfile(ProfileEntity profile) {
-        if (!UserContext.get().isAdmin()) {
-            throw new UnsupportedOperationException(I18nUtils.getMessage(context,"ProfileServiceImpl.saveProfile.msg1"));
-        }
         backupService.backupOnDeleteProfile(profile);
         profileDao.deleteProfileOnAdmin(profile.getProfileName());
         profileDao.deleteAccProfileOnAdmin(profile.getProfileName());
@@ -87,7 +78,10 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     public List<ProfileEntity> queryProfileList(AccountService as) {
-        if (UserContext.permitAllow(as.getUsername())) {
+        String currentUserName = UserContext.get().getUserName();
+        String serviceId = as.getServiceId();
+        if (UserContext.get().isAdmin() ||
+                UserContext.permitAllow(as.getUsername()) && serviceDao.querySelectCountByUser(serviceId, currentUserName) > 0) {
             List<ProfileEntity> all = profileDao.queryAllProfileList();
             as.setApp(context.getProperty("spring.application.name"));
             List<ProfileEntity> config = profileDao.queryProfileConfigNum(as);
@@ -98,35 +92,26 @@ public class ProfileServiceImpl implements ProfileService {
             }
             return all;
         } else {
-            throw new UnsupportedOperationException(I18nUtils.getMessage(context,"BackupServiceImpl.msg1"));
+            throw new UnsupportedOperationException(I18nUtils.getMessage(context, "BackupServiceImpl.msg1"));
         }
     }
 
     @Override
     public void deleteProfileConfig(AccountServiceProfile asp) {
         asp.setApp(context.getProperty("spring.application.name"));
-        if (UserContext.permitAllow(asp.getUsername())) {
-            backupService.backupOnClearProfileConfig(asp);
-            profileDao.deleteProfileConfig(asp);
-            profileDao.deleteProfileConfileFile2(asp);
-        } else {
-            throw new UnsupportedOperationException(I18nUtils.getMessage(context,"BackupServiceImpl.msg1"));
-        }
+        backupService.backupOnClearProfileConfig(asp);
+        profileDao.deleteProfileConfig(asp);
+        profileDao.deleteProfileConfileFile2(asp);
     }
 
     @Override
     public void backup(ProfileEntity profile) {
-        if (!UserContext.get().isAdmin()) {
-            throw new UnsupportedOperationException(I18nUtils.getMessage(context,"ProfileServiceImpl.saveProfile.msg1"));
-        }
         backupService.backupOnDeleteProfile(profile);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void backupAll() {
-        if (!UserContext.get().isAdmin()) {
-            throw new UnsupportedOperationException(I18nUtils.getMessage(context,"ProfileServiceImpl.saveProfile.msg1"));
-        }
         List<ProfileEntity> profiles = profileDao.queryAllProfileList();
         for (ProfileEntity profile : profiles) {
             backupService.backupOnDeleteProfile(profile);

@@ -1,22 +1,28 @@
-delete from h_dict_base where dict_name='import,file,type';
+delete from h_dict_base where dict_name in ('import,file,type','config,dataType');
+delete from h_dict_pairs where dict_name in ('import,file,type','config,dataType');
 insert into h_dict_base(dict_name,dict_desc,dict_source,key_column,val_column,app) values('import,file,type','ファイルタイプ',1,'key','value','h-dbc');
 insert into h_dict_pairs(dict_name,pair_key,pair_value) values('import,file,type','yml','yml');
 insert into h_dict_pairs(dict_name,pair_key,pair_value) values('import,file,type','yaml','yaml');
 insert into h_dict_pairs(dict_name,pair_key,pair_value) values('import,file,type','properties','properties');
+insert into h_dict_base(dict_name,dict_desc,dict_source,key_column,val_column,app) values('config,dataType','プロパティ データ型の構成',1,'key','value','h-dbc');
+insert into h_dict_pairs(dict_name,pair_key,pair_value) values('config,dataType','java.lang.String','文字列型');
+insert into h_dict_pairs(dict_name,pair_key,pair_value) values('config,dataType','java.lang.Character','文字タイプ');
+insert into h_dict_pairs(dict_name,pair_key,pair_value) values('config,dataType','java.lang.Double','倍精度浮動小数点型');
+insert into h_dict_pairs(dict_name,pair_key,pair_value) values('config,dataType','java.lang.Float','単精度浮動小数点型');
+insert into h_dict_pairs(dict_name,pair_key,pair_value) values('config,dataType','java.lang.Long','長整数型');
+insert into h_dict_pairs(dict_name,pair_key,pair_value) values('config,dataType','java.lang.Integer','整数型');
+insert into h_dict_pairs(dict_name,pair_key,pair_value) values('config,dataType','java.lang.Short','短整数型');
+insert into h_dict_pairs(dict_name,pair_key,pair_value) values('config,dataType','java.lang.Byte','バイトタイプ');
+insert into h_dict_pairs(dict_name,pair_key,pair_value) values('config,dataType','java.lang.Boolean','ブール型');
 
-delete from h_menus where app='h-dbc' and name in ('Config','Profile','Service','Backup','Encrypt','Guide');
+delete from h_menus where app='h-dbc' and name in ('Config','Profile','Service','Backup','Encrypt','Guide','OperLog');
 insert into h_menus(app,name,menu_desc,url,parent_key,order_index,menu_level,icon_name,created_at) values('h-dbc','Config','構成管理','inner:/h-dbc/Config','-',1,1,'Console',1735800456);
 insert into h_menus(app,name,menu_desc,url,parent_key,order_index,menu_level,icon_name,created_at) values('h-dbc','Profile','環境管理','inner:/h-dbc/dbc-ui/index.html#/profile','Config',0,2,'profile2',1735800456);
 insert into h_menus(app,name,menu_desc,url,parent_key,order_index,menu_level,icon_name,created_at) values('h-dbc','Service','サービス管理','inner:/h-dbc/dbc-ui/index.html#/service','Config',1,2,'service3',1735800456);
 insert into h_menus(app,name,menu_desc,url,parent_key,order_index,menu_level,icon_name,created_at) values('h-dbc','Backup','構成の回復','inner:/h-dbc/dbc-ui/index.html#/back/data','Config',2,2,'recovery5',1735800456);
 insert into h_menus(app,name,menu_desc,url,parent_key,order_index,menu_level,icon_name,created_at) values('h-dbc','Encrypt','暗号化および復号化ツール','inner:/h-dbc/hbq969-common/index.html#/encrypt','Config',3,2,'encrypt2',1735800456);
 insert into h_menus(app,name,menu_desc,url,parent_key,order_index,menu_level,icon_name,created_at) values('h-dbc','Guide','ガイドドキュメント','inner:/h-dbc/dbc-ui/index.html#/guide','Config',-1,2,'guide',1735800456);
-insert into h_role_menus(app,role_name,menu_name) values('h-dbc','ADMIN','Config');
-insert into h_role_menus(app,role_name,menu_name) values('h-dbc','ADMIN','Profile');
-insert into h_role_menus(app,role_name,menu_name) values('h-dbc','ADMIN','Service');
-insert into h_role_menus(app,role_name,menu_name) values('h-dbc','ADMIN','Backup');
-insert into h_role_menus(app,role_name,menu_name) values('h-dbc','ADMIN','Encrypt');
-insert into h_role_menus(app,role_name,menu_name) values('h-dbc','ADMIN','Guide');
+insert into h_menus(app,name,menu_desc,url,parent_key,order_index,menu_level,icon_name,created_at) values('h-dbc','OperLog','操作ログ','inner:/h-dbc/hbq969-tabula/index.html#/data?report=true&source=mysql%2C${defaultDataBaseSchema}&dialect=mysql&schema=${defaultDataBaseSchema}&name=log_dbc&desc=%E9%85%8D%E7%BD%AE%E4%B8%AD%E5%BF%83%E6%93%8D%E4%BD%9C%E6%97%A5%E5%BF%97&manage=0&fmtManage=%E5%90%A6&create=null&creator=admin&createTime=1743584250','Config',6,2,'TableManagementIcon',1735800456);
 
 delete from h_dbc_profiles where profile_name in ('default','dev','test','prod','mysql','oracle');
 insert into h_dbc_profiles(profile_name,profile_desc,created_at) values('default','デフォルト環境',1739763078);
@@ -34,3 +40,16 @@ insert into h_dbc_acc_profiles(app,username,profile_name) values('h-dbc','admin'
 
 delete from h_sm_info where app='h-dbc';
 insert into h_sm_info(app,info_content) values('h-dbc','{"title":"構成センター"}');
+
+delete from h_tabula where table_name='log_dbc';
+delete from h_tabula_col where table_name='log_dbc';
+INSERT INTO h_tabula (table_name, table_desc, creator, manage_enabled, create_time, update_time, source_dialect, source_schema) VALUES ('log_dbc', '構成センター操作ログ', 'admin', 0, 1743584250, 0, 'mysql', '${defaultDataBaseSchema}');
+INSERT INTO h_tabula_col (table_name, col_name, col_desc, col_source, col_source_define, is_query, is_list, is_add, is_edit, is_sort, sort_way, is_fuzzy, creator, create_time, update_time) VALUES ('log_dbc', 'get_paras', 'リクエスト取得パラメータ', 'page-input', NULL, 1, 1, 1, 1, 0, 0, 1, 'admin', 1743584490, NULL);
+INSERT INTO h_tabula_col (table_name, col_name, col_desc, col_source, col_source_define, is_query, is_list, is_add, is_edit, is_sort, sort_way, is_fuzzy, creator, create_time, update_time) VALUES ('log_dbc', 'method_desc', 'インターフェースの説明', 'page-input', NULL, 1, 1, 1, 1, 0, 0, 1, 'admin', 1743584475, NULL);
+INSERT INTO h_tabula_col (table_name, col_name, col_desc, col_source, col_source_define, is_query, is_list, is_add, is_edit, is_sort, sort_way, is_fuzzy, creator, create_time, update_time) VALUES ('log_dbc', 'method_name', 'インターフェースメソッドタイプ', 'page-input', NULL, 1, 1, 1, 1, 0, 0, 0, 'admin', 1743584457, NULL);
+INSERT INTO h_tabula_col (table_name, col_name, col_desc, col_source, col_source_define, is_query, is_list, is_add, is_edit, is_sort, sort_way, is_fuzzy, creator, create_time, update_time) VALUES ('log_dbc', 'oper_name', 'オペレーター', 'backend-session-key', 'h-sm-user', 1, 1, 0, 1, 0, 0, 1, 'admin', 1743584347, NULL);
+INSERT INTO h_tabula_col (table_name, col_name, col_desc, col_source, col_source_define, is_query, is_list, is_add, is_edit, is_sort, sort_way, is_fuzzy, creator, create_time, update_time) VALUES ('log_dbc', 'oper_time', '操作時間', 'backend-time-num-sec', NULL, 1, 1, 0, 1, 1, 1, 0, 'admin', 1743584376, NULL);
+INSERT INTO h_tabula_col (table_name, col_name, col_desc, col_source, col_source_define, is_query, is_list, is_add, is_edit, is_sort, sort_way, is_fuzzy, creator, create_time, update_time) VALUES ('log_dbc', 'post_body', 'リクエスト投稿パラメータ', 'page-input', NULL, 1, 1, 1, 1, 0, 0, 1, 'admin', 1743584501, NULL);
+INSERT INTO h_tabula_col (table_name, col_name, col_desc, col_source, col_source_define, is_query, is_list, is_add, is_edit, is_sort, sort_way, is_fuzzy, creator, create_time, update_time) VALUES ('log_dbc', 'req_id', 'リクエストID', 'backend-pri-str-uuid', NULL, 1, 1, 0, 1, 0, 0, 1, 'admin', 1743584286, NULL);
+INSERT INTO h_tabula_col (table_name, col_name, col_desc, col_source, col_source_define, is_query, is_list, is_add, is_edit, is_sort, sort_way, is_fuzzy, creator, create_time, update_time) VALUES ('log_dbc', 'result', '結果のリクエスト', 'page-input', NULL, 1, 1, 1, 1, 0, 0, 1, 'admin', 1743584513, NULL);
+INSERT INTO h_tabula_col (table_name, col_name, col_desc, col_source, col_source_define, is_query, is_list, is_add, is_edit, is_sort, sort_way, is_fuzzy, creator, create_time, update_time) VALUES ('log_dbc', 'url', 'インターフェース URL', 'page-input', NULL, 1, 1, 1, 1, 0, 0, 1, 'admin', 1743584397, NULL);

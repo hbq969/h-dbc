@@ -51,4 +51,6 @@ public interface ServiceDao {
     List<ServiceEntity> queryServiceByName(@Param("accService") AccountService accountService, @Param("serviceName") String serviceName);
 
     void saveAccountService(AccountService accountService);
+
+    int querySelectCountByUser(@Param("serviceId") String serviceId,@Param("username") String username);
 }

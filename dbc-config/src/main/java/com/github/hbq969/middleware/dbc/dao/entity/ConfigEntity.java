@@ -10,6 +10,7 @@ import lombok.Data;
 public class ConfigEntity implements DictModel, DictAware {
     private String configKey;
     private String configValue;
+    private String dataType = String.class.getName();
     private Long createdAt;
     private Long updatedAt;
     private String fmtCreatedAt;
@@ -23,6 +24,14 @@ public class ConfigEntity implements DictModel, DictAware {
         }
         if (updatedAt != null) {
             this.fmtUpdatedAt = FormatTime.YYYYMMDDHHMISS.withSecs(updatedAt.longValue());
+        }
+    }
+
+    public Class<?> toDataTypeClass() {
+        try {
+            return Class.forName(dataType);
+        } catch (ClassNotFoundException e) {
+            return String.class;
         }
     }
 }

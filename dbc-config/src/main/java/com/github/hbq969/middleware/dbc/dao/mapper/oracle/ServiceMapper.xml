@@ -48,16 +48,17 @@
     <update id="createConfig">
         create table h_dbc_config
         (
-            app          varchar2(100),
-            username     varchar2(100),
-            service_id   varchar2(100),
-            profile_name varchar2(100),
-            config_key   varchar2(500),
+            app varchar2 (100),
+            username varchar2 (100),
+            service_id varchar2 (100),
+            profile_name varchar2 (100),
+            config_key varchar2 (500),
             config_value clob,
-            created_at   number(20),
-            updated_at   number(20),
+            data_type varchar2 (50) default 'java.lang.String',
+            created_at number (20),
+            updated_at number (20),
             constraint pk_dbc_config primary key (app, username, service_id, profile_name, config_key)
-        ) 
+        )
     </update>
 
     <update id="createConfigFile">

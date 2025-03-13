@@ -27,3 +27,18 @@ mybatis:
     - classpath*:**/mapper/common/*Mapper.xml
     - classpath*:**/mapper/mysql/*Mapper.xml
   config-location: classpath:jpaConfig-mysql.xml
+
+operlog:
+  enabled: true
+  policy: mysql
+  use-default-collect-policy: true
+  table-name: log_dbc
+  thread-num: 1
+  batch-timeout-mills: 10000
+  batch-size: 50
+  queue-capacity: 5000
+
+tabula:
+  enabled: true
+  tables:
+    - log_dbc

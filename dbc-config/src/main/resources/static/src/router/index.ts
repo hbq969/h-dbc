@@ -38,6 +38,10 @@ const routes = [
         component: () => import((`@/views/dbc/ConfigCompare.vue`))
     },
     {
+        path: '/config/compareBackup',
+        component: () => import((`@/views/dbc/ConfigCompareBackup.vue`))
+    },
+    {
         path: '/guide',
         component: () => import((`@/views/dbc/Guide.vue`))
     }

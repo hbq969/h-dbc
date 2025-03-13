@@ -127,6 +127,7 @@ dict:
     cron: 0 */30 * * * *
   map-key-prefix: fmt
 
+
 encrypt:
   config:
     enabled: true
@@ -154,3 +155,9 @@ dbc:
       include-urls:
         - "/api/**"
     enabled: true
+
+operlog:
+  enabled: false
+
+tabula:
+  enabled: false

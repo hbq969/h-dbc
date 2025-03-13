@@ -1,9 +1,9 @@
 package com.github.hbq969.middleware.dbc.service.impl;
 
-import cn.hutool.core.lang.Pair;
 import com.github.hbq969.code.common.decorde.OptionalFacade;
 import com.github.hbq969.code.common.decorde.OptionalFacadeAware;
 import com.github.hbq969.code.common.spring.context.SpringContext;
+import com.github.hbq969.code.common.spring.yaml.TypePair;
 import com.github.hbq969.code.common.utils.I18nUtils;
 import com.github.hbq969.code.common.utils.YamlPropertiesFileConverter;
 import com.github.hbq969.middleware.dbc.service.FileReader;
@@ -46,7 +46,7 @@ public class YamlFileReader implements OptionalFacadeAware<String, FileReader>,F
     }
 
     @Override
-    public List<Pair<String, Object>> read(InputStream in) {
+    public List<TypePair> read(InputStream in) {
         String content=null;
         try {
             content = IOUtils.toString(in, StandardCharsets.UTF_8);

@@ -116,4 +116,13 @@
           and username = #{username}
           and service_id = #{serviceId}
     </delete>
+
+    <select id="querySelectCountByUser" resultType="int">
+        select count(1)
+        from h_dbc_service a,
+             h_dbc_acc_service b
+        where a.service_id = b.service_id
+          and b.username = #{username}
+          and a.service_id = #{serviceId}
+    </select>
 </mapper>

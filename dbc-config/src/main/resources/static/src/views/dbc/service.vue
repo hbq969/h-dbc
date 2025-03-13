@@ -196,7 +196,7 @@ const _ = (window as any).ResizeObserver;
       <el-table-column fixed="left" label="操作" width="180" header-align="center" align="center">
         <template #default="scope">
           <el-button circle :icon="EditPen" :title="langData.btnEdit" type="success" size="small" @click="showServiceEditDialog(scope)" :disabled="user.roleName!='ADMIN' && scope.row.username!=user.userName"/>
-          <el-popconfirm :title="langData.confirmDelete" @confirm="deleteService(scope)"
+          <el-popconfirm :title="langData.serviceTableDeleteConfirmTitle" @confirm="deleteService(scope)"
                          icon-color="red"
                          confirm-button-type="danger">
             <template #reference>

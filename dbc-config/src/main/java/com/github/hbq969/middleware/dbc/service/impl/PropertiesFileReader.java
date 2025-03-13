@@ -1,9 +1,9 @@
 package com.github.hbq969.middleware.dbc.service.impl;
 
-import cn.hutool.core.lang.Pair;
 import com.github.hbq969.code.common.decorde.OptionalFacade;
 import com.github.hbq969.code.common.decorde.OptionalFacadeAware;
 import com.github.hbq969.code.common.spring.context.SpringContext;
+import com.github.hbq969.code.common.spring.yaml.TypePair;
 import com.github.hbq969.code.common.utils.I18nUtils;
 import com.github.hbq969.middleware.dbc.service.FileReader;
 import lombok.extern.slf4j.Slf4j;
@@ -12,11 +12,14 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 @Service("dbc-PropertiesFileReader")
 @Slf4j
-public class PropertiesFileReader implements OptionalFacadeAware<String, FileReader>,FileReader {
+public class PropertiesFileReader implements OptionalFacadeAware<String, FileReader>, FileReader {
 
     @Autowired
     private FileReaderFacade facade;
@@ -35,17 +38,23 @@ public class PropertiesFileReader implements OptionalFacadeAware<String, FileRea
     }
 
     @Override
-    public List<Pair<String, Object>> read(InputStream in) {
+    public List<TypePair> read(InputStream in) {
         Properties p = new Properties();
         try {
             p.load(in);
         } catch (IOException e) {
-            log.error("读取properties文件异常",e);
-            throw new RuntimeException(I18nUtils.getMessage(context,"PropertiesFileReader.read.msg1"));
+            log.error("读取properties文件异常", e);
+            throw new RuntimeException(I18nUtils.getMessage(context, "PropertiesFileReader.read.msg1"));
         }
-        List<Pair<String,Object>> pairs = new ArrayList<>();
+        List<TypePair> pairs = new ArrayList<>();
+        String key;
+        Object value;
+        Class<?> clz;
         for (Map.Entry<Object, Object> entry : p.entrySet()) {
-            Pair<String,Object> pair=new Pair<>(String.valueOf(entry.getKey()),entry.getValue());
+            key = String.valueOf(entry.getKey());
+            value = entry.getValue();
+            clz = null == value ? String.class : value.getClass();
+            TypePair pair = new TypePair(key, value, clz.getName());
             pairs.add(pair);
         }
         return pairs;

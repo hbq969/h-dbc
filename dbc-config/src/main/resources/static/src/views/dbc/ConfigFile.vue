@@ -1,6 +1,6 @@
 <script lang="ts" setup xmlns="http://www.w3.org/1999/html">
 import {
-   ArrowLeft, ArrowUp, ArrowDown
+   ArrowLeft, ArrowUp, ArrowDown,Download
 } from '@element-plus/icons-vue'
 import {ref, reactive, onMounted, onBeforeUnmount} from 'vue'
 import axios from '@/network'
@@ -147,6 +147,48 @@ const saveConfigFile = () => {
   });
 }
 
+const downForm = reactive({
+  serviceId: router.currentRoute.value.query.serviceId,
+  username: router.currentRoute.value.query.username,
+  profileName: router.currentRoute.value.query.profileName,
+  fileSuffix: 'yml',
+  getFilename: function () {
+    if (!this.profileName || this.profileName == '' || this.profileName == 'default') {
+      return "application." + this.fileSuffix;
+    } else {
+      return "application-" + this.profileName + "." + this.fileSuffix;
+    }
+  }
+})
+const downFile = (fileSuffix) => {
+  downForm.fileSuffix = fileSuffix
+  axios({
+    url: '/config/download',
+    method: 'post',
+    data: downForm,
+  }).then((res: any) => {
+    const blob = new Blob([res.data]);
+    const fileName = downForm.getFilename();
+    if ('download' in document.createElement('a')) { // 非IE下载
+      const elink = document.createElement('a');
+      elink.download = fileName
+      elink.style.display = 'none';
+      elink.href = URL.createObjectURL(blob);
+      document.body.appendChild(elink);
+      elink.click();
+      URL.revokeObjectURL(elink.href);// 释放URL 对象
+      document.body.removeChild(elink);
+    } else {
+      // IE10+下载
+      // if (navigator) {
+      //   navigator.msSaveBlob(blob, fileName);
+      // }
+    }
+  }).catch((err: Error) => {
+    msg(langData.axiosRequestErr, 'error')
+  })
+}
+
 const debounce = (callback: (...args: any[]) => void, delay: number) => {
   let tid: any;
   return function (...args: any[]) {
@@ -197,6 +239,8 @@ const _ = (window as any).ResizeObserver;
         />
       </el-form-item>
       <span style="margin-left: 5px;color: red">* {{langData.configFileValidateSupportYaml}}</span>
+      <el-button :icon="Download" type="primary" size="small" style="margin-left: 20px;" @click="downFile('yml')">YAML</el-button>
+      <el-button :icon="Download" type="primary" size="small" style="margin-left: 5px;" @click="downFile('properties')">Properties</el-button>
     </el-form-item>
   </div>
 </template>

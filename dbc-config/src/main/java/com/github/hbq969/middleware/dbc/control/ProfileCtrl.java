@@ -1,5 +1,6 @@
 package com.github.hbq969.middleware.dbc.control;
 
+import com.github.hbq969.code.common.log.api.Log;
 import com.github.hbq969.code.common.restful.ReturnMessage;
 import com.github.hbq969.code.common.spring.context.SpringContext;
 import com.github.hbq969.code.common.utils.I18nUtils;
@@ -13,6 +14,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.*;
 
 @RestController("dbc-ProfileCtrl")
@@ -20,7 +22,9 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(path = "/dbc-ui/profile")
 @Slf4j
 public class ProfileCtrl {
+
     @Autowired
+    @Qualifier("dbc-ProfileServiceRBACImpl")
     private ProfileService profileService;
 
     @Autowired
@@ -30,6 +34,7 @@ public class ProfileCtrl {
     @RequestMapping(path = "", method = RequestMethod.POST)
     @ResponseBody
     @SMRequiresPermissions(menu = "Profile", apiKey = "saveProfile", apiDesc = "保存环境")
+    @Log(collectResult = true)
     public ReturnMessage<?> saveProfile(@RequestBody ProfileEntity profile) {
         profileService.saveProfile(profile);
         return ReturnMessage.success(I18nUtils.getMessage(context, "save.result"));
@@ -39,6 +44,7 @@ public class ProfileCtrl {
     @RequestMapping(path = "", method = RequestMethod.PUT)
     @ResponseBody
     @SMRequiresPermissions(menu = "Profile", apiKey = "updateProfile", apiDesc = "更新环境")
+    @Log(collectResult = true)
     public ReturnMessage<?> updateProfile(@RequestBody ProfileEntity profile) {
         profileService.updateProfile(profile);
         return ReturnMessage.success(I18nUtils.getMessage(context, "update.result"));
@@ -48,6 +54,7 @@ public class ProfileCtrl {
     @RequestMapping(path = "", method = RequestMethod.DELETE)
     @ResponseBody
     @SMRequiresPermissions(menu = "Profile", apiKey = "deleteProfile", apiDesc = "删除环境")
+    @Log(collectResult = true)
     public ReturnMessage<?> deleteProfile(ProfileEntity profile) {
         profileService.deleteProfile(profile);
         return ReturnMessage.success(I18nUtils.getMessage(context, "delete.result"));
@@ -76,6 +83,7 @@ public class ProfileCtrl {
     @RequestMapping(path = "/config", method = RequestMethod.DELETE)
     @ResponseBody
     @SMRequiresPermissions(menu = "Service", apiKey = "clearProfileConfig", apiDesc = "清空环境配置")
+    @Log(collectResult = true)
     public ReturnMessage<?> clearProfileConfig(@RequestBody AccountServiceProfile asp) {
         profileService.deleteProfileConfig(asp);
         return ReturnMessage.success(I18nUtils.getMessage(context, "clear.result"));
@@ -85,6 +93,7 @@ public class ProfileCtrl {
     @RequestMapping(path = "/backup", method = RequestMethod.POST)
     @ResponseBody
     @SMRequiresPermissions(menu = "Profile", apiKey = "backup", apiDesc = "备份配置")
+    @Log(collectResult = true)
     public ReturnMessage<?> backup(@RequestBody ProfileEntity profile) {
         profileService.backup(profile);
         return ReturnMessage.success(I18nUtils.getMessage(context, "ConfigCtrl.backup.result"));
@@ -94,6 +103,7 @@ public class ProfileCtrl {
     @RequestMapping(path = "/backup/all", method = RequestMethod.POST)
     @ResponseBody
     @SMRequiresPermissions(menu = "Profile", apiKey = "backupAll", apiDesc = "备份所有配置")
+    @Log(collectResult = true)
     public ReturnMessage<?> backupAll() {
         profileService.backupAll();
         return ReturnMessage.success(I18nUtils.getMessage(context, "ConfigCtrl.backup.result"));

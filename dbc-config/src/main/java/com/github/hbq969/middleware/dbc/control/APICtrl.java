@@ -1,9 +1,9 @@
 package com.github.hbq969.middleware.dbc.control;
 
-import cn.hutool.core.lang.Pair;
 import com.github.hbq969.code.common.encrypt.ext.config.Decrypt;
 import com.github.hbq969.code.common.encrypt.ext.config.Encrypt;
 import com.github.hbq969.code.common.spring.advice.log.LogSet;
+import com.github.hbq969.code.common.spring.yaml.TypePair;
 import com.github.hbq969.middleware.dbc.model.APIModel;
 import com.github.hbq969.middleware.dbc.model.ConfigModel;
 import com.github.hbq969.middleware.dbc.service.APIService;
@@ -12,8 +12,6 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController("dbc-APICtrl")
 @Api(tags = "配置中心-api接口")
@@ -30,7 +28,7 @@ public class APICtrl {
     @Encrypt
     @Decrypt
     @LogSet(printIn = false, printResult = false)
-    public List<Pair> getConfigList(@RequestBody APIModel model) {
+    public Object getConfigList(@RequestBody APIModel model) {
         return apiService.getConfigList(model);
     }
 
@@ -38,7 +36,7 @@ public class APICtrl {
     @RequestMapping(path = "/config/value", method = RequestMethod.POST)
     @Decrypt
     @Encrypt
-    public Pair getConfigValue(@RequestBody ConfigModel model) {
+    public TypePair getConfigValue(@RequestBody ConfigModel model) {
         return apiService.getConfigValue(model);
     }
 }

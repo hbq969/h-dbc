@@ -1,8 +1,8 @@
 package com.github.hbq969.middleware.dbc.driver.api;
 
-import com.github.hbq969.code.common.encrypt.ext.utils.AESUtil;
-import com.github.hbq969.code.common.utils.GsonUtils;
 import com.github.hbq969.middleware.dbc.driver.config.ApiInfo;
+import com.github.hbq969.middleware.dbc.driver.utils.AESUtils;
+import com.google.gson.Gson;
 import feign.RequestTemplate;
 import feign.codec.EncodeException;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +13,7 @@ import java.nio.charset.Charset;
 @Slf4j
 public class Encoder implements feign.codec.Encoder {
 
+    private Gson gson = new Gson();
     private ApiInfo api;
 
     public Encoder(ApiInfo api) {
@@ -21,13 +22,13 @@ public class Encoder implements feign.codec.Encoder {
 
     @Override
     public void encode(Object object, Type bodyType, RequestTemplate template) throws EncodeException {
-        String content = GsonUtils.toJson(object);
-        if (log.isTraceEnabled()) {
-            log.trace("加密前: {}", content);
+        String content = gson.toJson(object);
+        if (api.isApiLog()) {
+            log.debug("加密前: {}", content);
         }
-        String encryptBody = AESUtil.encrypt(content, this.api.getSecret(), this.api.getIv(), Charset.forName(this.api.getCharset()));
-        if (log.isTraceEnabled()) {
-            log.trace("加密后: {}", encryptBody);
+        String encryptBody = AESUtils.encrypt(content, this.api.getSecret(), this.api.getIv(), Charset.forName(this.api.getCharset()));
+        if (api.isApiLog()) {
+            log.debug("加密后: {}", encryptBody);
         }
         template.body(encryptBody);
     }

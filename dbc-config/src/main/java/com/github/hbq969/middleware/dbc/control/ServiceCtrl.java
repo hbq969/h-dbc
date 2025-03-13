@@ -1,5 +1,6 @@
 package com.github.hbq969.middleware.dbc.control;
 
+import com.github.hbq969.code.common.log.api.Log;
 import com.github.hbq969.code.common.restful.ReturnMessage;
 import com.github.hbq969.code.common.spring.context.SpringContext;
 import com.github.hbq969.code.common.utils.I18nUtils;
@@ -11,6 +12,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.*;
 
 @RestController("dbc-DbcCtrl")
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 public class ServiceCtrl {
 
     @Autowired
+    @Qualifier("dbc-ServiceRBACImpl")
     private Service service;
 
     @Autowired
@@ -29,6 +32,7 @@ public class ServiceCtrl {
     @RequestMapping(path = "", method = RequestMethod.POST)
     @ResponseBody
     @SMRequiresPermissions(menu = "Service", apiKey = "saveService", apiDesc = "保存服务")
+    @Log(collectResult = true)
     public ReturnMessage<?> saveService(@RequestBody ServiceEntity service) {
         this.service.saveService(service);
         return ReturnMessage.success(I18nUtils.getMessage(context, "save.result"));
@@ -38,6 +42,7 @@ public class ServiceCtrl {
     @RequestMapping(path = "", method = RequestMethod.PUT)
     @ResponseBody
     @SMRequiresPermissions(menu = "Service", apiKey = "updateService", apiDesc = "更新服务")
+    @Log(collectResult = true)
     public ReturnMessage<?> updateService(@RequestBody ServiceEntity service) {
         this.service.updateService(service);
         return ReturnMessage.success(I18nUtils.getMessage(context, "update.result"));
@@ -47,6 +52,7 @@ public class ServiceCtrl {
     @RequestMapping(path = "", method = RequestMethod.DELETE)
     @ResponseBody
     @SMRequiresPermissions(menu = "Service", apiKey = "deleteService", apiDesc = "删除服务")
+    @Log(collectResult = true)
     public ReturnMessage<?> deleteService(@RequestBody ServiceEntity entity) {
         this.service.deleteService(entity);
         return ReturnMessage.success(I18nUtils.getMessage(context, "delete.result"));

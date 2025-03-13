@@ -1,5 +1,6 @@
 package com.github.hbq969.middleware.dbc.control;
 
+import com.github.hbq969.code.common.log.api.Log;
 import com.github.hbq969.code.common.restful.ReturnMessage;
 import com.github.hbq969.code.common.spring.context.SpringContext;
 import com.github.hbq969.code.common.utils.I18nUtils;
@@ -30,7 +31,7 @@ public class BackupCtrl {
     private SpringContext context;
 
     @Autowired
-    @Qualifier("dbc-BackupProxyImpl")
+    @Qualifier("dbc-BackupServiceRBACImpl")
     private BackupService backupService;
 
     @ApiOperation("分页查询备份列表")
@@ -56,6 +57,7 @@ public class BackupCtrl {
     @RequestMapping(path = "/recovery", method = RequestMethod.POST)
     @ResponseBody
     @SMRequiresPermissions(menu = "Backup",apiKey = "recovery",apiDesc = "恢复配置")
+    @Log(collectResult = true)
     public ReturnMessage<?> recovery(@RequestBody BackupEntity bk) {
         backupService.recoveryBackup(bk);
         return ReturnMessage.success(I18nUtils.getMessage(context,"BackupCtrl.recovery.result"));
@@ -65,6 +67,7 @@ public class BackupCtrl {
     @RequestMapping(path = "/recovery/batch", method = RequestMethod.POST)
     @ResponseBody
     @SMRequiresPermissions(menu = "Backup",apiKey = "batchRecovery",apiDesc = "批量恢复配置")
+    @Log(collectResult = true)
     public ReturnMessage<?> batchRecovery(@RequestBody BatchDeleteRecovery bdr) {
         backupService.recoveryBackups(bdr);
         return ReturnMessage.success(I18nUtils.getMessage(context,"BackupCtrl.recovery.result"));
@@ -74,6 +77,7 @@ public class BackupCtrl {
     @RequestMapping(path = "", method = RequestMethod.DELETE)
     @ResponseBody
     @SMRequiresPermissions(menu = "Backup",apiKey = "deleteBackup",apiDesc = "删除备份记录")
+    @Log(collectResult = true)
     public ReturnMessage<?> deleteBackup(@RequestBody BackupEntity bk) {
         backupService.deleteBackup(bk);
         return ReturnMessage.success(I18nUtils.getMessage(context,"delete.result"));
@@ -83,6 +87,7 @@ public class BackupCtrl {
     @RequestMapping(path = "/batch", method = RequestMethod.DELETE)
     @ResponseBody
     @SMRequiresPermissions(menu = "Backup",apiKey = "batchDeleteBackup",apiDesc = "批量删除备份记录")
+    @Log(collectResult = true)
     public ReturnMessage<?> deleteBackups(@RequestBody BatchDeleteBackup bdb) {
         backupService.deleteBackups(bdb);
         return ReturnMessage.success(I18nUtils.getMessage(context,"delete.result"));

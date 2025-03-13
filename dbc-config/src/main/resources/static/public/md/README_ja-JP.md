@@ -70,47 +70,41 @@ mybatis:
 ```xml
 <dependency>
     <groupId>com.github.hbq969</groupId>
-    <artifactId>dbc-driver</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <artifactId>spring-cloud-starter-hdbc-config</artifactId>
+    <version>1.0</version>
 </dependency>
 ```
 
-> bootstrap.yml （API プルウェイ）
+> bootstrap.yml （strategy: mix，最初にAPIメソッドを使用し、APIメソッドが利用できない場合はDBメソッドに切り替えます）
 ```yaml
 spring:
   cloud:
     config:
       h-dbc:
         enabled: true
-        dbc-key: h-dbc
+        profile-name: dev
         service-name: h-example
-        profile-name: default
-        strategy: api
+        dbc-key: h-dbc
+        strategy: mix
         api:
-          secret: API encryption transmission key, refer to the configuration center configuration
           auth:
             basic:
-              username: API authentication account
-              password: API authentication password
+              password: Basic Auth Password
+              username: Basic Auth Account
             enabled: true
-```
-
-> bootstrap.yml （データベースの読み取り方法）
-```yaml
-spring:
-  cloud:
-    config:
-      h-dbc:
-        enabled: true
-        dbc-key: h-dbc
-        service-name: h-example
-        profile-name: dev
-        strategy: db
+          url: http://localhost:30170
+          charset: utf-8
+          secret: API Access SecretKey
+          iv: API Access IV
         db:
           driver-class-name: com.mysql.cj.jdbc.Driver
-          username: Database Account
-          password: Database password
-          jdbc-url: Database url
+          jdbc-url: Config Center Jdbc URL
+          username: Config Center Jdbc User
+          password: Config Center Jdbc Password
+          connection-test-query: SELECT 1
+          max-lifetime: 1800000
+          maximum-pool-size: 2
+          minimum-idle: 1
 ```
 
 

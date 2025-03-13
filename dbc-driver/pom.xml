@@ -1,64 +1,123 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <groupId>com.github.hbq969</groupId>
-    <artifactId>h-parent</artifactId>
-    <version>1.0-SNAPSHOT</version>
-    <relativePath/>
-  </parent>
-
-  <groupId>com.github.hbq969</groupId>
-  <artifactId>dbc-driver</artifactId>
-  <version>1.0-SNAPSHOT</version>
-  <name>dbc-driver</name>
-  <description>Spring Boot Archetype</description>
+  <distributionManagement>
+    <repository>
+      <id>thirdparty-cmss</id>
+      <name>Nexus Releases Repository</name>
+      <url>http://nexus.cmss.com:8081/repository/thirdparty-cmss/</url>
+    </repository>
+    <snapshotRepository>
+      <id>thirdparty-snapshot</id>
+      <name>Nexus Snapshots Repository</name>
+      <url>http://nexus.cmss.com:8081/repository/thirdparty-snapshot/</url>
+    </snapshotRepository>
+  </distributionManagement>
 
   <properties>
-    <common.version>1.0-SNAPSHOT</common.version>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <java.version>1.8</java.version>
+    <spring-boot.version>2.7.18</spring-boot.version>
+    <spring-cloud.version>2021.0.9</spring-cloud.version>
+    <feign-okhttp.version>10.4.0</feign-okhttp.version>
+    <feign-httpclient.version>11.8</feign-httpclient.version>
+    <mysql-connector-java.version>8.0.33</mysql-connector-java.version>
+    <hutool.version>5.8.18</hutool.version>
+    <jasypt-spring-boot-starter>3.0.5</jasypt-spring-boot-starter>
+    <lombok.version>1.18.26</lombok.version>
+    <okhttp-version>3.8.1</okhttp-version>
+    <okhttp-logging-interceptor-version>2.7.5</okhttp-logging-interceptor-version>
+    <commons-io.version>2.11.0</commons-io.version>
+    <commons-lang3.version>3.12.0</commons-lang3.version>
+    <commons-collections4.version>4.1</commons-collections4.version>
+    <tomcat.version>9.0.99</tomcat.version>
+    <h-common.version>1.0-SNAPSHOT</h-common.version>
+    <gson-version>2.10</gson-version>
   </properties>
-
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>2.7.18</version>
+    <relativePath/>
+  </parent>
+  <groupId>com.github.hbq969</groupId>
+  <artifactId>spring-cloud-starter-hdbc-config</artifactId>
+  <version>1.0</version>
+  <name>spring-cloud-starter-hdbc-config</name>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.springframework.cloud</groupId>
+        <artifactId>spring-cloud-dependencies</artifactId>
+        <version>${spring-cloud.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
   <dependencies>
-    <!-- bc exts jars -->
-    <dependency>
-      <groupId>com.github.hbq969</groupId>
-      <artifactId>h-common</artifactId>
-      <version>${common.version}</version>
-      <exclusions>
-        <exclusion>
-          <artifactId>feign-okhttp</artifactId>
-          <groupId>io.github.openfeign</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>jsch</artifactId>
-          <groupId>com.jcraft</groupId>
-        </exclusion>
-      </exclusions>
-    </dependency>
+    <!--  springcloud starter  -->
     <dependency>
       <groupId>org.springframework.cloud</groupId>
       <artifactId>spring-cloud-starter-bootstrap</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-starter-openfeign</artifactId>
+      <exclusions>
+        <exclusion>
+          <artifactId>commons-fileupload</artifactId>
+          <groupId>commons-fileupload</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>jsr305</artifactId>
+          <groupId>com.google.code.findbugs</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>io.github.openfeign</groupId>
+      <artifactId>feign-httpclient</artifactId>
+      <version>${feign-httpclient.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.github.openfeign</groupId>
+      <artifactId>feign-jackson</artifactId>
+      <version>${feign-okhttp.version}</version>
+    </dependency>
+    <!--  springboot starter  -->
+    <dependency>
+      <groupId>com.github.ulisesbocchio</groupId>
+      <artifactId>jasypt-spring-boot-starter</artifactId>
+      <version>${jasypt-spring-boot-starter}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-configuration-processor</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <version>${lombok.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>cn.hutool</groupId>
+      <artifactId>hutool-all</artifactId>
+      <version>${hutool.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.google.code.gson</groupId>
+      <artifactId>gson</artifactId>
+      <version>${gson-version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-jdbc</artifactId>
+    </dependency>
   </dependencies>
-
-  <build>
-    <resources>
-      <resource>
-        <directory>src/main/java</directory>
-        <includes>
-          <include>**/*Mapper.xml</include>
-        </includes>
-        <filtering>true</filtering>
-      </resource>
-      <resource>
-        <directory>src/main/resources</directory>
-        <includes>
-          <include>META-INF/*</include>
-        </includes>
-      </resource>
-    </resources>
-  </build>
-
+  <build></build>
 </project>

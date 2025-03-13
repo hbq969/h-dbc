@@ -6,3 +6,4 @@ dbc-config/src/main/resources/static/node_modules
 dbc-config/src/main/resources/static/dbc-ui
 dbc-config/src/main/resources/application-dev.yml
 .h2/
+.DS_Store/

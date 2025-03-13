@@ -1,10 +1,10 @@
 package com.github.hbq969.middleware.dbc.service;
 
-import cn.hutool.core.lang.Pair;
+import com.github.hbq969.code.common.spring.yaml.TypePair;
 
 import java.io.InputStream;
 import java.util.List;
 
 public interface FileReader {
-    List<Pair<String, Object>> read(InputStream in);
+    List<TypePair> read(InputStream in);
 }

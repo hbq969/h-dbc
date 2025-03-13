@@ -5,10 +5,9 @@ import com.github.hbq969.code.common.spring.context.SpringContext;
 import com.github.hbq969.code.common.utils.DigitSplit;
 import com.github.hbq969.code.common.utils.FormatTime;
 import com.github.hbq969.code.common.utils.GsonUtils;
-import com.github.hbq969.code.common.utils.I18nUtils;
-import com.github.hbq969.code.sm.login.session.UserContext;
 import com.github.hbq969.middleware.dbc.dao.BackupDao;
 import com.github.hbq969.middleware.dbc.dao.ProfileDao;
+import com.github.hbq969.middleware.dbc.dao.ServiceDao;
 import com.github.hbq969.middleware.dbc.dao.entity.*;
 import com.github.hbq969.middleware.dbc.model.AccountServiceProfile;
 import com.github.hbq969.middleware.dbc.service.BackupService;
@@ -19,19 +18,17 @@ import com.github.pagehelper.PageInfo;
 import com.google.gson.reflect.TypeToken;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -46,6 +43,9 @@ public class BackupServiceImpl implements BackupService {
     private SpringContext context;
     @Autowired
     private ProfileDao profileDao;
+    @Qualifier("dbc-ServiceDao")
+    @Autowired
+    private ServiceDao serviceDao;
 
     @Override
     public void backupOnDeleteProfile(ProfileEntity profile) {
@@ -118,18 +118,12 @@ public class BackupServiceImpl implements BackupService {
 
     @Override
     public void deleteBackup(BackupEntity bk) {
-        if (UserContext.permitAllow(bk.getUsername())) {
-            backupDao.deleteBackup(bk);
-        } else {
-            throw new UnsupportedOperationException(I18nUtils.getMessage(context,"BackupServiceImpl.msg1"));
-        }
+        backupDao.deleteBackup(bk);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void deleteBackups(BatchDeleteBackup bdb) {
-        if (!UserContext.permitAllow(bdb.getUsername())) {
-            throw new UnsupportedOperationException(I18nUtils.getMessage(context,"BackupServiceImpl.msg1"));
-        }
         bdb.check(context);
         String sql = "delete from h_dbc_config_bk where id=?";
         log.info("批量删除备份数据, {}, {}", sql, bdb.getBackups());
@@ -147,11 +141,9 @@ public class BackupServiceImpl implements BackupService {
         });
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void recoveryBackup(BackupEntity bk) {
-        if (!UserContext.permitAllow(bk.getUsername())) {
-            throw new UnsupportedOperationException(I18nUtils.getMessage(context,"BackupServiceImpl.msg1"));
-        }
         BackupEntity entity = backupDao.queryBackup(bk);
         String sql = "select service_id AS \"serviceId\",service_name AS \"serviceName\" from h_dbc_service where service_name=?";
         List<ServiceEntity> services = null;
@@ -229,7 +221,7 @@ public class BackupServiceImpl implements BackupService {
         final String sid = serviceId;
         DigitSplit.defaultStep(200).split(configs).forEach(sub -> {
             log.info("批量恢复配置, [{},{},{}], {} 个", entity.getUsername(), sid, entity.getProfileName(), sub.getList().size());
-            context.getBean(JdbcTemplate.class).batchUpdate("insert into h_dbc_config(app,username,service_id,profile_name,config_key,config_value,created_at) values(?,?,?,?,?,?,?)",
+            context.getBean(JdbcTemplate.class).batchUpdate("insert into h_dbc_config(app,username,service_id,profile_name,config_key,config_value,data_type,created_at) values(?,?,?,?,?,?,?,?)",
                     new BatchPreparedStatementSetter() {
                         @Override
                         public void setValues(PreparedStatement ps, int i) throws SQLException {
@@ -240,7 +232,8 @@ public class BackupServiceImpl implements BackupService {
                             ps.setString(4, entity.getProfileName());
                             ps.setString(5, ce.getConfigKey());
                             ps.setString(6, ce.getConfigValue());
-                            ps.setLong(7, now);
+                            ps.setString(7, ce.getDataType());
+                            ps.setLong(8, now);
                         }
 
                         @Override
@@ -251,11 +244,9 @@ public class BackupServiceImpl implements BackupService {
         });
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void recoveryBackups(BatchDeleteRecovery bdr) {
-        if (!UserContext.permitAllow(bdr.getUsername())) {
-            throw new UnsupportedOperationException(I18nUtils.getMessage(context,"BackupServiceImpl.msg1"));
-        }
         bdr.check(context);
         for (BackupEntity bk : bdr.getRecoveries()) {
             recoveryBackup(bk);

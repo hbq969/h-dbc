@@ -1,7 +1,8 @@
 package com.github.hbq969.middleware.dbc.driver.api;
 
-import com.github.hbq969.code.common.spring.cloud.feign.FeignFactoryBean;
+import com.github.hbq969.middleware.dbc.driver.api.feign.FeignFactoryBean;
 import com.github.hbq969.middleware.dbc.driver.config.ApiInfo;
+import feign.Request;
 import feign.RequestInterceptor;
 import feign.Retryer;
 
@@ -28,12 +29,20 @@ public class ConfigServiceImpl extends FeignFactoryBean<ConfigService> {
 
     @Override
     protected Retryer feignRetry() {
-        return new Retryer.Default(1000L, TimeUnit.SECONDS.toMillis(5L), this.api.getRetry());
+        return new Retryer.Default(api.getRetryPeriodMills(), api.getRetryTimeoutMills(), this.api.getRetry());
+    }
+
+    @Override
+    protected Request.Options options() {
+        return new Request.Options((int) api.getConnectTimeoutMills(), 60000, true);
     }
 
     @Override
     protected LinkedList<RequestInterceptor> interceptors() {
         LinkedList<RequestInterceptor> ins = super.interceptors();
+        if (!api.isApiLog()) {
+            ins.clear();
+        }
         if (api.getAuth().isEnabled()) {
             ins.addFirst(new BasicAuthRequestInterceptor(api));
         }

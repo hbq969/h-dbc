@@ -233,14 +233,14 @@ const _ = (window as any).ResizeObserver;
                        v-if="user.roleName=='ADMIN'">
         <template #default="scope">
           <el-button circle :icon="EditPen" type="success" size="small" @click="showProfileEditDialog(scope)" :title="langData.btnEdit"/>
-          <el-popconfirm :title="langData.confirmDelete" @confirm="deleteProfile(scope)"
+          <el-popconfirm :title="langData.profileDeleteConfirmTitle" @confirm="deleteProfile(scope)"
                          icon-color="red"
                          confirm-button-type="danger">
             <template #reference>
               <el-button circle :icon="Delete" type="danger" size="small" :title="langData.btnDelete"/>
             </template>
           </el-popconfirm>
-          <el-popconfirm :title="langData.confirmOpera" @confirm="backup(scope)"
+          <el-popconfirm :title="langData.profileRecoveryConfirmTitle" @confirm="backup(scope)"
                          icon-color="red"
                          confirm-button-type="danger">
             <template #reference>

@@ -1,0 +1,1 @@
+java -jar ..\..\lib\dbc-config-1.0-SHAPSHOT.jar

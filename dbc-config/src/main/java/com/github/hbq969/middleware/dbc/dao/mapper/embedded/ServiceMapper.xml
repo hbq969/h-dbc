@@ -53,6 +53,7 @@
             `profile_name` varchar(100),
             `config_key`   varchar(500),
             `config_value` text,
+            `data_type`    varchar(50) default 'java.lang.String',
             `created_at`   numeric(20),
             `updated_at`   numeric(20),
             primary key (`app`, `username`, `service_id`, `profile_name`, `config_key`)

@@ -64,88 +64,101 @@ mybatis:
 ```
 
 ### 服务配置
-> bootstrap.yml （db方式拉取配置）
+> bootstrap.yml 
 ```yaml
 spring:
   cloud:
     config:
       h-dbc:
         enabled: true
-        dbc-key: h-dbc
-        service-name: h-example
-        profile-name: dev
-        strategy: db
-        db:
-          driver-class-name: com.mysql.cj.jdbc.Driver
-          username: dbc
-          password: ENC(O05LzWQnZrj5z+zWl6WJQngl4pWrd5nQddgnPH51WAQeVxBEoLcVGMrocH3xdhc4)
-          jdbc-url: jdbc:mysql://docker.for.mac.host.internal:3306/dbc?useUnicode=true&allowPublicKeyRetrieval=true&characterEncoding=utf-8&useSSL=false&autoReconnect=true&failOverReadOnly=false&maxReconnects=15000
-# 如果上面属性不用加密方式，则下面配置不需要
-# 否则需要添加下面解密密码，密码是敏感信息尽量可通过命令行传入
-#jasypt:
-#  encryptor:
-#    password: 密码
-
-```
-
-
-> bootstrap.yml （api方式拉取配置）
-```yaml
-spring:
-  cloud:
-    config:
-      h-dbc:
-        enabled: true
-        dbc-key: h-dbc
-        service-name: h-example
         profile-name: default
-        strategy: api
+        service-name: h-example
+        dbc-key: h-dbc
+        # 支持mix/api/db三种方式
+        strategy: mix
         api:
-          secret: ENC(tHRgyoB.....c2b+eBw==)
           auth:
             basic:
-              username: foo
-              password: bar
+              password: 密码
+              username: 账号
             enabled: true
-# 如果上面属性不用加密方式，则下面配置不需要
-# 否则需要添加下面解密密码，密码是敏感信息尽量可通过命令行传入
-#jasypt:
-#  encryptor:
-#    password: 密码
+          url: http://localhost:30170
+          charset: utf-8
+          secret: 秘钥
+          iv: iv随机数
+        db:
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          jdbc-url: jdbc:mysql://docker.for.mac.host.internal:3306/dbc?useUnicode=true&allowPublicKeyRetrieval=true&characterEncoding=utf-8&useSSL=false&autoReconnect=true&failOverReadOnly=false&maxReconnects=15000
+          username: 账号
+          password: 密码
+          connection-test-query: SELECT 1
+          max-lifetime: 1800000
+          maximum-pool-size: 2
+          minimum-idle: 1
 ```
 
 > 服务依赖
 ```xml
 <dependency>
     <groupId>com.github.hbq969</groupId>
-    <artifactId>dbc-driver</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <artifactId>spring-cloud-starter-hdbc-config</artifactId>
+    <version>1.0</version>
 </dependency>
 ```
 
 ## 功能演示 (Features)
 
+### 登录页面
+
+![](dbc-config/src/main/resources/static/src/assets/img/0.png)
+
+
+### 引导文档
 ![](dbc-config/src/main/resources/static/src/assets/img/1.png)
 
 
+### 环境配置
 ![](dbc-config/src/main/resources/static/src/assets/img/2.png)
 
 
+### 服务管理
 ![](dbc-config/src/main/resources/static/src/assets/img/3.png)
 
 
+### 服务配置
 ![](dbc-config/src/main/resources/static/src/assets/img/4.png)
 
 
+### 导入配置
 ![](dbc-config/src/main/resources/static/src/assets/img/5.png)
 
 
+### 编辑配置(YAML)
 ![](dbc-config/src/main/resources/static/src/assets/img/6.png)
 
 
+### 编辑配置(Properties)
 ![](dbc-config/src/main/resources/static/src/assets/img/7.png)
 
 
+### 配置批量管理
+![](dbc-config/src/main/resources/static/src/assets/img/8.png)
+
+
+### 配置还原
+![](dbc-config/src/main/resources/static/src/assets/img/9.png)
+
+
+### 配置比较(不同环境)
+![](dbc-config/src/main/resources/static/src/assets/img/10.png)
+
+
+### 国际化(English)
+![](dbc-config/src/main/resources/static/src/assets/img/11.png)
+
+
+### 国际化(日语)
+![](dbc-config/src/main/resources/static/src/assets/img/12.png)
 
 ## 问题联系 (Contact)
 

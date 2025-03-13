@@ -17,6 +17,7 @@ public class ServiceConfigEntity implements DictModel, DictAware {
     private String profileDesc;
     private String configKey;
     private String configValue;
+    private String dataType;
     private Long createdAt;
     private Long updatedAt;
     private String fmtCreatedAt;
