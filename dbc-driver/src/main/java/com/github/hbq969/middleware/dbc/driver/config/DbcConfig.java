@@ -7,7 +7,6 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.core.env.ConfigurableEnvironment;
-import org.springframework.jdbc.core.JdbcTemplate;
 
 @ConfigurationProperties(prefix = "spring.cloud.config.h-dbc")
 @Data
@@ -19,11 +18,6 @@ public class DbcConfig {
     private boolean enabled;
 
     /**
-     * 配置中心标识
-     */
-    private String dbcKey = "h-dbc";
-
-    /**
      * 服务名，参考 <code>spring.application.name</code>
      */
     private String serviceName;
@@ -33,30 +27,13 @@ public class DbcConfig {
      */
     private String profileName;
 
-    /**
-     * 支持的策略
-     * <ul>
-     *     <li>api</li>
-     *     <li>db</li>
-     *     <li>mix</li>
-     * </ul>
-     */
-    private String strategy = "api";
-
-    private Database db = new Database();
-
     private ApiInfo api = new ApiInfo();
 
     public DbcConfig configSet(ConfigurableEnvironment env) {
         this.enabled = env.getProperty("spring.cloud.config.h-dbc.enabled", Boolean.class, false);
-        this.dbcKey = APIPropertySource.decode(env, "spring.cloud.config.h-dbc.dbc-key",
-                env.getProperty("spring.cloud.config.h-dbc.dbc-key", String.class, "h-dbc"));
-        this.serviceName = APIPropertySource.decode(env, "spring.cloud.config.h-dbc.service-name",
-                env.getProperty("spring.cloud.config.h-dbc.service-name", String.class, null));
+        this.serviceName = env.getProperty("spring.cloud.config.h-dbc.service-name", String.class, null);
         Assert.notNull(this.serviceName, "请配置服务名, spring.cloud.config.h-dbc.service-name");
-        this.profileName = APIPropertySource.decode(env, "spring.cloud.config.h-dbc.profile-name",
-                env.getProperty("spring.cloud.config.h-dbc.profile-name", String.class, "default"));
-        this.db.configSet(env);
+        this.profileName = env.getProperty("spring.cloud.config.h-dbc.profile-name", String.class, "default");
         this.api.configSet(env);
         if (log.isTraceEnabled()) {
             log.trace("配置中心对应配置: {}", this);
@@ -64,11 +41,7 @@ public class DbcConfig {
         return this;
     }
 
-    public JdbcTemplate getJt() {
-        return this.db.getJt();
-    }
-
     public ConfigService getApiProxy() throws Exception {
-        return this.api.getApiProxy(dbcKey);
+        return this.api.getApiProxy();
     }
 }

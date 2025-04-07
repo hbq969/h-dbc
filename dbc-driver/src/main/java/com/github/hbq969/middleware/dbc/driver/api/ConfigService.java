@@ -7,9 +7,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 public interface ConfigService {
-    @RequestMapping(path = "/config/list",
+
+    @RequestMapping(path = "/api/config/list",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             method = RequestMethod.POST)
     @ResponseBody
     Object getConfigList(@RequestBody ConfigInfo model);
+
+
 }

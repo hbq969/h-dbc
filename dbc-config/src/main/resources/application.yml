@@ -77,6 +77,7 @@ spring:
           - "/hbq969-sm/**/login"
           - "/hbq969-sm/i18n/lang"
           - "/hbq969-sm/i18n/lang/data"
+          - "/hbq969-sm/**/getPublicKey"
         session-key: h-dbc-sid
         sm-initial-script:
           prefix: sm-initial
@@ -134,9 +135,14 @@ encrypt:
   restful:
     enabled: true
     aes:
-      show-log: false
-      key: ENC(PhsjjLFsZX5eNgvGh72ZGbf4boGXwdrpzb+od/vfPQ13lBgjil9MU/rdrigeweDcHFpYCEZPe241Xn81rWpHsg==)
-      iv: ENC(Avu8L7a3mG/3dD8zSrQLEcSguU51vOS0KGluDsRakOttDyZJBRpC0l313nXRmFQ65lVMO5nJDKzho25mKRz8zg==)
+      charset: utf-8
+      show-log: true
+      way: thread_local
+    rsa:
+      charset: utf-8
+      show-log: true
+      public-key: ENC(WygNCSM1VuTwt13Hio/nuP8JIhCneaOqRlb77G6ulQuQGpX2a6su76UPXYt07MFSqgax6z1zqibwY12tLb31cPBZEFqnhjvx5H1EPxwTlHvlyfKuebgcJKnFHWhUwmdyNMWPfcdfLKvdOPC3zNMBLUBgw0dszOQykFf/lTNf8pQtuL81Z9BiXm2EBduZync84rXUv7DsmVrvh/tW3iL/iaM0696sffKwRAtoALeSd5OaXgaem9N1ku5JYK028VGxXxAx3JC3OZ0F6iEa/O/FlQsSl4gujumo4FVKzfvPZ9wYEJVwAS3ZtGLbKsllIiAKh/io6OkCRnENkO8IL+5KXg==)
+      private-key: ENC(9hwdaOnFLfGOjPrUHjRoIfOBUYK61YgA3hRLOBDsabqYXew/G1i4hwB+389Ils26RIZaBOM/rowiah9j2YFLWvvr8q3xkN3bAfGsa4aFOEiCHmCPZ0mwVhVUqfLWNWSLl5sHLvwbNR0I+bqRSWSMtiCqiffFhPzA70rTJfo/LHEFXwqTAkM5E+UOa04FSZVWBsD6Fwzyq4atkLir67svB2hBLthHEPQtT1vIHMTGtN5uFYPcN8y2JIpR/XZ44KFWBlS9SGpKgBsaSdyKRH9uycK/grEhoij4LEuO/XH5kjuMA0xLO+sehzleeGwlnQmbU30Aq2stYA4dz7hhw427cun/ZnXN9zYM/npshsMtfJDbquCMpEnTJeXQFg3dwSa7o2aspdUFoWEmV3Ogc6rKff05cOWWtcdyK4FhxPazLXZ3+EMXVmk0uAldP68sRtOcQwioPI/WhW8CPm0zHEbPeT0UnVA+lLexAezFO1/tukt4g6jZ7lxB1DBDSUXgZJXUjGnG/zN1mOVVgtmCnlq9NTFqbtv09FPAZ3nOCA3mxxW+ndLKLbVnuoWyMsXYb8Hd+SJLQZ1j5Gxhld3eR7Qrq6DEDOLfoH7OnKMlbIDStCM/v1UcbavKkgiQDLeXYV2xxIrJGFvMtuRrrCRBgFwmklgJb367tHcXMojopJe6GDeTTXz4i0ByOs7gxGndPNTs3IarsyALoopd+tFiw5B4yeO4LGb49J8y7TIwuxARR3b98HltPBkNciv48QCGdwUO+8bc71WjJue+LJ4rf1EL8ukH6l8rvf6eUTiFWUZK8AqaFM6kXM3OpzaC7+aXNkSf0wcEd/6Xdrnya34mkbdfYeWD7AH9F1+qn/YA1ELXgWkFsgRMVATsnnHrNj0iuE7u2Mu5OS5p8GRWjPVddGtXhxgRjvaq/sbVBfGoRA+jDR5nvqvvIv3SBEs392F331nS9Ql4ckJ6ThgjvrD3KcKr/cbeGSvQv0NaTkImiCB92WM3Etwa4tuBIGv1S0nWGcXKGi/YqKYq5gC0zixby43BC3DmbDd8GLNZUM9mDw9bANDIeRmvLvXmjt3H/up5AoXKoa25etG5xnDg+yM+JmcMHJY+Ud/+O7jEiBjLk4KiGS2GIfbTHgMp+dVKnZkJy4NOFGjKwu5nD8eciyGo755S9fu40+8pJ+pHhWA30JZll+o=)
     advice-packages:
       - com.github.hbq969.middleware
       - com.github.hbq969.code.sm

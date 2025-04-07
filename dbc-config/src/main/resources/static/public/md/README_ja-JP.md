@@ -71,90 +71,61 @@ mybatis:
 <dependency>
     <groupId>com.github.hbq969</groupId>
     <artifactId>spring-cloud-starter-hdbc-config</artifactId>
-    <version>1.0</version>
+    <version>1.1</version>
 </dependency>
 ```
 
-> bootstrap.yml （strategy: mix，最初にAPIメソッドを使用し、APIメソッドが利用できない場合はDBメソッドに切り替えます）
+> bootstrap.yml 
 ```yaml
 spring:
   cloud:
     config:
       h-dbc:
         enabled: true
-        profile-name: dev
-        service-name: h-example
         dbc-key: h-dbc
-        strategy: mix
+        service-name: h-example
+        profile-name: dev
         api:
-          auth:
-            basic:
-              password: Basic Auth Password
-              username: Basic Auth Account
-            enabled: true
-          url: http://localhost:30170
+          basic-auth:
+            username: <Username>
+            password: <Password>
           charset: utf-8
-          secret: API Access SecretKey
-          iv: API Access IV
-        db:
-          driver-class-name: com.mysql.cj.jdbc.Driver
-          jdbc-url: Config Center Jdbc URL
-          username: Config Center Jdbc User
-          password: Config Center Jdbc Password
-          connection-test-query: SELECT 1
-          max-lifetime: 1800000
-          maximum-pool-size: 2
-          minimum-idle: 1
+          url: http://localhost:30170/h-dbc
+          api-log: true
 ```
 
 
 
 ## 非 Java プログラム アクセス ガイド
 
+1. RSA公開鍵を取得する
 ```bash
-curl -XPOST 'http://user:pwd@ip:port/h-dbc/api/config/list' \
--d "3RCAL41+Rvbv/+s+jlqAw9Rjoiy.....SK5STJ7NbYGAuNdElRWA==" \
+curl -XGET 'http://<Username>:<Password>@ip:port/h-dbc/api/publicKey'
+```
+
+2. 8-64ビットのAESキーとIVを生成する
+
+3. 暗号化されたリクエスト本文
+```json
+{
+  "key": rsa(<生成された8〜64ビットのAESキー>, <取得した公開鍵>),
+  "iv": rsa(<8-64ビットIVを生成する>, <取得した公開鍵>),
+  "body": aes('{"serviceName":"h-example","profileName":"dev", "type":"YAML"}',<生成された8〜64ビットのAESキー>, <8-64ビットIVを生成する>)
+}
+```
+
+4. リクエストを送信
+> typeはPROPとYAML形式をサポートします
+```bash
+curl -XPOST 'http://<Username>:<Password>@ip:port/h-dbc/api/config/list' \
+-d ‘{
+  "key": rsa(<生成された8〜64ビットのAESキー>, <取得した公開鍵>),
+  "iv": rsa(<8-64ビットIVを生成する>, <取得した公開鍵>),
+  "body": aes('{"serviceName":"h-example","profileName":"dev", "type":"YAML"}',<生成された8〜64ビットのAESキー>, <8-64ビットIVを生成する>)
+}’ \
 -H 'Content-Type:application/json'
 ```
-
-![](./example.png)
-
-
-> リクエストボディの暗号化
-
+5. 応答データの復号
 ```javascript
-import CryptoJS from "crypto-js";
-
-function encrypt(word: any, key: any, iv: any): string {
-    let srcs = CryptoJS.enc.Utf8.parse(word);
-    let encrypted = CryptoJS.AES.encrypt(srcs, key, {
-        iv: iv,
-        mode: CryptoJS.mode.CBC,
-        padding: CryptoJS.pad.Pkcs7
-    });
-    return CryptoJS.enc.Base64.stringify(encrypted.ciphertext);
-}
-let query = {"serviceName":"h-example","profileName":"default"}
-let body = encrypt(JSON.stringify(query),key,iv)
+aes('<暗号化された応答データ>', <生成された8〜64ビットのAESキー>, <8-64ビットIVを生成する>)
 ```
-
-
-
-> レスポンス本文の復号
-
-```javascript
-import CryptoJS from "crypto-js";
-
-function decrypt(word: any, key: any, iv: any): string {
-    let base64 = CryptoJS.enc.Base64.parse(word);
-    let src = CryptoJS.enc.Base64.stringify(base64);
-    let decrypt = CryptoJS.AES.decrypt(src, key, {
-        iv: iv,
-        mode: CryptoJS.mode.CBC,
-        padding: CryptoJS.pad.Pkcs7
-    });
-    var decryptedStr = decrypt.toString(CryptoJS.enc.Utf8);
-    return decryptedStr.toString();
-}
-```
-

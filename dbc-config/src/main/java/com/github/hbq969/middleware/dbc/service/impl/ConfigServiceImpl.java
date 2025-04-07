@@ -370,21 +370,11 @@ public class ConfigServiceImpl implements ConfigService {
         prop.put("spring.cloud.config.h-dbc.dbc-key", context.getProperty("spring.application.name"));
         prop.put("spring.cloud.config.h-dbc.service-name", serviceName);
         prop.put("spring.cloud.config.h-dbc.profile-name", profileName);
-        prop.put("spring.cloud.config.h-dbc.strategy", "mix");
         prop.put("spring.cloud.config.h-dbc.api.charset", "utf-8");
-        prop.put("spring.cloud.config.h-dbc.api.secret", "api encryption transmission key");
-        prop.put("spring.cloud.config.h-dbc.api.iv", "api encryption transmission iv");
         prop.put("spring.cloud.config.h-dbc.api.api-log", false);
-        prop.put("spring.cloud.config.h-dbc.api.auth.enabled", "true");
-        prop.put("spring.cloud.config.h-dbc.api.auth.basic.username", "api authentication account");
-        prop.put("spring.cloud.config.h-dbc.api.auth.basic.password", "api authentication password");
-        prop.put("spring.cloud.config.h-dbc.db.driver-class-name", "com.mysql.cj.jdbc.Driver");
-        prop.put("spring.cloud.config.h-dbc.db.jdbc-url", "Config Center Jdbc URL");
-        prop.put("spring.cloud.config.h-dbc.db.username", "Config Center Jdbc User");
-        prop.put("spring.cloud.config.h-dbc.db.connection-test-query", "SELECT 1");
-        prop.put("spring.cloud.config.h-dbc.db.max-lifetime", 1800000);
-        prop.put("spring.cloud.config.h-dbc.db.maximum-pool-size", 2);
-        prop.put("spring.cloud.config.h-dbc.db.minimum-idle", 1);
+        prop.put("spring.cloud.config.h-dbc.api.url", "http://localhost:30170/h-dbc");
+        prop.put("spring.cloud.config.h-dbc.api.basic-auth.username", "api authentication account");
+        prop.put("spring.cloud.config.h-dbc.api.basic-auth.password", "api authentication password");
         List<TypePair> pairs = new ArrayList<>(prop.size());
         for (Map.Entry<String, Object> e : prop.entrySet()) {
             TypePair pair = new TypePair(e.getKey(), e.getValue(), e.getValue().getClass().getName());

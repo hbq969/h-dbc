@@ -4,6 +4,7 @@ import cn.hutool.core.io.IoUtil;
 import com.github.hbq969.middleware.dbc.driver.api.model.TypePair;
 import com.github.hbq969.middleware.dbc.driver.config.ApiInfo;
 import com.github.hbq969.middleware.dbc.driver.utils.AESUtils;
+import com.github.hbq969.middleware.dbc.driver.utils.MDCUtils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -35,12 +36,14 @@ public class Decoder implements feign.codec.Decoder {
         if (response.body() == null) {
             return null;
         }
+        String key = MDCUtils.rmAndGet("dbc,api,aes,key");
+        String iv = MDCUtils.rmAndGet("dbc,api,aes,iv");
         Reader reader = response.body().asReader(c);
         String content = IoUtil.read(reader);
         if (api.isApiLog()) {
-            log.debug("解码前: {}", content);
+            log.debug("解码前, key: {}, iv: {}, 相应报文: {}", key, iv, content);
         }
-        String decryptBody = AESUtils.decrypt(content, this.api.getSecret(), this.api.getIv(), c);
+        String decryptBody = AESUtils.decrypt(content, key, iv, c);
         if (api.isApiLog()) {
             log.debug("解码后: {}", decryptBody);
         }
@@ -50,13 +53,5 @@ public class Decoder implements feign.codec.Decoder {
         } else {
             return gson.fromJson(decryptBody, type);
         }
-    }
-
-    public static void main(String[] args) throws Exception {
-        String content = "[{\"key\":\"advice.log.enabled\",\"value\":true,\"type\":\"java.lang.Boolean\"},{\"key\":\"server.port\",\"value\":30161,\"type\":\"java.lang.Integer\"},{\"key\":\"server.servlet.context-path\",\"value\":\"/h-example\",\"type\":\"java.lang.String\"},{\"key\":\"foo\",\"value\":12.34,\"type\":\"java.lang.Float\"},{\"key\":\"bar\",\"value\":1.67,\"type\":\"java.lang.Double\"},{\"key\":\"abc\",\"value\":123,\"type\":\"java.lang.Long\"},{\"key\":\"bbb\",\"value\":12,\"type\":\"java.lang.Short\"},{\"key\":\"ccc\",\"value\":10,\"type\":\"java.lang.Byte\"},{\"key\":\"ddd\",\"value\":\"\\n\",\"type\":\"java.lang.Character\"}]";
-        Gson gson = new GsonBuilder().registerTypeAdapter(TypePair.class, new TypePairDeserializer()).create();
-        List<TypePair> list = gson.fromJson(content, new TypeToken<List<TypePair>>() {
-        });
-        System.out.println(list);
     }
 }

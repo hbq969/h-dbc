@@ -12,7 +12,6 @@ import com.github.hbq969.code.common.utils.I18nUtils;
 import com.github.hbq969.code.common.utils.StrUtils;
 import com.github.hbq969.code.dict.service.api.impl.MapDictHelperImpl;
 import com.github.hbq969.code.sm.login.service.LoginService;
-import com.github.hbq969.code.tabula.dao.entity.Source;
 import com.github.hbq969.middleware.dbc.dao.ServiceDao;
 import com.github.hbq969.middleware.dbc.dao.entity.ServiceEntity;
 import com.github.hbq969.middleware.dbc.model.AccountService;
@@ -26,7 +25,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.ApplicationListener;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,7 +38,7 @@ import java.util.Map;
 
 @org.springframework.stereotype.Service("dbc-ServiceImpl")
 @Slf4j
-public class ServiceImpl implements Service, ScriptInitialAware, ApplicationListener<LanguageEvent>, InitializingBean {
+public class ServiceImpl implements Service, ScriptInitialAware, InitializingBean {
 
     @Autowired
     private ServiceDao serviceDao;
@@ -206,6 +204,14 @@ public class ServiceImpl implements Service, ScriptInitialAware, ApplicationList
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
+        } finally {
+            if (c != null) {
+                try {
+                    c.close();
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            }
         }
     }
 

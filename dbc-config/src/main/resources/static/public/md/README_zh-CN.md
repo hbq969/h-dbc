@@ -71,92 +71,61 @@ mybatis:
 <dependency>
     <groupId>com.github.hbq969</groupId>
     <artifactId>spring-cloud-starter-hdbc-config</artifactId>
-    <version>1.0</version>
+    <version>1.1</version>
 </dependency>
 ```
 
-> bootstrap.yml （strategy: mix，优先使用api方式拉取，api方式不可用切换到db方式）
+> bootstrap.yml 
 ```yaml
 spring:
   cloud:
     config:
       h-dbc:
         enabled: true
-        profile-name: dev
-        service-name: h-example
         dbc-key: h-dbc
-        strategy: mix
+        service-name: h-example
+        profile-name: dev
         api:
-          auth:
-            basic:
-              password: Basic Auth Password
-              username: Basic Auth Account
-            enabled: true
-          url: http://localhost:30170
+          basic-auth:
+            username: <Username>
+            password: <Password>
           charset: utf-8
-          secret: API Access SecretKey
-          iv: API Access IV
-        db:
-          driver-class-name: com.mysql.cj.jdbc.Driver
-          jdbc-url: Config Center Jdbc URL
-          username: Config Center Jdbc User
-          password: Config Center Jdbc Password
-          connection-test-query: SELECT 1
-          max-lifetime: 1800000
-          maximum-pool-size: 2
-          minimum-idle: 1
+          url: http://localhost:30170/h-dbc
+          api-log: true
 ```
 
 
 
 ## 非Java接入方式
-
+1. 获取RSA公钥
 ```bash
-curl -XPOST 'http://user:pwd@ip:port/h-dbc/api/config/list' \
--d "3RCAL41+Rvbv/+s+jlqAw9Rjoiy.....SK5STJ7NbYGAuNdElRWA==" \
+curl -XGET 'http://<Username>:<Password>@ip:port/h-dbc/api/publicKey'
+```
+
+2. 生成8—64位的AES秘钥、IV
+
+3. 加密请求体
+> type支持PROP、YAML两种格式
+```json
+{
+  "key": rsa(<生成的8-64位的AES秘钥>, <获取的公钥>),
+  "iv": rsa(<生成的8-64位的IV>, <获取的公钥>),
+  "body": aes('{"serviceName":"h-example","profileName":"dev", "type":"YAML"}',<生成的8-64位的AES秘钥>, <生成的8-64位的IV>)
+}
+```
+
+4. 发送请求
+```bash
+curl -XPOST 'http://<Username>:<Password>@ip:port/h-dbc/api/config/list' \
+-d ‘{
+  "key": rsa(<生成的8-64位的AES秘钥>, <获取的公钥>),
+  "iv": rsa(<生成的8-64位的IV>, <获取的公钥>),
+  "body": aes('{"serviceName":"h-example","profileName":"dev", "type":"YAML"}',<生成的8-64位的AES秘钥>, <生成的8-64位的IV>)
+}’ \
 -H 'Content-Type:application/json'
 ```
-
-
-![](./example.png)
-
-
-
-> 请求数据加密
-
+5. 响应数据解密
 ```javascript
-import CryptoJS from "crypto-js";
-
-function encrypt(word: any, key: any, iv: any): string {
-    let srcs = CryptoJS.enc.Utf8.parse(word);
-    let encrypted = CryptoJS.AES.encrypt(srcs, key, {
-        iv: iv,
-        mode: CryptoJS.mode.CBC,
-        padding: CryptoJS.pad.Pkcs7
-    });
-    return CryptoJS.enc.Base64.stringify(encrypted.ciphertext);
-}
-let query = {"serviceName":"h-example","profileName":"default"}
-let body = encrypt(JSON.stringify(query),key,iv)
-```
-
-
-
-> 响应数据解密
-
-```javascript
-import CryptoJS from "crypto-js";
-
-function decrypt(word: any, key: any, iv: any): string {
-    let base64 = CryptoJS.enc.Base64.parse(word);
-    let src = CryptoJS.enc.Base64.stringify(base64);
-    let decrypt = CryptoJS.AES.decrypt(src, key, {
-        iv: iv,
-        mode: CryptoJS.mode.CBC,
-        padding: CryptoJS.pad.Pkcs7
-    });
-    var decryptedStr = decrypt.toString(CryptoJS.enc.Utf8);
-    return decryptedStr.toString();
-}
+aes('<加密的响应数据>', <生成的8-64位的AES秘钥>, <生成的8-64位的IV>)
 ```
 

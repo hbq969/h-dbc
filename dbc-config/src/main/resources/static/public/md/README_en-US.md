@@ -69,40 +69,27 @@ mybatis:
 <dependency>
     <groupId>com.github.hbq969</groupId>
     <artifactId>spring-cloud-starter-hdbc-config</artifactId>
-    <version>1.0</version>
+    <version>1.1</version>
 </dependency>
 ```
 
-> bootstrap.yml (strategy: mix, use api method to pull first, switch to db method if api method is not available)
+> bootstrap.yml
 ```yaml
 spring:
   cloud:
     config:
       h-dbc:
         enabled: true
-        profile-name: dev
-        service-name: h-example
         dbc-key: h-dbc
-        strategy: mix
+        service-name: h-example
+        profile-name: dev
         api:
-          auth:
-            basic:
-              password: Basic Auth Password
-              username: Basic Auth Account
-            enabled: true
-          url: http://localhost:30170
+          basic-auth:
+            username: <Username>
+            password: <Password>
           charset: utf-8
-          secret: API Access SecretKey
-          iv: API Access IV
-        db:
-          driver-class-name: com.mysql.cj.jdbc.Driver
-          jdbc-url: Config Center Jdbc URL
-          username: Config Center Jdbc User
-          password: Config Center Jdbc Password
-          connection-test-query: SELECT 1
-          max-lifetime: 1800000
-          maximum-pool-size: 2
-          minimum-idle: 1
+          url: http://localhost:30170/h-dbc
+          api-log: true
 ```
 
 ## Non-Java access method
@@ -124,50 +111,35 @@ spring:
 
 ## Non-Java Program Access Guide
 
+1. Get RSA public key
 ```bash
-curl -XPOST 'http://user:pwd@ip:port/h-dbc/api/config/list' \
--d "3RCAL41+Rvbv/+s+jlqAw9Rjoiy.....SK5STJ7NbYGAuNdElRWA==" \
+curl -XGET 'http://<Username>:<Password>@ip:port/h-dbc/api/publicKey'
+```
+
+2. Generate 8-64 bit AES key and IV
+
+3. Encrypted request body
+> type supports PROP and YAML formats
+```json
+{
+  "key": rsa(<Generated 8-64 bit AES key>, <Obtained public key>),
+  "iv": rsa(<Generated 8-64 bit IV>, <Obtained public key>),
+  "body": aes('{"serviceName":"h-example","profileName":"dev", "type":"YAML"}',<Generated 8-64 bit AES key>, <Generated 8-64 bit IV>)
+}
+```
+
+4. Send Request
+```bash
+curl -XPOST 'http://<Username>:<Password>@ip:port/h-dbc/api/config/list' \
+-d ‘{
+  "key": rsa(<Generated 8-64 bit AES key>, <Obtained public key>),
+  "iv": rsa(<Generated 8-64 bit IV>, <Obtained public key>),
+  "body": aes('{"serviceName":"h-example","profileName":"dev", "type":"YAML"}',<Generated 8-64 bit AES key>, <Generated 8-64 bit IV>)
+}’ \
 -H 'Content-Type:application/json'
 ```
-
-![](./example.png)
-
-
-> Request body encryption
-
+5. Response data decryption
 ```javascript
-import CryptoJS from "crypto-js";
-
-function encrypt(word: any, key: any, iv: any): string {
-    let srcs = CryptoJS.enc.Utf8.parse(word);
-    let encrypted = CryptoJS.AES.encrypt(srcs, key, {
-        iv: iv,
-        mode: CryptoJS.mode.CBC,
-        padding: CryptoJS.pad.Pkcs7
-    });
-    return CryptoJS.enc.Base64.stringify(encrypted.ciphertext);
-}
-let query = {"serviceName":"h-example","profileName":"default"}
-let body = encrypt(JSON.stringify(query),key,iv)
-```
-
-
-
-> Response body decryption
-
-```javascript
-import CryptoJS from "crypto-js";
-
-function decrypt(word: any, key: any, iv: any): string {
-    let base64 = CryptoJS.enc.Base64.parse(word);
-    let src = CryptoJS.enc.Base64.stringify(base64);
-    let decrypt = CryptoJS.AES.decrypt(src, key, {
-        iv: iv,
-        mode: CryptoJS.mode.CBC,
-        padding: CryptoJS.pad.Pkcs7
-    });
-    var decryptedStr = decrypt.toString(CryptoJS.enc.Utf8);
-    return decryptedStr.toString();
-}
+aes('<Encrypted response data>', <Generated 8-64 bit AES key>, <Generated 8-64 bit IV>)
 ```
 

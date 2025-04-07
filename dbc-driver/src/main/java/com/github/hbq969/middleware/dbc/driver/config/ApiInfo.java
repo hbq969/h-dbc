@@ -49,20 +49,6 @@ public class ApiInfo {
     private long retryTimeoutMills = 5000L;
 
     /**
-     * api接口私钥，参考配置中心配置
-     */
-    @Getter
-    @Setter
-    private String secret;
-
-    /**
-     * api接口加密iv随机数，长度和secret一致，参考配置中心配置
-     */
-    @Getter
-    @Setter
-    private String iv;
-
-    /**
      * api接口编码
      */
     @Getter
@@ -76,32 +62,38 @@ public class ApiInfo {
     @Setter
     private boolean apiLog = false;
 
+    /**
+     * AES秘钥、iv长度，最大不能超过32位
+     */
     @Getter
     @Setter
-    private Auth auth = new Auth();
+    private int lengthAesKey = 16;
+
+    @Getter
+    @Setter
+    private BasicAuth basicAuth = new BasicAuth();
 
     @Getter
     private volatile transient ConfigService api;
 
     public ApiInfo configSet(ConfigurableEnvironment env) {
-        this.url = APIPropertySource.decode(env, "spring.cloud.config.h-dbc.api.url", env.getProperty("spring.cloud.config.h-dbc.api.url", this.url));
-        this.secret = APIPropertySource.decode(env, "spring.cloud.config.h-dbc.api.secret", env.getProperty("spring.cloud.config.h-dbc.api.secret"));
-        this.iv = APIPropertySource.decode(env, "spring.cloud.config.h-dbc.api.iv", env.getProperty("spring.cloud.config.h-dbc.api.iv"));
+        this.url = env.getProperty("spring.cloud.config.h-dbc.api.url", this.url);
         this.charset = env.getProperty("spring.cloud.config.h-dbc.api.charset", this.charset);
         this.apiLog = env.getProperty("spring.cloud.config.h-dbc.api.api-log", Boolean.class, this.apiLog);
-        this.auth.setEnabled(env.getProperty("spring.cloud.config.h-dbc.api.auth.enabled", Boolean.class, true));
-        this.auth.getBasic().setKey(APIPropertySource.decode(env, "spring.cloud.config.h-dbc.api.auth.basic.key", env.getProperty("spring.cloud.config.h-dbc.api.auth.basic.key", this.auth.getBasic().getKey())));
-        this.auth.getBasic().setUsername(APIPropertySource.decode(env, "spring.cloud.config.h-dbc.api.auth.basic.username", env.getProperty("spring.cloud.config.h-dbc.api.auth.basic.username")));
-        this.auth.getBasic().setPassword(APIPropertySource.decode(env, "spring.cloud.config.h-dbc.api.auth.basic.password", env.getProperty("spring.cloud.config.h-dbc.api.auth.basic.password")));
+        this.lengthAesKey = env.getProperty("spring.cloud.config.h-dbc.api.length-aes-key", Integer.class, this.lengthAesKey);
+        this.basicAuth.setKey(env.getProperty("spring.cloud.config.h-dbc.api.basic-auth.key", this.basicAuth.getKey()));
+        this.basicAuth.setUsername(APIPropertySource.decode(env, "spring.cloud.config.h-dbc.api.basic-auth.username", env.getProperty("spring.cloud.config.h-dbc.api.basic-auth.username")));
+        this.basicAuth.setPassword(APIPropertySource.decode(env, "spring.cloud.config.h-dbc.api.basic-auth.password", env.getProperty("spring.cloud.config.h-dbc.api.basic-auth.password")));
+        this.basicAuth.check();
         return this;
     }
 
-    public ConfigService getApiProxy(String dbcKey) throws Exception {
+    public ConfigService getApiProxy() throws Exception {
         if (this.api != null) {
             return this.api;
         }
         ConfigServiceImpl csi = new ConfigServiceImpl(this);
-        csi.setUrl(String.join("/", this.url, dbcKey, "api"));
+        csi.setUrl(this.url);
         csi.setInter(ConfigService.class);
         csi.afterPropertiesSet();
         this.api = csi.getObject();

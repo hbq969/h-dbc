@@ -28,9 +28,11 @@ public class APIPropertySource extends MapPropertySource implements RefreshListe
     private static volatile PooledPBEStringEncryptor encryptor;
     private static DbcConfig conf = new DbcConfig();
     private volatile boolean loadFailed = false;
+    private final boolean mix;
 
-    public APIPropertySource(String name, ConfigurableEnvironment environment) {
+    public APIPropertySource(String name, ConfigurableEnvironment environment, boolean mix) {
         super(name, new HashMap<>());
+        this.mix = mix;
         this.environment = environment;
         loadConfig();
     }
@@ -38,6 +40,7 @@ public class APIPropertySource extends MapPropertySource implements RefreshListe
     @Override
     public void refreshConfig() {
         loadConfig();
+
     }
 
     private void loadConfig() {
@@ -58,12 +61,10 @@ public class APIPropertySource extends MapPropertySource implements RefreshListe
                 }
                 this.loadFailed = true;
             }
-            if (!isLoadFailed() && (pairs == null || pairs.isEmpty())) {
-                log.warn("未拉取到相关配置，请检查是否在配置中心添加服务配置");
-            } else {
-                if (log.isDebugEnabled()) {
-                    log.debug("api拉取到配置数: {} 个", pairs.size());
-                }
+            if (isLoadFailed()) log.warn(mix ? "api拉取配置失败" : "api拉取配置失败，切换为读取应用本地配置");
+            else if (pairs == null || pairs.isEmpty()) log.warn("未拉取到相关配置，请检查是否在配置中心添加服务配置");
+            else if (!pairs.isEmpty()) {
+                if (log.isDebugEnabled()) log.debug("api拉取到配置数: {} 个", pairs.size());
             }
             for (TypePair pair : pairs) {
                 String value = String.valueOf(pair.getValue());
@@ -123,8 +124,7 @@ public class APIPropertySource extends MapPropertySource implements RefreshListe
         String sgcn = environment.getProperty("jasypt.encryptor.salt-generator-class-name", "org.jasypt.salt.RandomSaltGenerator");
         String sot = environment.getProperty("jasypt.encryptor.string-output-type", "base64");
         if (log.isDebugEnabled()) {
-            log.debug("jasypt配置, algorithm: {}, koi: {}, poolSize: {}, providerName: {}, sgcn: {}, sot: {}"
-                    , algorithm, koi, poolSize, providerName, sgcn, sot);
+            log.debug("jasypt配置, algorithm: {}, koi: {}, poolSize: {}, providerName: {}, sgcn: {}, sot: {}", algorithm, koi, poolSize, providerName, sgcn, sot);
         }
         config.setPassword(pwd);
         config.setAlgorithm(algorithm);
@@ -142,6 +142,7 @@ public class APIPropertySource extends MapPropertySource implements RefreshListe
     }
 
     public static boolean isEncValue(String value) {
+        if (value == null) return false;
         return value.startsWith(ENC_PREFIX) && value.endsWith(ENC_SUFFIX);
     }
 
@@ -151,8 +152,8 @@ public class APIPropertySource extends MapPropertySource implements RefreshListe
             return encode;
         }
         String value = encryptor.decrypt(encode.substring(4, encode.length() - 1));
-        if (log.isTraceEnabled()) {
-            log.trace("springboot初始化阶段属性解密处理, 属性名: {}, 原始值: {}, 解密后: {}", key, encode, value);
+        if (log.isDebugEnabled()) {
+            log.debug("springboot初始化阶段属性解密处理, 属性名: {}, 原始值: {}, 解密后: {}", key, encode, value);
         }
         return value;
     }

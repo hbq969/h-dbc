@@ -21,8 +21,8 @@ public class BasicAuthRequestInterceptor implements RequestInterceptor {
     public BasicAuthRequestInterceptor(ApiInfo api) {
         this.api = api;
         this.c = Charset.forName(api.getCharset());
-        String username = api.getAuth().getBasic().getUsername();
-        String password = api.getAuth().getBasic().getPassword();
+        String username = api.getBasicAuth().getUsername();
+        String password = api.getBasicAuth().getPassword();
         checkNotNull(username, "username");
         checkNotNull(password, "password");
         String auth = base64Encode((username + ":" + password).getBytes(c));
@@ -35,6 +35,6 @@ public class BasicAuthRequestInterceptor implements RequestInterceptor {
 
     @Override
     public void apply(RequestTemplate template) {
-        template.header(api.getAuth().getBasic().getKey(), headerValue);
+        template.header(api.getBasicAuth().getKey(), headerValue);
     }
 }

@@ -16,9 +16,6 @@ import org.springframework.util.Assert;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
-
-import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class FeignFactoryBean<T> implements FactoryBean<T>, InitializingBean {
 
@@ -72,11 +69,11 @@ public class FeignFactoryBean<T> implements FactoryBean<T>, InitializingBean {
      * @return
      */
     protected Retryer feignRetry() {
-        return new Retryer.Default(1000, SECONDS.toMillis(5), 3);
+        return new Retryer.Default(1000, 3000, 3);
     }
 
     protected Request.Options options() {
-        return new Request.Options(1, TimeUnit.MINUTES, 30, SECONDS, true);
+        return new Request.Options(1000,  30000, true);
     }
 
     protected Contract contract() {

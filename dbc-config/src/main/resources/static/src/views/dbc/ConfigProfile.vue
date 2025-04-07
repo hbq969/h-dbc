@@ -386,20 +386,20 @@ const _ = (window as any).ResizeObserver;
             <el-form-item :label="langData.configProfileProfileDesc">
               {{ source.profileDesc }}
             </el-form-item>
-            <el-form-item :label="langData.configProfileServiceIntegrated">
-              <el-tooltip :content="langData.configProfileJavaIntegrated" effect="dark" placement="top">
-                <el-link type="success" style="font-size: 1em; margin-right: 5px"
-                         @click="downIntegrated(source,'bootstrap'+(source.profileName == 'default' ? '' : '-' + source.profileName)+'.yml')">
-                  java
-                </el-link>
-              </el-tooltip>
-              |
-              <el-tooltip :content="langData.configProfileHttpIntegrated" effect="dark" placement="top">
-                <el-link type="success" style="font-size: 1em; margin-left: 5px" @click="showHttpIntegrated(source)">
-                  http
-                </el-link>
-              </el-tooltip>
-            </el-form-item>
+<!--            <el-form-item :label="langData.configProfileServiceIntegrated">-->
+<!--              <el-tooltip :content="langData.configProfileJavaIntegrated" effect="dark" placement="top">-->
+<!--                <el-link type="success" style="font-size: 1em; margin-right: 5px"-->
+<!--                         @click="downIntegrated(source,'bootstrap'+(source.profileName == 'default' ? '' : '-' + source.profileName)+'.yml')">-->
+<!--                  java-->
+<!--                </el-link>-->
+<!--              </el-tooltip>-->
+<!--              |-->
+<!--              <el-tooltip :content="langData.configProfileHttpIntegrated" effect="dark" placement="top">-->
+<!--                <el-link type="success" style="font-size: 1em; margin-left: 5px" @click="showHttpIntegrated(source)">-->
+<!--                  http-->
+<!--                </el-link>-->
+<!--              </el-tooltip>-->
+<!--            </el-form-item>-->
           </el-form>
         </template>
       </el-card>

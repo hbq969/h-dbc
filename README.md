@@ -71,30 +71,16 @@ spring:
     config:
       h-dbc:
         enabled: true
-        profile-name: default
-        service-name: h-example
         dbc-key: h-dbc
-        # 支持mix/api/db三种方式
-        strategy: mix
+        service-name: h-example
+        profile-name: dev
         api:
-          auth:
-            basic:
-              password: 密码
-              username: 账号
-            enabled: true
-          url: http://localhost:30170
+          basic-auth:
+            username: 账号
+            password: 密码
           charset: utf-8
-          secret: 秘钥
-          iv: iv随机数
-        db:
-          driver-class-name: com.mysql.cj.jdbc.Driver
-          jdbc-url: jdbc:mysql://docker.for.mac.host.internal:3306/dbc?useUnicode=true&allowPublicKeyRetrieval=true&characterEncoding=utf-8&useSSL=false&autoReconnect=true&failOverReadOnly=false&maxReconnects=15000
-          username: 账号
-          password: 密码
-          connection-test-query: SELECT 1
-          max-lifetime: 1800000
-          maximum-pool-size: 2
-          minimum-idle: 1
+          url: http://localhost:30170/h-dbc
+          api-log: true
 ```
 
 > 服务依赖
@@ -102,7 +88,7 @@ spring:
 <dependency>
     <groupId>com.github.hbq969</groupId>
     <artifactId>spring-cloud-starter-hdbc-config</artifactId>
-    <version>1.0</version>
+    <version>1.1</version>
 </dependency>
 ```
 
