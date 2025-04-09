@@ -12,7 +12,7 @@
             `updated_at`   numeric(20),
             constraint pk_dbc_service primary key (`service_id`)
         ) ENGINE = InnoDB
-          DEFAULT CHARSET = utf8
+          DEFAULT CHARSET = utf8mb3
     </update>
 
     <update id="createAccService">
@@ -23,7 +23,7 @@
             `service_id` varchar(100),
             constraint pk_dbc_acc_service primary key (`app`, `username`, `service_id`)
         ) ENGINE = InnoDB
-          DEFAULT CHARSET = utf8
+          DEFAULT CHARSET = utf8mb3
     </update>
 
     <update id="createProfiles">
@@ -35,7 +35,7 @@
             `updated_at` numeric(20),
             constraint pk_dbc_profiles primary key (`profile_name`)
         ) ENGINE = InnoDB
-          DEFAULT CHARSET = utf8
+          DEFAULT CHARSET = utf8mb3
     </update>
 
     <update id="createAccProfiles">
@@ -46,7 +46,7 @@
             `profile_name` varchar(100),
             constraint pk_dbc_acc_profiles primary key (`app`, `profile_name`)
         ) ENGINE = InnoDB
-          DEFAULT CHARSET = utf8
+          DEFAULT CHARSET = utf8mb3
     </update>
 
     <update id="createConfig">
@@ -63,7 +63,7 @@
             `updated_at`   numeric(20),
             constraint pk_db_config primary key (`app`, `username`, `service_id`, `profile_name`, `config_key`)
         ) ENGINE = InnoDB
-          DEFAULT CHARSET = utf8
+          DEFAULT CHARSET = utf8mb3
     </update>
 
     <update id="createConfigFile">
@@ -79,7 +79,7 @@
             `updated_at`   numeric(20),
             constraint pk_dbc_config_file primary key (`app`, `username`, `service_id`, `profile_name`)
         ) ENGINE = InnoDB
-          DEFAULT CHARSET = utf8
+          DEFAULT CHARSET = utf8mb3
     </update>
 
     <update id="createConfigBackup">
@@ -98,6 +98,6 @@
             `created_at`     numeric(20),
             constraint pk_dbc_config_bk primary key (`id`)
         ) ENGINE = InnoDB
-          DEFAULT CHARSET = utf8
+          DEFAULT CHARSET = utf8mb3
     </update>
 </mapper>

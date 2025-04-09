@@ -116,15 +116,15 @@ spring:
 curl -XGET 'http://<Username>:<Password>@ip:port/h-dbc/api/publicKey'
 ```
 
-2. Generate 8-64 bit AES key and IV
+2. Generate 8-32 bit AES key and IV
 
 3. Encrypted request body
 > type supports PROP and YAML formats
 ```json
 {
-  "key": rsa(<Generated 8-64 bit AES key>, <Obtained public key>),
-  "iv": rsa(<Generated 8-64 bit IV>, <Obtained public key>),
-  "body": aes('{"serviceName":"h-example","profileName":"dev", "type":"YAML"}',<Generated 8-64 bit AES key>, <Generated 8-64 bit IV>)
+  "key": rsa(<Generated 8-32 bit AES key>, <Obtained public key>),
+  "iv": rsa(<Generated 8-32 bit IV>, <Obtained public key>),
+  "body": aes('{"serviceName":"h-example","profileName":"dev", "type":"YAML"}',<Generated 8-32 bit AES key>, <Generated 8-32 bit IV>)
 }
 ```
 
@@ -132,14 +132,19 @@ curl -XGET 'http://<Username>:<Password>@ip:port/h-dbc/api/publicKey'
 ```bash
 curl -XPOST 'http://<Username>:<Password>@ip:port/h-dbc/api/config/list' \
 -d ‘{
-  "key": rsa(<Generated 8-64 bit AES key>, <Obtained public key>),
-  "iv": rsa(<Generated 8-64 bit IV>, <Obtained public key>),
-  "body": aes('{"serviceName":"h-example","profileName":"dev", "type":"YAML"}',<Generated 8-64 bit AES key>, <Generated 8-64 bit IV>)
+  "key": rsa(<Generated 8-32 bit AES key>, <Obtained public key>),
+  "iv": rsa(<Generated 8-32 bit IV>, <Obtained public key>),
+  "body": aes('{"serviceName":"h-example","profileName":"dev", "type":"YAML"}',<Generated 8-32 bit AES key>, <Generated 8-32 bit IV>)
 }’ \
 -H 'Content-Type:application/json'
 ```
 5. Response data decryption
 ```javascript
-aes('<Encrypted response data>', <Generated 8-64 bit AES key>, <Generated 8-64 bit IV>)
+aes('<Encrypted response data>', <Generated 8-32 bit AES key>, <Generated 8-32 bit IV>)
 ```
 
+## Other language `SDK` sample code reference
+
+[sdk-python-examples](./sdk/python/dbc-sdk-python.zip)
+
+[sdk-javascript-examples](./sdk/javascript/dbc-sdk-javascript.zip)

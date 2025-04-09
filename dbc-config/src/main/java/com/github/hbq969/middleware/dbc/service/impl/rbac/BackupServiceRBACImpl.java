@@ -1,4 +1,4 @@
-package com.github.hbq969.middleware.dbc.service.impl;
+package com.github.hbq969.middleware.dbc.service.impl.rbac;
 
 import com.github.hbq969.code.common.spring.context.SpringContext;
 import com.github.hbq969.code.common.utils.I18nUtils;

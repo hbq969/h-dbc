@@ -1,107 +1,99 @@
-package com.github.hbq969.middleware.dbc.service.impl;
+package com.github.hbq969.middleware.dbc.service.impl.cache;
 
-import com.github.hbq969.middleware.dbc.config.Config;
 import com.github.hbq969.middleware.dbc.dao.entity.BackupEntity;
 import com.github.hbq969.middleware.dbc.dao.entity.ConfigFileEntity;
 import com.github.hbq969.middleware.dbc.dao.entity.ProfileEntity;
 import com.github.hbq969.middleware.dbc.dao.entity.ServiceEntity;
+import com.github.hbq969.middleware.dbc.model.APIModel;
 import com.github.hbq969.middleware.dbc.model.AccountServiceProfile;
 import com.github.hbq969.middleware.dbc.service.BackupService;
+import com.github.hbq969.middleware.dbc.service.CacheService;
 import com.github.hbq969.middleware.dbc.view.request.BatchDeleteBackup;
 import com.github.hbq969.middleware.dbc.view.request.BatchDeleteRecovery;
 import com.github.pagehelper.PageInfo;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-@Service("dbc-BackupProxyImpl")
-public class BackupProxyImpl implements BackupService {
+@Service("dbc-BackupServiceCacheImpl")
+public class BackupServiceCacheImpl implements BackupService {
 
     @Autowired
-    @Qualifier("dbc-BackupServiceCacheImpl")
+    @Qualifier("dbc-BackupServiceImpl")
     private BackupService target;
 
     @Autowired
-    private Config conf;
+    private CacheService cacheService;
 
     @Override
     public void backupOnDeleteProfile(ProfileEntity profile) {
-        if (conf.isBackup()) {
-            target.backupOnDeleteProfile(profile);
-        }
+        this.target.backupOnDeleteProfile(profile);
     }
 
     @Override
     public void backupOnDeleteService(ServiceEntity service) {
-        if (conf.isBackup()) {
-            target.backupOnDeleteService(service);
-        }
+        this.target.backupOnDeleteService(service);
     }
 
     @Override
     public void backupOnClearProfileConfig(AccountServiceProfile asp) {
-        if (conf.isBackup()) {
-            target.backupOnClearProfileConfig(asp);
-        }
+        this.target.backupOnClearProfileConfig(asp);
     }
 
     @Override
     public void backupOnConfigImport(AccountServiceProfile asp) {
-        if (conf.isBackup()) {
-            target.backupOnConfigImport(asp);
-        }
+        this.target.backupOnConfigImport(asp);
     }
 
     @Override
     public void backupOnUpdateConfigFile(ConfigFileEntity file) {
-        if (conf.isBackup()) {
-            target.backupOnUpdateConfigFile(file);
-        }
+        this.target.backupOnUpdateConfigFile(file);
     }
 
     @Override
     public PageInfo<BackupEntity> queryBackupList(AccountServiceProfile asp, int pageNum, int pageSize) {
-        if (conf.isBackup()) {
-            return target.queryBackupList(asp, pageNum, pageSize);
-        }
-        throw new UnsupportedOperationException();
+        return this.target.queryBackupList(asp, pageNum, pageSize);
     }
 
     @Override
     public void deleteBackup(BackupEntity bk) {
-        if (conf.isBackup()) {
-            target.deleteBackup(bk);
-        }
+        this.target.deleteBackup(bk);
     }
 
     @Override
     public void deleteBackups(BatchDeleteBackup bdb) {
-        if (conf.isBackup()) {
-            target.deleteBackups(bdb);
-        }
+        this.target.deleteBackups(bdb);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void recoveryBackup(BackupEntity bk) {
-        if (conf.isBackup()) {
-            target.recoveryBackup(bk);
+        try {
+            cacheService.clear(new APIModel().of(bk));
+        } finally {
+            this.target.recoveryBackup(bk);
         }
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void recoveryBackups(BatchDeleteRecovery bdr) {
-        if (conf.isBackup()) {
-            target.recoveryBackups(bdr);
+        try {
+            if (bdr != null && CollectionUtils.isNotEmpty(bdr.getRecoveries()))
+                for (BackupEntity be : bdr.getRecoveries()) {
+                    cacheService.clear(new APIModel().of(be));
+                }
+        } finally {
+            this.target.recoveryBackups(bdr);
         }
     }
 
     @Override
     public List<ProfileEntity> queryProfileList() {
-        if (conf.isBackup()) {
-            return target.queryProfileList();
-        }
-        throw new UnsupportedOperationException();
+        return this.target.queryProfileList();
     }
 }

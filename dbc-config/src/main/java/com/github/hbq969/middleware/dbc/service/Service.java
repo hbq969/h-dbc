@@ -11,4 +11,6 @@ public interface Service {
     void deleteService(ServiceEntity service);
 
     PageInfo<ServiceEntity> queryServiceList(ServiceEntity service,int pageNum,int pageSize);
+
+    ServiceEntity queryService(String id);
 }

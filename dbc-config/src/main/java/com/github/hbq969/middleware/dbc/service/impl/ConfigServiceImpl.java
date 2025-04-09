@@ -32,7 +32,6 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -84,7 +83,6 @@ public class ConfigServiceImpl implements ConfigService {
         return pg;
     }
 
-    @Transactional(rollbackFor = Exception.class)
     @Override
     public void saveConfig(AccountServiceProfile asp, ConfigEntity config) {
         asp.userInitial(context);
@@ -92,7 +90,6 @@ public class ConfigServiceImpl implements ConfigService {
         configDao.saveConfig(asp, config);
     }
 
-    @Transactional(rollbackFor = Exception.class)
     @Override
     public void updateConfig(AccountServiceProfile asp, ConfigEntity config) {
         config.setUpdatedAt(FormatTime.nowSecs());
@@ -100,7 +97,6 @@ public class ConfigServiceImpl implements ConfigService {
         configDao.updateConfig(asp, config);
     }
 
-    @Transactional(rollbackFor = Exception.class)
     @Override
     public void batchUpdateConfig(List<ServiceConfigEntity> rows) {
         Assert.notNull(rows, I18nUtils.getMessage(context, "ConfigServiceImpl.batchUpdateConfig.msg1"));
@@ -132,18 +128,15 @@ public class ConfigServiceImpl implements ConfigService {
         });
     }
 
-    @Transactional(rollbackFor = Exception.class)
     @Override
     public void deleteConfig(AccountServiceProfile asp, ConfigEntity q) {
         asp.userInitial(context);
         configDao.deleteConfig(asp, q);
     }
 
-    @Transactional(rollbackFor = Exception.class)
     @Override
     public void batchDeleteConfig(List<ServiceConfigEntity> rows) {
         Assert.notNull(rows, I18nUtils.getMessage(context, "ConfigServiceImpl.batchUpdateConfig.msg1"));
-        String currentUserName = UserContext.get().getUserName();
         String sql = "delete from h_dbc_config where app=? and username=? and service_id=? and profile_name=? and config_key=?";
         String app = context.getProperty("spring.application.name");
         log.info("批量删除配置, {}, [username,serviceId,profileName,configKey] => {}",
@@ -168,7 +161,6 @@ public class ConfigServiceImpl implements ConfigService {
         });
     }
 
-    @Transactional(rollbackFor = Exception.class)
     @Override
     public void deleteConfigMultiple(DeleteConfigMultiple dcm) {
         dcm.getAsp().userInitial(context);
@@ -208,7 +200,6 @@ public class ConfigServiceImpl implements ConfigService {
         return pg;
     }
 
-    @Transactional(rollbackFor = Exception.class)
     @Override
     public void configImport(AccountServiceProfile asp, MultipartFile file, String cover, String backup) {
         asp.userInitial(context);

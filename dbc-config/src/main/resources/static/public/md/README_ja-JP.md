@@ -103,14 +103,14 @@ spring:
 curl -XGET 'http://<Username>:<Password>@ip:port/h-dbc/api/publicKey'
 ```
 
-2. 8-64ビットのAESキーとIVを生成する
+2. 8-32ビットのAESキーとIVを生成する
 
 3. 暗号化されたリクエスト本文
 ```json
 {
-  "key": rsa(<生成された8〜64ビットのAESキー>, <取得した公開鍵>),
-  "iv": rsa(<8-64ビットIVを生成する>, <取得した公開鍵>),
-  "body": aes('{"serviceName":"h-example","profileName":"dev", "type":"YAML"}',<生成された8〜64ビットのAESキー>, <8-64ビットIVを生成する>)
+  "key": rsa(<生成された8-32ビットのAESキー>, <取得した公開鍵>),
+  "iv": rsa(<8-32ビットIVを生成する>, <取得した公開鍵>),
+  "body": aes('{"serviceName":"h-example","profileName":"dev", "type":"YAML"}',<生成された8-32ビットのAESキー>, <8-32ビットIVを生成する>)
 }
 ```
 
@@ -119,13 +119,20 @@ curl -XGET 'http://<Username>:<Password>@ip:port/h-dbc/api/publicKey'
 ```bash
 curl -XPOST 'http://<Username>:<Password>@ip:port/h-dbc/api/config/list' \
 -d ‘{
-  "key": rsa(<生成された8〜64ビットのAESキー>, <取得した公開鍵>),
-  "iv": rsa(<8-64ビットIVを生成する>, <取得した公開鍵>),
-  "body": aes('{"serviceName":"h-example","profileName":"dev", "type":"YAML"}',<生成された8〜64ビットのAESキー>, <8-64ビットIVを生成する>)
+  "key": rsa(<生成された8-32ビットのAESキー>, <取得した公開鍵>),
+  "iv": rsa(<8-32ビットIVを生成する>, <取得した公開鍵>),
+  "body": aes('{"serviceName":"h-example","profileName":"dev", "type":"YAML"}',<生成された8-32ビットのAESキー>, <8-32ビットIVを生成する>)
 }’ \
 -H 'Content-Type:application/json'
 ```
 5. 応答データの復号
 ```javascript
-aes('<暗号化された応答データ>', <生成された8〜64ビットのAESキー>, <8-64ビットIVを生成する>)
+aes('<暗号化された応答データ>', <生成された8-32ビットのAESキー>, <8-32ビットIVを生成する>)
 ```
+
+
+## 他の言語の `SDK` サンプルコードリファレンス
+
+[sdk-python-examples](./sdk/python/dbc-sdk-python.zip)
+
+[sdk-javascript-examples](./sdk/javascript/dbc-sdk-javascript.zip)

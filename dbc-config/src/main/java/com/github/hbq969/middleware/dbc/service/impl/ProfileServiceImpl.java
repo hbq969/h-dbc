@@ -58,7 +58,6 @@ public class ProfileServiceImpl implements ProfileService {
         profileDao.updateProfile(profile);
     }
 
-    @Transactional(rollbackFor = Exception.class)
     @Override
     public void deleteProfile(ProfileEntity profile) {
         backupService.backupOnDeleteProfile(profile);

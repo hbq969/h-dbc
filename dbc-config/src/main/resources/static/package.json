@@ -13,16 +13,16 @@
     "crypto-js": "^4.2.0",
     "echarts": "^5.4.1",
     "element-plus": "^2.2.28",
+    "highlight.js": "^11.11.1",
     "jsencrypt": "^3.3.2",
     "lodash": "^4.17.21",
-    "monaco-editor": "^0.52.2",
-    "vue": "^3.2.13",
-    "vue-router": "^4.0.3",
-    "vuex": "^4.0.0",
     "markdown-it": "^14.1.0",
     "markdown-it-katex": "^2.0.3",
     "marked": "^15.0.7",
-    "highlight.js": "^11.11.1"
+    "monaco-editor": "^0.52.2",
+    "vue": "^3.2.13",
+    "vue-router": "^4.0.3",
+    "vuex": "^4.0.0"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~5.0.0",

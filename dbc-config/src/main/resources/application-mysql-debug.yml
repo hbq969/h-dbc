@@ -6,7 +6,7 @@ spring:
       base-packages: com.github.hbq969
       default-lookup-key: hikari
     hikari:
-      jdbc-url: jdbc:mysql://docker.for.mac.host.internal:3306/dbc?useUnicode=true&allowPublicKeyRetrieval=true&characterEncoding=utf-8&useSSL=false&autoReconnect=true&failOverReadOnly=false&maxReconnects=15000
+      jdbc-url: jdbc:mysql://docker.for.mac.host.internal:3306/dbctest?useUnicode=true&allowPublicKeyRetrieval=true&characterEncoding=utf-8&useSSL=false&autoReconnect=true&failOverReadOnly=false&maxReconnects=15000
       driver-class-name: com.mysql.cj.jdbc.Driver
       username: dbc
       password: ENC(PQWxMysuG2mMhw2IpXF9BudyHe2cS5hL3nPx6tJBvYJLl9dZ2eSkBhU6ed7FDgQZ)

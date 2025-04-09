@@ -12,6 +12,7 @@ import com.github.hbq969.code.common.utils.I18nUtils;
 import com.github.hbq969.code.common.utils.StrUtils;
 import com.github.hbq969.code.dict.service.api.impl.MapDictHelperImpl;
 import com.github.hbq969.code.sm.login.service.LoginService;
+import com.github.hbq969.middleware.dbc.dao.ProfileDao;
 import com.github.hbq969.middleware.dbc.dao.ServiceDao;
 import com.github.hbq969.middleware.dbc.dao.entity.ServiceEntity;
 import com.github.hbq969.middleware.dbc.model.AccountService;
@@ -22,7 +23,6 @@ import com.github.pagehelper.PageInfo;
 import com.google.common.collect.ImmutableMap;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -38,7 +38,7 @@ import java.util.Map;
 
 @org.springframework.stereotype.Service("dbc-ServiceImpl")
 @Slf4j
-public class ServiceImpl implements Service, ScriptInitialAware, InitializingBean {
+public class ServiceImpl implements Service, ScriptInitialAware {
 
     @Autowired
     private ServiceDao serviceDao;
@@ -53,9 +53,9 @@ public class ServiceImpl implements Service, ScriptInitialAware, InitializingBea
     @Qualifier("dbc-BackupServiceRBACImpl")
     private BackupService backupService;
 
-    @Override
-    public void afterPropertiesSet() throws Exception {
-    }
+    @Qualifier("dbc-ProfileDao")
+    @Autowired
+    private ProfileDao profileDao;
 
     @Transactional(rollbackFor = Exception.class)
     @Override
@@ -81,7 +81,6 @@ public class ServiceImpl implements Service, ScriptInitialAware, InitializingBea
         serviceDao.updateService(service);
     }
 
-    @Transactional(rollbackFor = Exception.class)
     @Override
     public void deleteService(ServiceEntity service) {
         backupService.backupOnDeleteService(service);
@@ -100,6 +99,11 @@ public class ServiceImpl implements Service, ScriptInitialAware, InitializingBea
                 .doSelectPageInfo(() -> serviceDao.queryServiceList(accountService, service));
         pg.getList().forEach(se -> se.convertDict(context));
         return pg;
+    }
+
+    @Override
+    public ServiceEntity queryService(String id) {
+        return serviceDao.queryService(id);
     }
 
     @Override

@@ -1,4 +1,4 @@
-package com.github.hbq969.middleware.dbc.service.impl;
+package com.github.hbq969.middleware.dbc.service.impl.rbac;
 
 import com.github.hbq969.code.common.spring.context.SpringContext;
 import com.github.hbq969.code.common.utils.I18nUtils;
@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 public class ServiceRBACImpl implements Service {
 
     @Autowired
-    @Qualifier("dbc-ServiceImpl")
+    @Qualifier("dbc-ServiceCacheImpl")
     private Service target;
 
     @Autowired
@@ -43,6 +43,11 @@ public class ServiceRBACImpl implements Service {
     @Override
     public PageInfo<ServiceEntity> queryServiceList(ServiceEntity service, int pageNum, int pageSize) {
         return target.queryServiceList(service, pageNum, pageSize);
+    }
+
+    @Override
+    public ServiceEntity queryService(String id) {
+        return target.queryService(id);
     }
 
     private void rbac(ServiceEntity service) {

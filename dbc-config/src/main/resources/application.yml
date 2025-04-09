@@ -87,7 +87,6 @@ spring:
           prefix: dbc-initial
           language: zh-CN
           charset: utf-8
-
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     dynamic:
@@ -103,6 +102,11 @@ spring:
       minimum-idle: 5
       max-lifetime: 1800000
       connection-test-query: SELECT 1
+  cache:
+    ext:
+      juc:
+        enabled: true
+        max-capacity: 500
 
 knife4j:
   enable: true

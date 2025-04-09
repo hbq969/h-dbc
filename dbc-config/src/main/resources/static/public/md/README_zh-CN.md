@@ -108,9 +108,9 @@ curl -XGET 'http://<Username>:<Password>@ip:port/h-dbc/api/publicKey'
 > type支持PROP、YAML两种格式
 ```json
 {
-  "key": rsa(<生成的8-64位的AES秘钥>, <获取的公钥>),
-  "iv": rsa(<生成的8-64位的IV>, <获取的公钥>),
-  "body": aes('{"serviceName":"h-example","profileName":"dev", "type":"YAML"}',<生成的8-64位的AES秘钥>, <生成的8-64位的IV>)
+  "key": rsa(<生成的8-32位的AES秘钥>, <获取的公钥>),
+  "iv": rsa(<生成的8-32位的IV>, <获取的公钥>),
+  "body": aes('{"serviceName":"h-example","profileName":"dev", "type":"YAML"}',<生成的8-32位的AES秘钥>, <生成的8-32位的IV>)
 }
 ```
 
@@ -118,14 +118,20 @@ curl -XGET 'http://<Username>:<Password>@ip:port/h-dbc/api/publicKey'
 ```bash
 curl -XPOST 'http://<Username>:<Password>@ip:port/h-dbc/api/config/list' \
 -d ‘{
-  "key": rsa(<生成的8-64位的AES秘钥>, <获取的公钥>),
-  "iv": rsa(<生成的8-64位的IV>, <获取的公钥>),
-  "body": aes('{"serviceName":"h-example","profileName":"dev", "type":"YAML"}',<生成的8-64位的AES秘钥>, <生成的8-64位的IV>)
+  "key": rsa(<生成的8-32位的AES秘钥>, <获取的公钥>),
+  "iv": rsa(<生成的8-32位的IV>, <获取的公钥>),
+  "body": aes('{"serviceName":"h-example","profileName":"dev", "type":"YAML"}',<生成的8-32位的AES秘钥>, <生成的8-32位的IV>)
 }’ \
 -H 'Content-Type:application/json'
 ```
 5. 响应数据解密
 ```javascript
-aes('<加密的响应数据>', <生成的8-64位的AES秘钥>, <生成的8-64位的IV>)
+aes('<加密的响应数据>', <生成的8-32位的AES秘钥>, <生成的8-32位的IV>)
 ```
+
+## 其他语言`SDK`示例代码参考
+
+[sdk-python-examples](./sdk/python/dbc-sdk-python.zip)
+
+[sdk-javascript-examples](./sdk/javascript/dbc-sdk-javascript.zip)
 

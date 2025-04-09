@@ -1,4 +1,4 @@
-package com.github.hbq969.middleware.dbc.service.impl;
+package com.github.hbq969.middleware.dbc.service.impl.rbac;
 
 import com.github.hbq969.code.common.spring.context.SpringContext;
 import com.github.hbq969.code.common.utils.I18nUtils;
@@ -19,7 +19,7 @@ import java.util.List;
 public class ProfileServiceRBACImpl implements ProfileService {
 
     @Autowired
-    @Qualifier("dbc-ProfileServiceImpl")
+    @Qualifier("dbc-ProfileServiceCacheImpl")
     private ProfileService target;
 
     @Autowired

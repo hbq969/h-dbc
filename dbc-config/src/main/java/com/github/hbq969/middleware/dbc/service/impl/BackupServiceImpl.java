@@ -141,7 +141,6 @@ public class BackupServiceImpl implements BackupService {
         });
     }
 
-    @Transactional(rollbackFor = Exception.class)
     @Override
     public void recoveryBackup(BackupEntity bk) {
         BackupEntity entity = backupDao.queryBackup(bk);
@@ -244,13 +243,9 @@ public class BackupServiceImpl implements BackupService {
         });
     }
 
-    @Transactional(rollbackFor = Exception.class)
     @Override
     public void recoveryBackups(BatchDeleteRecovery bdr) {
         bdr.check(context);
-        for (BackupEntity bk : bdr.getRecoveries()) {
-            recoveryBackup(bk);
-        }
     }
 
     @Override

@@ -53,4 +53,8 @@ public interface ServiceDao {
     void saveAccountService(AccountService accountService);
 
     int querySelectCountByUser(@Param("serviceId") String serviceId,@Param("username") String username);
+
+    ServiceEntity queryService(@Param("id") String id);
+
+    List<ServiceEntity> queryAllServices();
 }
