@@ -129,9 +129,10 @@ curl -XPOST 'http://<Username>:<Password>@ip:port/h-dbc/api/config/list' \
 aes('<加密的响应数据>', <生成的8-32位的AES秘钥>, <生成的8-32位的IV>)
 ```
 
-## 其他语言`SDK`示例代码参考
+## 其他语言接入示例参考
 
-[sdk-python-examples](./sdk/python/dbc-sdk-python.zip)
-
-[sdk-javascript-examples](./sdk/javascript/dbc-sdk-javascript.zip)
+1. [sdk-python-examples](./sdk/python/dbc-sdk-python.zip)
+2. [sdk-javascript-examples](./sdk/javascript/dbc-sdk-javascript.zip)
+3. [sdk-golang-examples](./sdk/golang/dbc-sdk-golang.zip)
+4. [sdk-C++-examples](./sdk/C++/dbc-sdk-C++.zip)
 

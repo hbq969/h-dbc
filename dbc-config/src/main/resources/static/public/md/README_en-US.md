@@ -143,8 +143,9 @@ curl -XPOST 'http://<Username>:<Password>@ip:port/h-dbc/api/config/list' \
 aes('<Encrypted response data>', <Generated 8-32 bit AES key>, <Generated 8-32 bit IV>)
 ```
 
-## Other language `SDK` sample code reference
+## Reference for other language access examples
 
-[sdk-python-examples](./sdk/python/dbc-sdk-python.zip)
-
-[sdk-javascript-examples](./sdk/javascript/dbc-sdk-javascript.zip)
+1. [sdk-python-examples](./sdk/python/dbc-sdk-python.zip)
+2. [sdk-javascript-examples](./sdk/javascript/dbc-sdk-javascript.zip)
+3. [sdk-golang-examples](./sdk/golang/dbc-sdk-golang.zip)
+4. [sdk-C++-examples](./sdk/C++/dbc-sdk-C++.zip)

@@ -125,7 +125,7 @@ curl -XPOST 'http://<Username>:<Password>@ip:port/h-dbc/api/config/list' \
 }’ \
 -H 'Content-Type:application/json'
 ```
-5. 応答データの復号
+5. 他の言語アクセス例の参考
 ```javascript
 aes('<暗号化された応答データ>', <生成された8-32ビットのAESキー>, <8-32ビットIVを生成する>)
 ```
@@ -133,6 +133,7 @@ aes('<暗号化された応答データ>', <生成された8-32ビットのAES�
 
 ## 他の言語の `SDK` サンプルコードリファレンス
 
-[sdk-python-examples](./sdk/python/dbc-sdk-python.zip)
-
-[sdk-javascript-examples](./sdk/javascript/dbc-sdk-javascript.zip)
+1. [sdk-python-examples](./sdk/python/dbc-sdk-python.zip)
+2. [sdk-javascript-examples](./sdk/javascript/dbc-sdk-javascript.zip)
+3. [sdk-golang-examples](./sdk/golang/dbc-sdk-golang.zip)
+4. [sdk-C++-examples](./sdk/C++/dbc-sdk-C++.zip)
