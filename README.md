@@ -61,6 +61,17 @@ mybatis:
     - classpath*:**/mapper/common/*Mapper.xml
     - classpath*:**/mapper/mysql/*Mapper.xml
   config-location: classpath:jpaConfig-mysql.xml
+
+# 开启https（可选，默认不开启为http）
+server:
+  ssl:
+    enabled: true
+    key-store: classpath:certs/dbc.p12
+    key-store-password: 证书密码
+    key-store-type: PKCS12
+    key-alias: hdbc.for.host.internal
+    enabled-protocols: TLSv1.2,TLSv1.3
+    ciphers: TLS_AES_256_GCM_SHA384,TLS_CHACHA20_POLY1305_SHA256
 ```
 
 ### 服务配置
@@ -81,6 +92,9 @@ spring:
           charset: utf-8
           url: http://localhost:30170/h-dbc
           api-log: true
+          # 启用https（可选）
+          https: true
+          truststore-password: 证书密码
 ```
 
 > 服务依赖

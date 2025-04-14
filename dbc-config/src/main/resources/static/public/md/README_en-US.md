@@ -89,7 +89,6 @@ spring:
             password: <Password>
           charset: utf-8
           url: http://localhost:30170/h-dbc
-          api-log: true
 ```
 
 ## Non-Java access method

@@ -25,6 +25,10 @@ public class APIModel {
     }
 
     public String key() {
+        if (serviceName == null || profileName == null)
+            throw new IllegalArgumentException("serviceName、profileName、type不能为空，请检查");
+        if (type == null)
+            type = ConfigType.PROP;
         return Joiner.on(",").join(serviceName, profileName, type.name());
     }
 

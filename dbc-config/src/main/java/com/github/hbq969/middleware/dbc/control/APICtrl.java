@@ -49,7 +49,7 @@ public class APICtrl {
     @LogSet(printIn = false, printResult = false)
     @RestfulLimit(forSameIP = true, value = 5)
     @Cacheable(keyGenerator = "configKeyGenerator", value = "default", unless = "#result==null")
-    @Expire(methodKey = "getConfigList", time = 365, unit = TimeUnit.DAYS)
+    @Expire(methodKey = "getConfigList", time = 1, unit = TimeUnit.DAYS)
     public Object getConfigList(@RequestBody APIModel model) {
         return apiService.getConfigList(model);
     }

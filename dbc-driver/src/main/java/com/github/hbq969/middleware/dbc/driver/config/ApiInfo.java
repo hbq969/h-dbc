@@ -73,6 +73,20 @@ public class ApiInfo {
     @Setter
     private BasicAuth basicAuth = new BasicAuth();
 
+    /**
+     * 是否开启证书验证
+     */
+    @Getter
+    @Setter
+    private boolean https = false;
+
+    /**
+     * truststore.jks的密码
+     */
+    @Getter
+    @Setter
+    private String truststorePassword;
+
     @Getter
     private volatile transient ConfigService api;
 
@@ -85,6 +99,10 @@ public class ApiInfo {
         this.basicAuth.setUsername(APIPropertySource.decode(env, "spring.cloud.config.h-dbc.api.basic-auth.username", env.getProperty("spring.cloud.config.h-dbc.api.basic-auth.username")));
         this.basicAuth.setPassword(APIPropertySource.decode(env, "spring.cloud.config.h-dbc.api.basic-auth.password", env.getProperty("spring.cloud.config.h-dbc.api.basic-auth.password")));
         this.basicAuth.check();
+        this.https = env.getProperty("spring.cloud.config.h-dbc.api.https", Boolean.class, this.https);
+        this.truststorePassword = env.getProperty("spring.cloud.config.h-dbc.api.truststore-password");
+        if (this.https && (this.truststorePassword == null || this.truststorePassword.length() == 0))
+            throw new UnsupportedOperationException("开启https后，spring.cloud.config.h-dbc.api.truststore-password不能为空");
         return this;
     }
 

@@ -12,7 +12,7 @@
   <groupId>com.github.hbq969</groupId>
   <artifactId>h-dbc</artifactId>
   <packaging>pom</packaging>
-  <version>1.2-SNAPSHOT</version>
+  <version>1.2</version>
   <modules>
     <module>dbc-config</module>
     <module>dbc-driver</module>

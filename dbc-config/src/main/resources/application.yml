@@ -11,6 +11,14 @@ server:
         path: /
         name: h-dbc-sid
       timeout: 30m
+  ssl:
+    enabled: false
+    key-store: classpath:certs/dbc.p12
+    key-store-password: ENC(iQY02JsKEZu6i+zfgX+ukWHVbB7XXs6ahqj+5iDn2amemycCBH6AV7qR4cXW3jtG)
+    key-store-type: PKCS12
+    key-alias: hdbc.for.host.internal
+    enabled-protocols: TLSv1.2,TLSv1.3
+    ciphers: TLS_AES_256_GCM_SHA384,TLS_CHACHA20_POLY1305_SHA256
 
 mybatis:
   mapper-locations:
