@@ -100,9 +100,10 @@ public class ApiInfo {
         this.basicAuth.setPassword(APIPropertySource.decode(env, "spring.cloud.config.h-dbc.api.basic-auth.password", env.getProperty("spring.cloud.config.h-dbc.api.basic-auth.password")));
         this.basicAuth.check();
         this.https = env.getProperty("spring.cloud.config.h-dbc.api.https", Boolean.class, this.https);
-        this.truststorePassword = env.getProperty("spring.cloud.config.h-dbc.api.truststore-password");
-        if (this.https && (this.truststorePassword == null || this.truststorePassword.length() == 0))
+        String _truststorePassword = env.getProperty("spring.cloud.config.h-dbc.api.truststore-password");
+        if (this.https && (_truststorePassword == null || _truststorePassword.length() == 0))
             throw new UnsupportedOperationException("开启https后，spring.cloud.config.h-dbc.api.truststore-password不能为空");
+        this.truststorePassword = APIPropertySource.decode(env, "spring.cloud.config.h-dbc.api.truststore-password", _truststorePassword);
         return this;
     }
 
