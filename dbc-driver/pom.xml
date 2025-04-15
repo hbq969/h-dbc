@@ -5,14 +5,14 @@
 
   <distributionManagement>
     <repository>
-      <id>thirdparty-cmss</id>
+      <id>thirdparty-release</id>
       <name>Nexus Releases Repository</name>
-      <url>http://nexus.cmss.com:8081/repository/thirdparty-cmss/</url>
+      <url>http://nexus.for.mac.host.internal:8081/repository/thirdparty-cmss/</url>
     </repository>
     <snapshotRepository>
       <id>thirdparty-snapshot</id>
       <name>Nexus Snapshots Repository</name>
-      <url>http://nexus.cmss.com:8081/repository/thirdparty-snapshot/</url>
+      <url>http://nexus.for.mac.host.internal:8081/repository/thirdparty-snapshot/</url>
     </snapshotRepository>
   </distributionManagement>
 
@@ -44,7 +44,7 @@
   </parent>
   <groupId>com.github.hbq969</groupId>
   <artifactId>spring-cloud-starter-hdbc-config</artifactId>
-  <version>1.3-SNAPSHOT</version>
+  <version>1.2</version>
   <name>spring-cloud-starter-hdbc-config</name>
   <dependencyManagement>
     <dependencies>

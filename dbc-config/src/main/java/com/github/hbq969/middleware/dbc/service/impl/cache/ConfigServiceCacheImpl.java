@@ -16,7 +16,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
@@ -41,7 +40,6 @@ public class ConfigServiceCacheImpl implements ConfigService {
         return this.target.queryConfigProfileList(q, pageNum, pageSize);
     }
 
-    @Transactional(rollbackFor = Exception.class)
     @Override
     public void saveConfig(AccountServiceProfile asp, ConfigEntity config) {
         try {
@@ -51,7 +49,6 @@ public class ConfigServiceCacheImpl implements ConfigService {
         }
     }
 
-    @Transactional(rollbackFor = Exception.class)
     @Override
     public void updateConfig(AccountServiceProfile asp, ConfigEntity config) {
         try {
@@ -61,7 +58,6 @@ public class ConfigServiceCacheImpl implements ConfigService {
         }
     }
 
-    @Transactional(rollbackFor = Exception.class)
     @Override
     public void batchUpdateConfig(List<ServiceConfigEntity> rows) {
         try {
@@ -76,7 +72,6 @@ public class ConfigServiceCacheImpl implements ConfigService {
         }
     }
 
-    @Transactional(rollbackFor = Exception.class)
     @Override
     public void deleteConfig(AccountServiceProfile asp, ConfigEntity q) {
         try {
@@ -86,7 +81,6 @@ public class ConfigServiceCacheImpl implements ConfigService {
         }
     }
 
-    @Transactional(rollbackFor = Exception.class)
     @Override
     public void batchDeleteConfig(List<ServiceConfigEntity> rows) {
         try {
@@ -100,7 +94,6 @@ public class ConfigServiceCacheImpl implements ConfigService {
         }
     }
 
-    @Transactional(rollbackFor = Exception.class)
     @Override
     public void deleteConfigMultiple(DeleteConfigMultiple dcm) {
         try {
@@ -115,7 +108,6 @@ public class ConfigServiceCacheImpl implements ConfigService {
         return this.target.queryConfigList(asp, q, pageNum, pageSize);
     }
 
-    @Transactional(rollbackFor = Exception.class)
     @Override
     public void configImport(AccountServiceProfile asp, MultipartFile file, String cover, String backup) {
         try {
@@ -132,7 +124,6 @@ public class ConfigServiceCacheImpl implements ConfigService {
         return this.target.queryConfigFile(asp);
     }
 
-    @Transactional(rollbackFor = Exception.class)
     @Override
     public void updateConfigFile(ConfigFileEntity cfe) {
         try {

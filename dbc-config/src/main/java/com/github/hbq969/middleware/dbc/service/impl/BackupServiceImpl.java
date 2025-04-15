@@ -24,7 +24,6 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -121,7 +120,6 @@ public class BackupServiceImpl implements BackupService {
         backupDao.deleteBackup(bk);
     }
 
-    @Transactional(rollbackFor = Exception.class)
     @Override
     public void deleteBackups(BatchDeleteBackup bdb) {
         bdb.check(context);

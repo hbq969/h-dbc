@@ -9,6 +9,7 @@ import com.github.hbq969.middleware.dbc.service.Service;
 import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.transaction.annotation.Transactional;
 
 @org.springframework.stereotype.Service("dbc-ServiceRBACImpl")
 public class ServiceRBACImpl implements Service {
@@ -23,17 +24,20 @@ public class ServiceRBACImpl implements Service {
     @Autowired
     private SpringContext context;
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void saveService(ServiceEntity service) {
         target.saveService(service);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void updateService(ServiceEntity service) {
         rbac(service);
         target.updateService(service);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void deleteService(ServiceEntity service) {
         rbac(service);

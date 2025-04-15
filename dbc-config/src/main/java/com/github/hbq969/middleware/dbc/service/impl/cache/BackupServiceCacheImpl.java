@@ -15,7 +15,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -69,7 +68,6 @@ public class BackupServiceCacheImpl implements BackupService {
         this.target.deleteBackups(bdb);
     }
 
-    @Transactional(rollbackFor = Exception.class)
     @Override
     public void recoveryBackup(BackupEntity bk) {
         try {
@@ -79,7 +77,6 @@ public class BackupServiceCacheImpl implements BackupService {
         }
     }
 
-    @Transactional(rollbackFor = Exception.class)
     @Override
     public void recoveryBackups(BatchDeleteRecovery bdr) {
         try {

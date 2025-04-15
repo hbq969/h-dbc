@@ -26,7 +26,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -57,7 +56,6 @@ public class ServiceImpl implements Service, ScriptInitialAware {
     @Autowired
     private ProfileDao profileDao;
 
-    @Transactional(rollbackFor = Exception.class)
     @Override
     public void saveService(ServiceEntity service) {
         AccountService accountService = new AccountService();

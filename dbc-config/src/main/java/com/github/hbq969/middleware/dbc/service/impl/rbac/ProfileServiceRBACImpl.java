@@ -12,6 +12,7 @@ import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -28,18 +29,21 @@ public class ProfileServiceRBACImpl implements ProfileService {
     @Autowired
     private ServiceDao serviceDao;
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void saveProfile(ProfileEntity profile) {
         rbac();
         target.saveProfile(profile);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void updateProfile(ProfileEntity profile) {
         rbac();
         target.updateProfile(profile);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void deleteProfile(ProfileEntity profile) {
         rbac();
@@ -56,6 +60,7 @@ public class ProfileServiceRBACImpl implements ProfileService {
         return target.queryProfileList(as);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void deleteProfileConfig(AccountServiceProfile asp) {
         String serviceId = asp.getServiceId();
@@ -68,12 +73,14 @@ public class ProfileServiceRBACImpl implements ProfileService {
         target.deleteProfileConfig(asp);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void backup(ProfileEntity profile) {
         rbac();
         target.backup(profile);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void backupAll() {
         rbac();
