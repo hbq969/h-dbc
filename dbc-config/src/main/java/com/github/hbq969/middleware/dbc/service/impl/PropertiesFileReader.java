@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 @Service("dbc-PropertiesFileReader")
@@ -41,36 +43,44 @@ public class PropertiesFileReader implements OptionalFacadeAware<String, FileRea
     @Override
     public List<TypePair> read(InputStream in) {
         Properties p = new Properties();
-        try {
-            p.load(in);
+        try (InputStreamReader isr = new InputStreamReader(in, StandardCharsets.UTF_8)) {
+            p.load(isr);
         } catch (IOException e) {
             log.error("读取properties文件异常", e);
             throw new RuntimeException(I18nUtils.getMessage(context, "PropertiesFileReader.read.msg1"));
         }
+        if (log.isDebugEnabled())
+            log.debug("读取properties配置数量: {} 个", p.size());
         List<TypePair> pairs = new ArrayList<>();
         String key;
         Object value;
-        String valueStr;
         Class<?> clz;
         for (Map.Entry<Object, Object> entry : p.entrySet()) {
             key = String.valueOf(entry.getKey());
             value = entry.getValue();
-            if (value == null)
-                clz = String.class;
-            else {
-                valueStr = value.toString();
-                if (BOOLEAN_SET.contains(valueStr.toLowerCase())) {
-                    clz = Boolean.class;
-                } else if (valueStr.startsWith("0")) {
-                    clz = String.class;
-                } else if (PatternPool.NUMBERS.matcher(valueStr).matches()) {
-                    clz = Long.class;
-                } else
-                    clz = String.class;
-            }
+            clz = getValueClass(value);
             TypePair pair = new TypePair(key, value, clz.getName());
             pairs.add(pair);
         }
         return pairs;
+    }
+
+    private Class<?> getValueClass(Object value) {
+        Class<?> clz;
+        String valueStr;
+        if (value == null)
+            clz = String.class;
+        else {
+            valueStr = value.toString();
+            if (BOOLEAN_SET.contains(valueStr.toLowerCase())) {
+                clz = Boolean.class;
+            } else if (valueStr.startsWith("0")) {
+                clz = String.class;
+            } else if (PatternPool.NUMBERS.matcher(valueStr).matches()) {
+                clz = Long.class;
+            } else
+                clz = String.class;
+        }
+        return clz;
     }
 }
