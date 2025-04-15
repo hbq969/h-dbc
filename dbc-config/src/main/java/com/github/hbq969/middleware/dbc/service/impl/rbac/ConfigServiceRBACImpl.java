@@ -19,6 +19,7 @@ import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
@@ -48,18 +49,21 @@ public class ConfigServiceRBACImpl implements ConfigService {
         return target.queryConfigProfileList(q, pageNum, pageSize);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void saveConfig(AccountServiceProfile asp, ConfigEntity config) {
         rbac(asp);
         target.saveConfig(asp, config);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void updateConfig(AccountServiceProfile asp, ConfigEntity config) {
         rbac(asp);
         target.updateConfig(asp, config);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void batchUpdateConfig(List<ServiceConfigEntity> rows) {
         for (ServiceConfigEntity row : rows) {
@@ -70,12 +74,14 @@ public class ConfigServiceRBACImpl implements ConfigService {
         target.batchUpdateConfig(rows);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void deleteConfig(AccountServiceProfile asp, ConfigEntity q) {
         rbac(asp);
         target.deleteConfig(asp, q);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void batchDeleteConfig(List<ServiceConfigEntity> rows) {
         for (ServiceConfigEntity row : rows) {
@@ -86,6 +92,7 @@ public class ConfigServiceRBACImpl implements ConfigService {
         target.batchDeleteConfig(rows);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void deleteConfigMultiple(DeleteConfigMultiple dcm) {
         rbac(dcm.getAsp());
@@ -98,6 +105,7 @@ public class ConfigServiceRBACImpl implements ConfigService {
         return target.queryConfigList(asp, q, pageNum, pageSize);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void configImport(AccountServiceProfile asp, MultipartFile file, String cover, String backup) {
         rbac(asp);
@@ -110,6 +118,7 @@ public class ConfigServiceRBACImpl implements ConfigService {
         return target.queryConfigFile(asp);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void updateConfigFile(ConfigFileEntity cfe) {
         String currentUserName = UserContext.get().getUserName();
@@ -136,6 +145,7 @@ public class ConfigServiceRBACImpl implements ConfigService {
         return target.queryAllProfilesThisConfig(map);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void backup(AccountServiceProfile asp) {
         rbac(asp);

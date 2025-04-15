@@ -6,7 +6,6 @@ import com.github.hbq969.code.common.encrypt.ext.config.Algorithm;
 import com.github.hbq969.code.common.encrypt.ext.config.Decrypt;
 import com.github.hbq969.code.common.encrypt.ext.config.Encrypt;
 import com.github.hbq969.code.common.restful.ReturnMessage;
-import com.github.hbq969.code.common.spring.advice.limit.RestfulLimit;
 import com.github.hbq969.code.common.spring.advice.log.LogSet;
 import com.github.hbq969.middleware.dbc.model.APIModel;
 import com.github.hbq969.middleware.dbc.service.APIService;
@@ -35,7 +34,6 @@ public class APICtrl {
     @ApiOperation("获取rsa公钥")
     @RequestMapping(path = "/publicKey", method = RequestMethod.GET)
     @ResponseBody
-    @RestfulLimit(forSameIP = true, value = 1)
     public ReturnMessage<?> getPublicKey() {
         return ReturnMessage.success(encryptConfig == null ? null
                 : encryptConfig.getRestful().getRsa().getPublicKey());
@@ -47,14 +45,13 @@ public class APICtrl {
     @Encrypt(algorithm = Algorithm.RAS)
     @Decrypt(algorithm = Algorithm.RAS)
     @LogSet(printIn = false, printResult = false)
-    @RestfulLimit(forSameIP = true, value = 5)
     @Cacheable(keyGenerator = "configKeyGenerator", value = "default", unless = "#result==null")
     @Expire(methodKey = "getConfigList", time = 1, unit = TimeUnit.DAYS)
     public Object getConfigList(@RequestBody APIModel model) {
         return apiService.getConfigList(model);
     }
 
-    @RequestMapping(path = "/config/list", method = RequestMethod.GET)
+    @RequestMapping(path = "/config/list", method = RequestMethod.DELETE)
     @Cacheable(keyGenerator = "configKeyGenerator", value = "default", unless = "#result==null")
     @Expire(methodKey = "getConfigList", time = 10, unit = TimeUnit.SECONDS)
     @CacheEvict(keyGenerator = "configKeyGenerator", value = "default")

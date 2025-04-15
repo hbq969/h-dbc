@@ -19,7 +19,6 @@ import org.apache.commons.collections4.MapUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -38,7 +37,6 @@ public class ProfileServiceImpl implements ProfileService {
     @Autowired
     private ServiceDao serviceDao;
 
-    @Transactional(rollbackFor = Exception.class)
     @Override
     public void saveProfile(ProfileEntity profile) {
         List<ProfileEntity> pes = profileDao.queryProfileByName(profile.getProfileName());
@@ -108,7 +106,6 @@ public class ProfileServiceImpl implements ProfileService {
         backupService.backupOnDeleteProfile(profile);
     }
 
-    @Transactional(rollbackFor = Exception.class)
     @Override
     public void backupAll() {
         List<ProfileEntity> profiles = profileDao.queryAllProfileList();

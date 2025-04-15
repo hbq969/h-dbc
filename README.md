@@ -102,7 +102,7 @@ spring:
 <dependency>
     <groupId>com.github.hbq969</groupId>
     <artifactId>spring-cloud-starter-hdbc-config</artifactId>
-    <version>1.1</version>
+    <version>latest</version>
 </dependency>
 ```
 

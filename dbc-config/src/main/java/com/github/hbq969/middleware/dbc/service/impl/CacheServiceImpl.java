@@ -26,12 +26,11 @@ public class CacheServiceImpl implements CacheService {
         for (String format : formats) {
             model.setType(APIModel.ConfigType.valueOf(format));
             String key = model.key();
-            if (log.isDebugEnabled()) {
+            if (log.isDebugEnabled())
                 log.debug("配置数据发生变化, 刷新接口缓存: {}", key);
-                Cache c = manager.getCache("default");
-                if (c != null)
-                    c.evict(ExpireKey.of(key));
-            }
+            Cache c = manager.getCache("default");
+            if (c != null)
+                c.evict(ExpireKey.of(key));
         }
     }
 }

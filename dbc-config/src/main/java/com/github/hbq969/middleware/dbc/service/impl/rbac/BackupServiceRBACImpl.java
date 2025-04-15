@@ -16,6 +16,7 @@ import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -32,26 +33,31 @@ public class BackupServiceRBACImpl implements BackupService {
     @Qualifier("dbc-BackupProxyImpl")
     private BackupService target;
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void backupOnDeleteProfile(ProfileEntity profile) {
         target.backupOnDeleteProfile(profile);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void backupOnDeleteService(ServiceEntity service) {
         target.backupOnDeleteService(service);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void backupOnClearProfileConfig(AccountServiceProfile asp) {
         target.backupOnClearProfileConfig(asp);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void backupOnConfigImport(AccountServiceProfile asp) {
         target.backupOnConfigImport(asp);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void backupOnUpdateConfigFile(ConfigFileEntity file) {
         target.backupOnUpdateConfigFile(file);
@@ -62,12 +68,14 @@ public class BackupServiceRBACImpl implements BackupService {
         return target.queryBackupList(asp, pageNum, pageSize);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void deleteBackup(BackupEntity bk) {
         rbac(bk);
         target.deleteBackup(bk);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void deleteBackups(BatchDeleteBackup bdb) {
         if (!UserContext.permitAllow(bdb.getUsername())) {
@@ -81,12 +89,14 @@ public class BackupServiceRBACImpl implements BackupService {
         target.deleteBackups(bdb);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void recoveryBackup(BackupEntity bk) {
         rbac(bk);
         target.recoveryBackup(bk);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void recoveryBackups(BatchDeleteRecovery bdr) {
         if (!UserContext.permitAllow(bdr.getUsername())) {

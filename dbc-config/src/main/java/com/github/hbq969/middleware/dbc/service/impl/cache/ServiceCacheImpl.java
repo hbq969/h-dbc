@@ -10,7 +10,6 @@ import com.github.hbq969.middleware.dbc.service.Service;
 import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -40,7 +39,6 @@ public class ServiceCacheImpl implements Service {
         target.updateService(service);
     }
 
-    @Transactional(rollbackFor = Exception.class)
     @Override
     public void deleteService(ServiceEntity service) {
         try {
