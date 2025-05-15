@@ -88,7 +88,6 @@ spring:
           - "/hbq969-sm/**/getPublicKey"
         session-key: h-dbc-sid
         sm-initial-script:
-          prefix: sm-initial
           language: zh-CN
           charset: utf-8
         service-initial-script:
