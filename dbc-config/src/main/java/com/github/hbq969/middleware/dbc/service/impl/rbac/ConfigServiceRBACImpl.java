@@ -51,21 +51,21 @@ public class ConfigServiceRBACImpl implements ConfigService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public void saveConfig(AccountServiceProfile asp, ConfigEntity config) {
+    public synchronized void saveConfig(AccountServiceProfile asp, ConfigEntity config) {
         rbac(asp);
         target.saveConfig(asp, config);
     }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public void updateConfig(AccountServiceProfile asp, ConfigEntity config) {
+    public synchronized void updateConfig(AccountServiceProfile asp, ConfigEntity config) {
         rbac(asp);
         target.updateConfig(asp, config);
     }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public void batchUpdateConfig(List<ServiceConfigEntity> rows) {
+    public synchronized void batchUpdateConfig(List<ServiceConfigEntity> rows) {
         for (ServiceConfigEntity row : rows) {
             if(!UserContext.permitAllow(row.getUsername())){
                 throw new UnsupportedOperationException(I18nUtils.getMessage(context, "ConfigServiceImpl.batchUpdateConfig.msg2"));
@@ -76,14 +76,14 @@ public class ConfigServiceRBACImpl implements ConfigService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public void deleteConfig(AccountServiceProfile asp, ConfigEntity q) {
+    public synchronized void deleteConfig(AccountServiceProfile asp, ConfigEntity q) {
         rbac(asp);
         target.deleteConfig(asp, q);
     }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public void batchDeleteConfig(List<ServiceConfigEntity> rows) {
+    public synchronized void batchDeleteConfig(List<ServiceConfigEntity> rows) {
         for (ServiceConfigEntity row : rows) {
             if(!UserContext.permitAllow(row.getUsername())){
                 throw new UnsupportedOperationException(I18nUtils.getMessage(context, "ConfigServiceImpl.batchDeleteConfig.msg1"));
@@ -94,7 +94,7 @@ public class ConfigServiceRBACImpl implements ConfigService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public void deleteConfigMultiple(DeleteConfigMultiple dcm) {
+    public synchronized void deleteConfigMultiple(DeleteConfigMultiple dcm) {
         rbac(dcm.getAsp());
         target.deleteConfigMultiple(dcm);
     }
@@ -107,7 +107,7 @@ public class ConfigServiceRBACImpl implements ConfigService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public void configImport(AccountServiceProfile asp, MultipartFile file, String cover, String backup) {
+    public synchronized void configImport(AccountServiceProfile asp, MultipartFile file, String cover, String backup) {
         rbac(asp);
         target.configImport(asp, file, cover, backup);
     }
@@ -120,7 +120,7 @@ public class ConfigServiceRBACImpl implements ConfigService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public void updateConfigFile(ConfigFileEntity cfe) {
+    public synchronized void updateConfigFile(ConfigFileEntity cfe) {
         String currentUserName = UserContext.get().getUserName();
         if (UserContext.get().isAdmin() || UserContext.permitAllow(cfe.getUsername())
                 && serviceDao.querySelectCountByUser(cfe.getServiceId(), currentUserName) > 0) {
@@ -147,7 +147,7 @@ public class ConfigServiceRBACImpl implements ConfigService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public void backup(AccountServiceProfile asp) {
+    public synchronized void backup(AccountServiceProfile asp) {
         rbac(asp);
         target.backup(asp);
     }

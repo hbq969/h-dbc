@@ -35,31 +35,31 @@ public class BackupServiceRBACImpl implements BackupService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public void backupOnDeleteProfile(ProfileEntity profile) {
+    public synchronized void backupOnDeleteProfile(ProfileEntity profile) {
         target.backupOnDeleteProfile(profile);
     }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public void backupOnDeleteService(ServiceEntity service) {
+    public synchronized void backupOnDeleteService(ServiceEntity service) {
         target.backupOnDeleteService(service);
     }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public void backupOnClearProfileConfig(AccountServiceProfile asp) {
+    public synchronized void backupOnClearProfileConfig(AccountServiceProfile asp) {
         target.backupOnClearProfileConfig(asp);
     }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public void backupOnConfigImport(AccountServiceProfile asp) {
+    public synchronized void backupOnConfigImport(AccountServiceProfile asp) {
         target.backupOnConfigImport(asp);
     }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public void backupOnUpdateConfigFile(ConfigFileEntity file) {
+    public synchronized void backupOnUpdateConfigFile(ConfigFileEntity file) {
         target.backupOnUpdateConfigFile(file);
     }
 
@@ -70,14 +70,14 @@ public class BackupServiceRBACImpl implements BackupService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public void deleteBackup(BackupEntity bk) {
+    public synchronized void deleteBackup(BackupEntity bk) {
         rbac(bk);
         target.deleteBackup(bk);
     }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public void deleteBackups(BatchDeleteBackup bdb) {
+    public synchronized void deleteBackups(BatchDeleteBackup bdb) {
         if (!UserContext.permitAllow(bdb.getUsername())) {
             throw new UnsupportedOperationException(I18nUtils.getMessage(context, "BackupServiceImpl.msg1"));
         }
@@ -91,14 +91,14 @@ public class BackupServiceRBACImpl implements BackupService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public void recoveryBackup(BackupEntity bk) {
+    public synchronized void recoveryBackup(BackupEntity bk) {
         rbac(bk);
         target.recoveryBackup(bk);
     }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public void recoveryBackups(BatchDeleteRecovery bdr) {
+    public synchronized void recoveryBackups(BatchDeleteRecovery bdr) {
         if (!UserContext.permitAllow(bdr.getUsername())) {
             throw new UnsupportedOperationException(I18nUtils.getMessage(context, "BackupServiceImpl.msg1"));
         }

@@ -31,21 +31,21 @@ public class ProfileServiceRBACImpl implements ProfileService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public void saveProfile(ProfileEntity profile) {
+    public synchronized void saveProfile(ProfileEntity profile) {
         rbac();
         target.saveProfile(profile);
     }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public void updateProfile(ProfileEntity profile) {
+    public synchronized void updateProfile(ProfileEntity profile) {
         rbac();
         target.updateProfile(profile);
     }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public void deleteProfile(ProfileEntity profile) {
+    public synchronized void deleteProfile(ProfileEntity profile) {
         rbac();
         target.deleteProfile(profile);
     }
@@ -62,7 +62,7 @@ public class ProfileServiceRBACImpl implements ProfileService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public void deleteProfileConfig(AccountServiceProfile asp) {
+    public synchronized void deleteProfileConfig(AccountServiceProfile asp) {
         String serviceId = asp.getServiceId();
         String currentUserName = UserContext.get().getUserName();
         if (UserContext.get().isAdmin() ||
@@ -75,14 +75,14 @@ public class ProfileServiceRBACImpl implements ProfileService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public void backup(ProfileEntity profile) {
+    public synchronized void backup(ProfileEntity profile) {
         rbac();
         target.backup(profile);
     }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public void backupAll() {
+    public synchronized void backupAll() {
         rbac();
         target.backupAll();
     }

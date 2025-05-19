@@ -26,20 +26,20 @@ public class ServiceRBACImpl implements Service {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public void saveService(ServiceEntity service) {
+    public synchronized void saveService(ServiceEntity service) {
         target.saveService(service);
     }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public void updateService(ServiceEntity service) {
+    public synchronized void updateService(ServiceEntity service) {
         rbac(service);
         target.updateService(service);
     }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public void deleteService(ServiceEntity service) {
+    public synchronized void deleteService(ServiceEntity service) {
         rbac(service);
         target.deleteService(service);
     }

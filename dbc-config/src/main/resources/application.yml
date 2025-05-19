@@ -12,13 +12,9 @@ server:
         name: h-dbc-sid
       timeout: 30m
   ssl:
-    enabled: true
+    enabled: false
     key-store: classpath:certs/hdbc_server.p12
     key-store-password: Yjc@201301
-#    key-store-type: PKCS12
-#    key-alias: hdbc.for.host.internal
-#    enabled-protocols: TLSv1.2,TLSv1.3
-#    ciphers: TLS_AES_256_GCM_SHA384,TLS_CHACHA20_POLY1305_SHA256
 
 mybatis:
   mapper-locations:
@@ -88,10 +84,6 @@ spring:
           - "/hbq969-sm/**/getPublicKey"
         session-key: h-dbc-sid
         sm-initial-script:
-          language: zh-CN
-          charset: utf-8
-        service-initial-script:
-          prefix: dbc-initial
           language: zh-CN
           charset: utf-8
   datasource:
