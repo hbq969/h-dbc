@@ -81,11 +81,25 @@ public class ApiInfo {
     private boolean https = false;
 
     /**
+     * hdbc_client.p12的路径，默认：/certs/hdbc_client.p12
+     */
+    @Getter
+    @Setter
+    private String truststorePath = "/certs/hdbc_client.p12";
+
+    /**
      * hdbc_client.p12的密码
      */
     @Getter
     @Setter
     private String truststorePassword;
+
+    /**
+     * hdbc_client.p12的类型
+     */
+    @Getter
+    @Setter
+    private String truststoreType = "PKCS12";
 
     @Getter
     private volatile transient ConfigService api;
@@ -103,6 +117,8 @@ public class ApiInfo {
         String _truststorePassword = env.getProperty("spring.cloud.config.h-dbc.api.truststore-password");
         if (this.https && (_truststorePassword == null || _truststorePassword.length() == 0))
             throw new UnsupportedOperationException("开启https后，spring.cloud.config.h-dbc.api.truststore-password不能为空");
+        this.truststorePath = env.getProperty("spring.cloud.config.h-dbc.api.truststore-path", this.truststorePath);
+        this.truststoreType = env.getProperty("spring.cloud.config.h-dbc.api.truststore-type", this.truststoreType);
         this.truststorePassword = APIPropertySource.decode(env, "spring.cloud.config.h-dbc.api.truststore-password", _truststorePassword);
         return this;
     }

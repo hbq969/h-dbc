@@ -51,10 +51,10 @@ public class PublicKeyServiceImpl extends FeignFactoryBean<PublicKeyService> {
 
         try {
             // 1. 安全加载证书
-            KeyStore trustStore = KeyStore.getInstance("PKCS12");
-            try (InputStream is = getClass().getResourceAsStream("/certs/hdbc_client.p12")) {
+            KeyStore trustStore = KeyStore.getInstance(this.api.getTruststoreType());
+            try (InputStream is = getClass().getResourceAsStream(this.api.getTruststorePath())) {
                 if (is == null)
-                    throw new FileNotFoundException("hdbc_client.p12 not found");
+                    throw new FileNotFoundException(String.format("%s not found", this.api.getTruststorePath()));
                 trustStore.load(is, this.api.getTruststorePassword().toCharArray());
             }
             // 2. 构建SSL上下文
