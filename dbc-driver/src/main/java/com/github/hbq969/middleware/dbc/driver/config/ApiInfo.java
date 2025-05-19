@@ -81,7 +81,7 @@ public class ApiInfo {
     private boolean https = false;
 
     /**
-     * truststore.jks的密码
+     * hdbc_client.p12的密码
      */
     @Getter
     @Setter
