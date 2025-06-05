@@ -6,6 +6,7 @@ import com.github.hbq969.code.sm.login.event.SMUserEvent;
 import com.github.hbq969.code.sm.login.session.UserContext;
 import com.github.hbq969.middleware.dbc.config.Config;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,7 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @ConditionalOnProperty(prefix = "dbc.auth", name = "enabled", havingValue = "true")
 @Component("dbc-APIAuthInterceptor")
@@ -43,22 +45,34 @@ public class APIAuthInterceptor extends AbstractHandlerInterceptor implements Ap
 
     private volatile Map<String, UserInfo> users = new HashMap<>();
 
+    private AtomicBoolean firstLoading = new AtomicBoolean(false);
+
     @Override
     public void afterPropertiesSet() throws Exception {
-        String sql = "select username,password from h_users where app=?";
-        if (log.isDebugEnabled())
-            log.debug("初始化api拦截器加载用户信息, {}, {}", sql, app);
-        List<UserInfo> uls = jt.query(sql, new Object[]{app}, new int[]{Types.VARCHAR}, (rs, rowNum) -> {
-            UserInfo ui = new UserInfo();
-            ui.setUsername(rs.getString(1));
-            ui.setPassword(rs.getString(2));
-            return ui;
-        });
-        Map<String, UserInfo> tmp = new HashMap<>(32);
-        for (UserInfo ul : uls) {
-            tmp.put(ul.getUsername(), ul);
+        loadUserInfos();
+    }
+
+    private void loadUserInfos() {
+        try {
+            String sql = "select username,password from h_users where app=?";
+            if (log.isDebugEnabled())
+                log.debug("初始化api拦截器加载用户信息, {}, {}", sql, app);
+            List<UserInfo> uls = jt.query(sql, new Object[]{app}, new int[]{Types.VARCHAR}, (rs, rowNum) -> {
+                UserInfo ui = new UserInfo();
+                ui.setUsername(rs.getString(1));
+                ui.setPassword(rs.getString(2));
+                return ui;
+            });
+            Map<String, UserInfo> tmp = new HashMap<>(32);
+            for (UserInfo ul : uls) {
+                tmp.put(ul.getUsername(), ul);
+            }
+            this.users = tmp;
+            if (CollectionUtils.isNotEmpty(uls))
+                firstLoading.set(true);
+        } catch (Exception e) {
+            log.error("初始化api拦截器加载用户信息异常: {}", e.getMessage());
         }
-        this.users = tmp;
     }
 
     @Override
@@ -93,6 +107,11 @@ public class APIAuthInterceptor extends AbstractHandlerInterceptor implements Ap
                 return false;
             } else {
                 UserInfo ui = users.get(array[0]);
+                if (!firstLoading.get() && ui == null) {
+                    loadUserInfos();
+                    ui = users.get(array[0]);
+                    firstLoading.set(true);
+                }
                 if (ui == null) {
                     log.warn("basic认证，账号不存在, {}", array[0]);
                     response.setStatus(HttpStatus.UNAUTHORIZED.value());
