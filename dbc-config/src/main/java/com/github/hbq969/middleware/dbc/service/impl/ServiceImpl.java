@@ -122,7 +122,8 @@ public class ServiceImpl implements Service, ScriptInitialAware {
     public void scriptInitial() {
         String lang = com.github.hbq969.code.sm.login.utils.I18nUtils.getFullLanguage(context);
         String filename = String.join("", "dbc-initial", "-", lang, ".sql");
-        Map map = ImmutableMap.of("defaultDataBaseSchema", getDefaultDatabaseName(context.getBean(JdbcTemplate.class)));
+        Map map = ImmutableMap.of("defaultDataBaseSchema", getDefaultDatabaseName(context.getBean(JdbcTemplate.class)),
+                "menuPrefixPath", context.getProperty("dbc.menu.prefix-path", ""));
         com.github.hbq969.code.common.utils.InitScriptUtils.initial(context, filename, StandardCharsets.UTF_8,
                 (sql) -> StrUtils.replacePlaceHolders(sql, map, "dbc"),
                 () -> {
@@ -201,6 +202,8 @@ public class ServiceImpl implements Service, ScriptInitialAware {
                 return extractDatabaseName(metaData.getURL());
             } else if (dcn.contains("oracle")) {
                 return metaData.getUserName();
+            } else if (dcn.contains("h2")) {
+                return "dbc";
             } else {
                 throw new UnsupportedOperationException(String.format("不支持的缺省数据源: %s", dcn));
             }
