@@ -34,6 +34,7 @@ spring:
   messages:
     basename: i18n/messages
     encoding: UTF-8
+    enabled: true
   mvc:
     interceptors:
       mdc:
@@ -161,7 +162,7 @@ dbc:
         - "/api/**"
     enabled: true
   menu:
-    prefix-path: "/api/web/dbc"
+    prefix-path: ""
 
 operlog:
   enabled: false
