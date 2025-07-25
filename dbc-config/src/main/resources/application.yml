@@ -78,6 +78,9 @@ spring:
         sm-initial-script:
           language: zh-CN
           charset: utf-8
+        auth:
+          base:
+            enabled: true
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     dynamic:
@@ -146,12 +149,6 @@ advice:
 
 dbc:
   backup: true
-  auth:
-    basic:
-      key: Authorization
-      include-urls:
-        - "/api/**"
-    enabled: true
   menu:
     prefix-path: ""
 
