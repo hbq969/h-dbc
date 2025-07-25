@@ -103,10 +103,10 @@ spring:
         max-capacity: 500
 
 knife4j:
-  enable: true
+  enable: false
   production: false
   basic:
-    enable: true
+    enable: false
     username: ${spring.application.name}
     password: ENC(PQWxMysuG2mMhw2IpXF9BudyHe2cS5hL3nPx6tJBvYJLl9dZ2eSkBhU6ed7FDgQZ)
 
