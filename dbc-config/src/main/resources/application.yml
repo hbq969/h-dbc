@@ -12,7 +12,7 @@ server:
         name: h-dbc-sid
       timeout: 30m
   ssl:
-    enabled: false
+    enabled: true
     key-store: classpath:certs/hdbc_server.p12
     key-store-password: Yjc@201301
 
@@ -59,26 +59,17 @@ spring:
         cookie-max-age-sec: 1800
         dialect: embedded
         include-urls:
-          - "/hbq969-common/**"
-          - "/hbq969-sm/**"
-          - "/hbq969-dict/**"
-          - "/hbq969-tabula/**"
-          - "/common/encrypt/**"
-          - "/ui-gw/**"
-          - "/**/doc.html"
-          - "/**/swagger-ui.html"
-          - "/**/api-docs"
-          - "/dbc-ui/**"
+          - "/**"
         exclude-urls:
+          - "/**/*.js"
+          - "/**/*.css"
+          - "/**/*.png"
+          - "/**/*.jpg"
+          - "/**/*.map"
+          - "/**/*.ico"
           - "/**/error"
           - "/common/health"
           - "/hbq969-sm/index.html"
-          - "/hbq969-sm/**/*.js"
-          - "/hbq969-sm/**/*.css"
-          - "/hbq969-sm/**/*.png"
-          - "/hbq969-sm/**/*.jpg"
-          - "/hbq969-sm/**/*.map"
-          - "/hbq969-sm/**/*.ico"
           - "/hbq969-sm/**/login"
           - "/hbq969-sm/i18n/lang"
           - "/hbq969-sm/i18n/lang/data"

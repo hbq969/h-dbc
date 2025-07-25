@@ -2,6 +2,7 @@ package com.github.hbq969.middleware.dbc.service.impl;
 
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.lang.UUID;
+import com.github.hbq969.code.common.initial.AbstractScriptInitialAware;
 import com.github.hbq969.code.common.initial.ScriptInitialAware;
 import com.github.hbq969.code.common.spring.context.SpringContext;
 import com.github.hbq969.code.common.spring.i18n.LangInfo;
@@ -37,7 +38,7 @@ import java.util.Map;
 
 @org.springframework.stereotype.Service("dbc-ServiceImpl")
 @Slf4j
-public class ServiceImpl implements Service, ScriptInitialAware {
+public class ServiceImpl extends AbstractScriptInitialAware implements Service {
 
     @Autowired
     private ServiceDao serviceDao;
@@ -119,7 +120,7 @@ public class ServiceImpl implements Service, ScriptInitialAware {
     }
 
     @Override
-    public void scriptInitial() {
+    public void scriptInitial0() {
         String lang = com.github.hbq969.code.sm.login.utils.I18nUtils.getFullLanguage(context);
         String filename = String.join("", "dbc-initial", "-", lang, ".sql");
         Map map = ImmutableMap.of("defaultDataBaseSchema", getDefaultDatabaseName(context.getBean(JdbcTemplate.class)),
@@ -138,7 +139,7 @@ public class ServiceImpl implements Service, ScriptInitialAware {
     }
 
     @Override
-    public void tableCreate() {
+    public void tableCreate0() {
         log.debug("h-dbc 初始化创建所有的表。");
         try {
             serviceDao.createService();
