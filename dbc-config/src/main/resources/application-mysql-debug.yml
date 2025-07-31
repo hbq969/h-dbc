@@ -42,6 +42,3 @@ tabula:
   enabled: true
   tables:
     - log_dbc
-
-logging:
-  config: classpath:logback-mysql-debug.xml
