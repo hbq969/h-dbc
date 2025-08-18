@@ -6,13 +6,13 @@
   <parent>
     <groupId>com.github.hbq969</groupId>
     <artifactId>h-parent</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>3.0-SNAPSHOT</version>
   </parent>
 
   <groupId>com.github.hbq969</groupId>
   <artifactId>h-dbc</artifactId>
   <packaging>pom</packaging>
-  <version>1.2</version>
+  <version>1.2-SpringBoot3.5.4</version>
   <modules>
     <module>dbc-config</module>
     <module>dbc-driver</module>

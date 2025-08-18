@@ -12,15 +12,15 @@ import com.github.hbq969.middleware.dbc.model.AccountServiceProfile;
 import com.github.hbq969.middleware.dbc.service.CacheService;
 import com.github.hbq969.middleware.dbc.service.ProfileService;
 import com.github.pagehelper.PageInfo;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.*;
 
 @RestController("dbc-ProfileCtrl")
-@Api(tags = "配置中心-环境管理接口")
+@Tag(name = "配置中心-环境管理接口")
 @RequestMapping(path = "/dbc-ui/profile")
 @Slf4j
 public class ProfileCtrl {
@@ -32,7 +32,7 @@ public class ProfileCtrl {
     @Autowired
     private SpringContext context;
 
-    @ApiOperation("保存环境")
+    @Operation(summary ="保存环境")
     @RequestMapping(path = "", method = RequestMethod.POST)
     @ResponseBody
     @SMRequiresPermissions(menu = "Profile", apiKey = "saveProfile", apiDesc = "保存环境")
@@ -42,7 +42,7 @@ public class ProfileCtrl {
         return ReturnMessage.success(I18nUtils.getMessage(context, "save.result"));
     }
 
-    @ApiOperation("更新环境")
+    @Operation(summary ="更新环境")
     @RequestMapping(path = "", method = RequestMethod.PUT)
     @ResponseBody
     @SMRequiresPermissions(menu = "Profile", apiKey = "updateProfile", apiDesc = "更新环境")
@@ -52,7 +52,7 @@ public class ProfileCtrl {
         return ReturnMessage.success(I18nUtils.getMessage(context, "update.result"));
     }
 
-    @ApiOperation("删除环境")
+    @Operation(summary ="删除环境")
     @RequestMapping(path = "", method = RequestMethod.DELETE)
     @ResponseBody
     @SMRequiresPermissions(menu = "Profile", apiKey = "deleteProfile", apiDesc = "删除环境")
@@ -62,7 +62,7 @@ public class ProfileCtrl {
         return ReturnMessage.success(I18nUtils.getMessage(context, "delete.result"));
     }
 
-    @ApiOperation("分页查询环境列表")
+    @Operation(summary ="分页查询环境列表")
     @RequestMapping(path = "/list", method = RequestMethod.POST)
     @ResponseBody
     @SMRequiresPermissions(menu = "Profile", apiKey = "queryProfilePageList", apiDesc = "分页查询环境列表")
@@ -73,7 +73,7 @@ public class ProfileCtrl {
         return ReturnMessage.success(profileService.queryProfileList(profile, pageNum, pageSize));
     }
 
-    @ApiOperation("查询环境列表")
+    @Operation(summary ="查询环境列表")
     @RequestMapping(path = "/all", method = RequestMethod.POST)
     @ResponseBody
     @SMRequiresPermissions(menu = "Service", apiKey = "queryProfileList", apiDesc = "查询环境列表")
@@ -81,7 +81,7 @@ public class ProfileCtrl {
         return ReturnMessage.success(profileService.queryProfileList(as));
     }
 
-    @ApiOperation("清空环境配置")
+    @Operation(summary ="清空环境配置")
     @RequestMapping(path = "/config", method = RequestMethod.DELETE)
     @ResponseBody
     @SMRequiresPermissions(menu = "Service", apiKey = "clearProfileConfig", apiDesc = "清空环境配置")
@@ -91,7 +91,7 @@ public class ProfileCtrl {
         return ReturnMessage.success(I18nUtils.getMessage(context, "clear.result"));
     }
 
-    @ApiOperation("备份配置")
+    @Operation(summary ="备份配置")
     @RequestMapping(path = "/backup", method = RequestMethod.POST)
     @ResponseBody
     @SMRequiresPermissions(menu = "Profile", apiKey = "backup", apiDesc = "备份配置")
@@ -101,7 +101,7 @@ public class ProfileCtrl {
         return ReturnMessage.success(I18nUtils.getMessage(context, "ConfigCtrl.backup.result"));
     }
 
-    @ApiOperation("备份所有配置")
+    @Operation(summary ="备份所有配置")
     @RequestMapping(path = "/backup/all", method = RequestMethod.POST)
     @ResponseBody
     @SMRequiresPermissions(menu = "Profile", apiKey = "backupAll", apiDesc = "备份所有配置")

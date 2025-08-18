@@ -4,8 +4,8 @@ import com.github.hbq969.code.common.restful.ReturnMessage;
 import com.github.hbq969.code.common.spring.context.SpringContext;
 import com.github.hbq969.code.dict.service.api.impl.MapDictHelperImpl;
 import com.github.hbq969.code.sm.login.utils.I18nUtils;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,7 +17,7 @@ import java.util.Map;
 @RestController("dbc-i18nCtrl")
 @RequestMapping(path = "/dbc-ui/i18n")
 @Slf4j
-@Api(tags = "页面使用-国际化管理")
+@Tag(name = "页面使用-国际化管理")
 public class I18nCtrl {
 
     @Autowired
@@ -32,21 +32,21 @@ public class I18nCtrl {
     @Autowired
     private SpringContext context;
 
-    @ApiOperation("设置语言")
+    @Operation(summary ="设置语言")
     @RequestMapping(path = "/lang", method = RequestMethod.PUT)
     @ResponseBody
     public ReturnMessage<String> langSet(@RequestBody Map map) {
         return i18nCtrl.langSet(map);
     }
 
-    @ApiOperation("获取语言")
+    @Operation(summary ="获取语言")
     @RequestMapping(path = "/lang", method = RequestMethod.GET)
     @ResponseBody
     public ReturnMessage<String> getLang() {
         return ReturnMessage.success(I18nUtils.getFullLanguage(context));
     }
 
-    @ApiOperation("获取语言数据")
+    @Operation(summary ="获取语言数据")
     @RequestMapping(path = "/lang/data", method = RequestMethod.GET)
     @ResponseBody
     public ReturnMessage<Map<String, String>> getLangData() {

@@ -47,5 +47,14 @@
                 <include>.h2/*.db</include>
             </includes>
         </fileSet>
+        <fileSet>
+            <directory>src/main/resources</directory>
+            <outputDirectory>deploy/bootstrap/config</outputDirectory>
+            <directoryMode>0755</directoryMode>
+            <fileMode>0755</fileMode>
+            <includes>
+                <include>*.yml</include>
+            </includes>
+        </fileSet>
     </fileSets>
 </assembly>

@@ -40,6 +40,6 @@ operlog:
   queue-capacity: 5000
 
 tabula:
-  enabled: true
+  enabled: false
   tables:
     - log_dbc

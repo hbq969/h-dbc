@@ -7,17 +7,14 @@ import com.github.hbq969.code.common.utils.I18nUtils;
 import com.github.hbq969.code.sm.perm.api.SMRequiresPermissions;
 import com.github.hbq969.middleware.dbc.dao.entity.BackupEntity;
 import com.github.hbq969.middleware.dbc.dao.entity.ProfileEntity;
-import com.github.hbq969.middleware.dbc.model.APIModel;
 import com.github.hbq969.middleware.dbc.model.AccountServiceProfile;
 import com.github.hbq969.middleware.dbc.service.BackupService;
-import com.github.hbq969.middleware.dbc.service.CacheService;
 import com.github.hbq969.middleware.dbc.view.request.BatchDeleteBackup;
 import com.github.hbq969.middleware.dbc.view.request.BatchDeleteRecovery;
 import com.github.pagehelper.PageInfo;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.*;
@@ -25,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController("dbc-BackupCtrl")
-@Api(tags = "配置中心-备份、恢复管理接口")
+@Tag(name = "配置中心-备份、恢复管理接口")
 @RequestMapping(path = "/dbc-ui/backup")
 @Slf4j
 public class BackupCtrl {
@@ -37,7 +34,7 @@ public class BackupCtrl {
     @Qualifier("dbc-BackupServiceRBACImpl")
     private BackupService backupService;
 
-    @ApiOperation("分页查询备份列表")
+    @Operation(summary ="分页查询备份列表")
     @RequestMapping(path = "/list", method = RequestMethod.POST)
     @ResponseBody
     @SMRequiresPermissions(menu = "Backup", apiKey = "queryBackupList", apiDesc = "分页查询备份列表")
@@ -48,7 +45,7 @@ public class BackupCtrl {
         return ReturnMessage.success(backupService.queryBackupList(asp, pageNum, pageSize));
     }
 
-    @ApiOperation("获取环境列表")
+    @Operation(summary ="获取环境列表")
     @RequestMapping(path = "/profile/list", method = RequestMethod.GET)
     @ResponseBody
     @SMRequiresPermissions(menu = "Backup", apiKey = "queryProfileList", apiDesc = "获取环境列表")
@@ -56,7 +53,7 @@ public class BackupCtrl {
         return ReturnMessage.success(backupService.queryProfileList());
     }
 
-    @ApiOperation("恢复配置")
+    @Operation(summary ="恢复配置")
     @RequestMapping(path = "/recovery", method = RequestMethod.POST)
     @ResponseBody
     @SMRequiresPermissions(menu = "Backup", apiKey = "recovery", apiDesc = "恢复配置")
@@ -66,7 +63,7 @@ public class BackupCtrl {
         return ReturnMessage.success(I18nUtils.getMessage(context, "BackupCtrl.recovery.result"));
     }
 
-    @ApiOperation("批量恢复配置")
+    @Operation(summary ="批量恢复配置")
     @RequestMapping(path = "/recovery/batch", method = RequestMethod.POST)
     @ResponseBody
     @SMRequiresPermissions(menu = "Backup", apiKey = "batchRecovery", apiDesc = "批量恢复配置")
@@ -76,7 +73,7 @@ public class BackupCtrl {
         return ReturnMessage.success(I18nUtils.getMessage(context, "BackupCtrl.recovery.result"));
     }
 
-    @ApiOperation("删除备份记录")
+    @Operation(summary ="删除备份记录")
     @RequestMapping(path = "", method = RequestMethod.DELETE)
     @ResponseBody
     @SMRequiresPermissions(menu = "Backup", apiKey = "deleteBackup", apiDesc = "删除备份记录")
@@ -86,7 +83,7 @@ public class BackupCtrl {
         return ReturnMessage.success(I18nUtils.getMessage(context, "delete.result"));
     }
 
-    @ApiOperation("删除备份记录")
+    @Operation(summary ="删除备份记录")
     @RequestMapping(path = "/batch", method = RequestMethod.DELETE)
     @ResponseBody
     @SMRequiresPermissions(menu = "Backup", apiKey = "batchDeleteBackup", apiDesc = "批量删除备份记录")

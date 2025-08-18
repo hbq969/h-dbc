@@ -18,8 +18,9 @@ import com.github.hbq969.middleware.dbc.service.CacheService;
 import com.github.hbq969.middleware.dbc.service.ConfigService;
 import com.github.hbq969.middleware.dbc.view.request.*;
 import com.github.pagehelper.PageInfo;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,14 +29,13 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletResponse;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @RestController("dbc-ConfigCtrl")
-@Api(tags = "配置中心-配置管理接口")
+@Tag(name = "配置中心-配置管理接口")
 @RequestMapping(path = "/dbc-ui/config")
 @Slf4j
 public class ConfigCtrl {
@@ -47,7 +47,7 @@ public class ConfigCtrl {
     @Autowired
     private SpringContext context;
 
-    @ApiOperation("获取应用配置环境列表")
+    @Operation(summary ="获取应用配置环境列表")
     @RequestMapping(path = "/profile/list", method = RequestMethod.POST)
     @ResponseBody
     @SMRequiresPermissions(menu = "Service", apiKey = "queryConfigProfileList", apiDesc = "获取应用配置环境列表")
@@ -55,7 +55,7 @@ public class ConfigCtrl {
         return ReturnMessage.success(configService.queryConfigProfileList(q, pageNum, pageSize));
     }
 
-    @ApiOperation("获取页面初始化数据")
+    @Operation(summary ="获取页面初始化数据")
     @RequestMapping(path = "/initial", method = RequestMethod.GET)
     @ResponseBody
     public ReturnMessage<?> queryInitial() {
@@ -65,7 +65,7 @@ public class ConfigCtrl {
         return ReturnMessage.success(result);
     }
 
-    @ApiOperation("保存配置")
+    @Operation(summary ="保存配置")
     @RequestMapping(path = "", method = RequestMethod.POST)
     @ResponseBody
     @SMRequiresPermissions(menu = "Service", apiKey = "saveConfig", apiDesc = "保存配置")
@@ -75,7 +75,7 @@ public class ConfigCtrl {
         return ReturnMessage.success(I18nUtils.getMessage(context, "save.result"));
     }
 
-    @ApiOperation("更新配置")
+    @Operation(summary ="更新配置")
     @RequestMapping(path = "", method = RequestMethod.PUT)
     @ResponseBody
     @SMRequiresPermissions(menu = "Service", apiKey = "updateConfig", apiDesc = "更新配置")
@@ -85,7 +85,7 @@ public class ConfigCtrl {
         return ReturnMessage.success(I18nUtils.getMessage(context, "update.result"));
     }
 
-    @ApiOperation("批量更新配置")
+    @Operation(summary ="批量更新配置")
     @RequestMapping(path = "/batch", method = RequestMethod.PUT)
     @ResponseBody
     @SMRequiresPermissions(menu = "Service", apiKey = "batchUpdateConfig", apiDesc = "批量更新配置")
@@ -95,7 +95,7 @@ public class ConfigCtrl {
         return ReturnMessage.success(I18nUtils.getMessage(context, "update.result"));
     }
 
-    @ApiOperation("删除配置")
+    @Operation(summary ="删除配置")
     @RequestMapping(path = "", method = RequestMethod.DELETE)
     @ResponseBody
     @SMRequiresPermissions(menu = "Service", apiKey = "deleteConfig", apiDesc = "删除配置")
@@ -105,7 +105,7 @@ public class ConfigCtrl {
         return ReturnMessage.success(I18nUtils.getMessage(context, "delete.result"));
     }
 
-    @ApiOperation("批量删除配置")
+    @Operation(summary ="批量删除配置")
     @RequestMapping(path = "/batch", method = RequestMethod.DELETE)
     @ResponseBody
     @SMRequiresPermissions(menu = "Service", apiKey = "batchDeleteConfig", apiDesc = "批量删除配置")
@@ -115,7 +115,7 @@ public class ConfigCtrl {
         return ReturnMessage.success(I18nUtils.getMessage(context, "delete.result"));
     }
 
-    @ApiOperation("批量删除配置")
+    @Operation(summary ="批量删除配置")
     @RequestMapping(path = "/multiple", method = RequestMethod.DELETE)
     @ResponseBody
     @SMRequiresPermissions(menu = "Service", apiKey = "deleteConfigMultiple", apiDesc = "批量删除配置")
@@ -125,7 +125,7 @@ public class ConfigCtrl {
         return ReturnMessage.success(I18nUtils.getMessage(context, "delete.result"));
     }
 
-    @ApiOperation("分页查询配置列表")
+    @Operation(summary ="分页查询配置列表")
     @RequestMapping(path = "/list", method = RequestMethod.POST)
     @ResponseBody
     @SMRequiresPermissions(menu = "Service", apiKey = "queryConfigPageList", apiDesc = "分页查询配置列表")
@@ -133,7 +133,7 @@ public class ConfigCtrl {
         return ReturnMessage.success(configService.queryConfigList(cq.getAsp(), cq.getConfig(), pageNum, pageSize));
     }
 
-    @ApiOperation("导入配置")
+    @Operation(summary ="导入配置")
     @RequestMapping(path = "/import", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseBody
     @SMRequiresPermissions(menu = "Service", apiKey = "configImport", apiDesc = "导入配置")
@@ -157,7 +157,7 @@ public class ConfigCtrl {
         }
     }
 
-    @ApiOperation("查询yml配置文件信息")
+    @Operation(summary ="查询yml配置文件信息")
     @RequestMapping(path = "/file/info", method = RequestMethod.POST)
     @ResponseBody
     @SMRequiresPermissions(menu = "Service", apiKey = "getConfigFile", apiDesc = "查询yml配置文件信息")
@@ -165,7 +165,7 @@ public class ConfigCtrl {
         return ReturnMessage.success(configService.queryConfigFile(asp));
     }
 
-    @ApiOperation("查询当前配置和待恢复配置信息")
+    @Operation(summary ="查询当前配置和待恢复配置信息")
     @RequestMapping(path = "/file/info/currentAndBackup", method = RequestMethod.POST)
     @ResponseBody
     @SMRequiresPermissions(menu = "Backup", apiKey = "getCurrentAndBackupFile", apiDesc = "查询当前配置和待恢复配置信息")
@@ -173,7 +173,7 @@ public class ConfigCtrl {
         return ReturnMessage.success(configService.getCurrentAndBackupFile(ccabf));
     }
 
-    @ApiOperation("更新yml配置文件信息")
+    @Operation(summary ="更新yml配置文件信息")
     @RequestMapping(path = "/file", method = RequestMethod.POST)
     @ResponseBody
     @SMRequiresPermissions(menu = "Service", apiKey = "updateConfigFile", apiDesc = "更新yml配置文件信息")
@@ -184,21 +184,21 @@ public class ConfigCtrl {
         return ReturnMessage.success(I18nUtils.getMessage(context, "update.result"));
     }
 
-    @ApiOperation("下载配置文件")
+    @Operation(summary ="下载配置文件")
     @RequestMapping(path = "/download", method = RequestMethod.POST)
     @SMRequiresPermissions(menu = "Service", apiKey = "downFile", apiDesc = "下载配置文件")
     public void downFile(HttpServletResponse response, @RequestBody DownFile downFile) {
         configService.downFile(response, downFile);
     }
 
-    @ApiOperation("下载服务集成文件")
+    @Operation(summary ="下载服务集成文件")
     @RequestMapping(path = "/bootstrap/download", method = RequestMethod.POST)
     @SMRequiresPermissions(menu = "Service", apiKey = "downBootstrapFile", apiDesc = "下载服务集成文件")
     public void downBootstrapFile(HttpServletResponse response, @RequestBody Map map) {
         configService.downBootstrapFile(response, map);
     }
 
-    @ApiOperation("精确查询账号下所有服务的指定配置")
+    @Operation(summary ="精确查询账号下所有服务的指定配置")
     @RequestMapping(path = "/list/services", method = RequestMethod.POST)
     @ResponseBody
     @SMRequiresPermissions(menu = "Service", apiKey = "queryAllProfilesThisConfig", apiDesc = "精确查询账号下所有服务的指定配置")
@@ -206,7 +206,7 @@ public class ConfigCtrl {
         return ReturnMessage.success(configService.queryAllProfilesThisConfig(map));
     }
 
-    @ApiOperation("备份配置")
+    @Operation(summary ="备份配置")
     @RequestMapping(path = "/backup", method = RequestMethod.POST)
     @ResponseBody
     @SMRequiresPermissions(menu = "Service", apiKey = "backup", apiDesc = "备份配置")

@@ -9,15 +9,16 @@ import com.github.hbq969.middleware.dbc.dao.entity.ServiceEntity;
 import com.github.hbq969.middleware.dbc.service.CacheService;
 import com.github.hbq969.middleware.dbc.service.Service;
 import com.github.pagehelper.PageInfo;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.*;
 
 @RestController("dbc-DbcCtrl")
-@Api(tags = "配置中心-服务管理接口")
+@Tag(name = "配置中心-服务管理接口")
 @RequestMapping(path = "/dbc-ui/service")
 @Slf4j
 public class ServiceCtrl {
@@ -29,7 +30,7 @@ public class ServiceCtrl {
     @Autowired
     private SpringContext context;
 
-    @ApiOperation("保存服务")
+    @Operation(summary ="保存服务")
     @RequestMapping(path = "", method = RequestMethod.POST)
     @ResponseBody
     @SMRequiresPermissions(menu = "Service", apiKey = "saveService", apiDesc = "保存服务")
@@ -39,7 +40,7 @@ public class ServiceCtrl {
         return ReturnMessage.success(I18nUtils.getMessage(context, "save.result"));
     }
 
-    @ApiOperation("更新服务")
+    @Operation(summary ="更新服务")
     @RequestMapping(path = "", method = RequestMethod.PUT)
     @ResponseBody
     @SMRequiresPermissions(menu = "Service", apiKey = "updateService", apiDesc = "更新服务")
@@ -49,7 +50,7 @@ public class ServiceCtrl {
         return ReturnMessage.success(I18nUtils.getMessage(context, "update.result"));
     }
 
-    @ApiOperation("删除服务")
+    @Operation(summary ="删除服务")
     @RequestMapping(path = "", method = RequestMethod.DELETE)
     @ResponseBody
     @SMRequiresPermissions(menu = "Service", apiKey = "deleteService", apiDesc = "删除服务")
@@ -59,7 +60,7 @@ public class ServiceCtrl {
         return ReturnMessage.success(I18nUtils.getMessage(context, "delete.result"));
     }
 
-    @ApiOperation("分页查询服务列表")
+    @Operation(summary ="分页查询服务列表")
     @RequestMapping(path = "/list", method = RequestMethod.POST)
     @ResponseBody
     @SMRequiresPermissions(menu = "Service", apiKey = "queryServicePageList", apiDesc = "分页查询服务列表")

@@ -9,8 +9,8 @@ import com.github.hbq969.code.common.restful.ReturnMessage;
 import com.github.hbq969.code.common.spring.advice.log.LogSet;
 import com.github.hbq969.middleware.dbc.model.APIModel;
 import com.github.hbq969.middleware.dbc.service.APIService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.concurrent.TimeUnit;
 
 @RestController("dbc-APICtrl")
-@Api(tags = "配置中心-api接口")
+@Tag(name = "配置中心-api接口")
 @RequestMapping(path = "/api")
 @Slf4j
 public class APICtrl {
@@ -31,7 +31,7 @@ public class APICtrl {
     @Autowired(required = false)
     private EncryptProperties encryptConfig;
 
-    @ApiOperation("获取rsa公钥")
+    @Operation(summary = "获取rsa公钥")
     @RequestMapping(path = "/publicKey", method = RequestMethod.GET)
     @ResponseBody
     public ReturnMessage<?> getPublicKey() {
@@ -39,7 +39,7 @@ public class APICtrl {
                 : encryptConfig.getRestful().getRsa().getPublicKey());
     }
 
-    @ApiOperation("获取服务配置（服务维度）")
+    @Operation(summary ="获取服务配置（服务维度）")
     @RequestMapping(path = "/config/list", method = RequestMethod.POST)
     @ResponseBody
     @Encrypt(algorithm = Algorithm.RAS)

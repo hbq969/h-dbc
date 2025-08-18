@@ -74,5 +74,5 @@ spec:
             - name: spring_profiles_active
               value: "${spring_profiles_active}"
           command: [ "java" ]
-          args: [ "-Xmx800m","-Xms800m","-DAPP_SN=h-dbc","-Dspring.profiles.active=${spring_profiles_active}", "-Dspring.main.allow-bean-definition-overriding=true","-Dreactor.netty.http.server.accessLogEnabled=true","-Dfile.encoding=utf-8","-XX:+UseG1GC","-XX:MaxGCPauseMillis=100", "-XX:MetaspaceSize=128m", "-XX:MaxMetaspaceSize=256m", "-XX:+PrintGCDetails", "-XX:+PrintGCDateStamps", "-Xloggc:/opt/app/dbc-config/gc.log", "-jar","/opt/app/dbc-config/lib/dbc-config-1.2.jar" ]
+          args: [ "-Xmx800m","-Xms800m","-DAPP_SN=h-dbc","-Dspring.profiles.active=${spring_profiles_active}", "-Dspring.main.allow-bean-definition-overriding=true","-Dreactor.netty.http.server.accessLogEnabled=true","-Dfile.encoding=utf-8","-XX:+UseG1GC","-XX:MaxGCPauseMillis=100", "-XX:MetaspaceSize=128m", "-XX:MaxMetaspaceSize=256m", "-XX:+PrintGCDetails", "-XX:+PrintGCDateStamps", "-Xloggc:/opt/app/dbc-config/gc.log", "-jar","/opt/app/dbc-config/lib/dbc-config-1.2-SpringBoot3.5.4.jar" ]
 
