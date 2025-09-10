@@ -81,6 +81,11 @@ spring:
         auth:
           base:
             enabled: true
+        login-fail-timeout-mills: 120000
+        login-fail-times: 3
+        multi-user-login: false
+        account-expire-notify-days: 7
+        complex-pass: true
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     dynamic:
@@ -115,10 +120,13 @@ swagger:
   api-info:
     title: web应用Restful API
     description: web应用Restful API
-    termsOfServiceUrl: http://127.0.0.1:${server.port}
+    termsOfService: http://127.0.0.1:${server.port}
     version: v1.0
-    license: Apache LICENSE-2.0
-    licenseUrl: https://apache.org/licenses/LICENSE-2.0.txt
+    contact:
+      email: hbq969@gmail.com
+    license:
+      name: Apache License, Version 2.0
+      url: https://apache.org/licenses/LICENSE-2.0.txt
 
 dict:
   enabled: true
