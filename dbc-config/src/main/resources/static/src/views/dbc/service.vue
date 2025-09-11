@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-  Delete,Grid, ZoomIn, EditPen, Search
+  Delete, Grid, ZoomIn, EditPen, Search, Edit, Plus
 } from '@element-plus/icons-vue'
 import {ref, reactive, onMounted} from 'vue'
 import axios from '@/network'
@@ -187,27 +187,27 @@ const _ = (window as any).ResizeObserver;
       </el-form-item>
       <el-form-item>
         <el-button type="primary" size="small" @click="queryServiceList()" :icon="Search">{{langData.btnSearch}}</el-button>
-        <el-button type="success" :icon="EditPen" @click="showServiceAddDialog()">{{langData.btnAdd}}</el-button>
+<!--        <el-button type="success" :icon="EditPen" @click="showServiceAddDialog()">{{langData.btnAdd}}</el-button>-->
       </el-form-item>
     </el-form>
 
-    <el-table :data="data.serviceList" style="width: 100%" :border="true" table-layout="fixed" :stripe="true"
+    <el-table :data="data.serviceList" style="width: 100%" table-layout="fixed" :stripe="true"
               size="small" :highlight-current-row="true" :header-cell-style="headerCellStyle">
       <el-table-column fixed="left" label="操作" width="180" header-align="center" align="center">
         <template #default="scope">
-          <el-button circle :icon="EditPen" :title="langData.btnEdit" type="success" size="small" @click="showServiceEditDialog(scope)" :disabled="user.roleName!='ADMIN' && scope.row.username!=user.userName"/>
+          <el-icon @click="showServiceEditDialog(scope)" color="#3F9EFF" style="cursor: pointer; margin-left: 10px" :size="14" :title="langData.btnEdit" :disabled="user.roleName!='ADMIN' && scope.row.username!=user.userName"><Edit/></el-icon>
           <el-popconfirm :title="langData.serviceTableDeleteConfirmTitle" @confirm="deleteService(scope)"
                          icon-color="red"
                          confirm-button-type="danger">
             <template #reference>
-              <el-button circle :icon="Delete" :title="langData.btnDelete" type="danger" size="small" :disabled="user.roleName!='ADMIN' && scope.row.username!=user.userName"/>
+              <el-icon color="red" style="cursor: pointer; margin-left: 10px" :size="14" :disabled="user.roleName!='ADMIN' && scope.row.username!=user.userName"><Delete/></el-icon>
             </template>
           </el-popconfirm>
           <el-tooltip :content="langData.serviceTableOpConfigManage" effect="dark" placement="top">
-            <el-button circle :icon="Grid" type="success" size="small" @click="router.push({path:'/config/profile',query:scope.row})" :disabled="user.roleName!='ADMIN' && scope.row.username!=user.userName"/>
+            <el-icon color="#95D475" style="cursor: pointer; margin-left: 10px" :size="14" @click="router.push({path:'/config/profile',query:scope.row})" :disabled="user.roleName!='ADMIN' && scope.row.username!=user.userName"><Grid/></el-icon>
           </el-tooltip>
           <el-tooltip :content="langData.serviceTableOpConfigCompare" effect="dark" placement="top">
-            <el-button circle :icon="ZoomIn" type="primary" size="small" @click="router.push({path:'/config/compare',query:scope.row})" :disabled="user.roleName!='ADMIN' && scope.row.username!=user.userName"/>
+            <el-icon color="#3F9EFF" style="cursor: pointer; margin-left: 10px" :size="14" @click="router.push({path:'/config/compare',query:scope.row})" :disabled="user.roleName!='ADMIN' && scope.row.username!=user.userName"><ZoomIn/></el-icon>
           </el-tooltip>
         </template>
       </el-table-column>
@@ -231,6 +231,10 @@ const _ = (window as any).ResizeObserver;
                    @next-click="queryServiceList()"
                    :small="true" :background="true"
                    :page-sizes="[5, 10, 20, 50, 100]"/>
+    <div class="addBtn">
+        <el-button :icon="Plus" size="small" round @click="showServiceAddDialog">{{langData.btnAdd}}
+        </el-button>
+    </div>
   </div>
 
   <el-dialog v-model="dialogFormVisible" :title="dialogTitle" draggable width="400px">
@@ -258,5 +262,9 @@ const _ = (window as any).ResizeObserver;
   padding: 20px 2%;
   overflow: auto;
   width: 96%;
+}
+.addBtn {
+  margin-top: 5px;
+  text-align: center;
 }
 </style>
