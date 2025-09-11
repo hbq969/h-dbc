@@ -1,6 +1,6 @@
 <script lang="ts" setup xmlns="http://www.w3.org/1999/html">
 import {
-  Edit, ArrowLeft, EditPen, Delete, Search, DocumentCopy
+  Edit, ArrowLeft, EditPen, Delete, Search, DocumentCopy, Plus
 } from '@element-plus/icons-vue'
 import {ref, reactive, onMounted} from 'vue'
 import axios from '@/network'
@@ -269,7 +269,6 @@ const _ = (window as any).ResizeObserver;
       <el-form-item>
         <el-button type="primary" size="small" @click="queryConfigList()" :icon="Search">{{ langData.btnSearch }}
         </el-button>
-        <el-button type="success" :icon="EditPen" @click="showConfigAddDialog()">{{ langData.btnAdd }}</el-button>
         <el-popconfirm :title="langData.confirmDelete" confirm-button-type="danger" @confirm="deleteMultipleConfig()">
           <template #reference>
             <el-button type="danger" :icon="Delete">{{ langData.configListTableBatchDelete }}</el-button>
@@ -279,22 +278,21 @@ const _ = (window as any).ResizeObserver;
     </el-form>
 
     <el-table ref="multipleTableRef" :select-on-indeterminate="selectAll" :data="data.configList" style="width: 100%"
-              :border="true" table-layout="fixed" :stripe="true"
+              table-layout="fixed" :stripe="true"
               size="small" :highlight-current-row="true" :header-cell-style="headerCellStyle">
       <el-table-column type="selection" header-align="center" align="center"/>
-      <el-table-column fixed="left" :label="langData.tableHeaderOp" width="130" header-align="center" align="center">
+      <el-table-column fixed="left" :label="langData.tableHeaderOp" width="120" header-align="center" align="center">
         <template #default="scope">
-          <el-button circle :icon="Edit" :title="langData.btnEdit" type="primary" size="small"
-                     @click="showConfigEditDialog(scope)"/>
+          <el-icon @click="showConfigEditDialog(scope)" color="#3F9EFF" style="cursor: pointer; margin-left: 10px" :size="14"><Edit/></el-icon>
           <el-popconfirm :title="langData.confirmDelete" @confirm="deleteConfig(scope)"
                          icon-color="red"
                          confirm-button-type="danger">
             <template #reference>
-              <el-button circle :icon="Delete" :title="langData.btnDelete" type="danger" size="small"/>
+              <el-icon color="red" style="cursor: pointer; margin-left: 10px" :size="14"><Delete/></el-icon>
             </template>
           </el-popconfirm>
           <el-tooltip :content="langData.configListTableBatchManage" effect="dark" placement="top">
-            <el-button circle :icon="DocumentCopy" type="warning" size="small" @click="goConfigQuery(scope)"/>
+            <el-icon @click="goConfigQuery(scope)" color="#FFB85C" style="cursor: pointer; margin-left: 10px" :size="14"><DocumentCopy/></el-icon>
           </el-tooltip>
         </template>
       </el-table-column>
@@ -317,6 +315,10 @@ const _ = (window as any).ResizeObserver;
                    @current-change="queryConfigList()" @prev-click="queryConfigList()" @next-click="queryConfigList()"
                    :small="true" :background="true"
                    :page-sizes="[5, 10, 20, 50, 100,200,500]"/>
+    <div class="addBtn">
+        <el-button :icon="Plus" size="small" round @click="showConfigAddDialog">{{langData.btnAdd}}
+        </el-button>
+    </div>
 
     <el-dialog v-model="dialogFormVisible" :title="dialogTitle" draggable width="400px">
       <el-form :model="configForm" label-position="right" size="small" :inline="false" ref="configFormRef"
@@ -351,5 +353,9 @@ const _ = (window as any).ResizeObserver;
   padding: 20px 2%;
   overflow: auto;
   width: 96%;
+}
+.addBtn {
+  margin-top: 5px;
+  text-align: center;
 }
 </style>

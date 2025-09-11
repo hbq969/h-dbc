@@ -265,30 +265,30 @@ const _ = (window as any).ResizeObserver;
       </el-form-item>
     </el-form>
 
-    <el-table ref="tableRef" :data="data.backups" style="width: 100%" :border="true" table-layout="fixed" :stripe="true"
+    <el-table ref="tableRef" :data="data.backups" style="width: 100%" table-layout="fixed" :stripe="true"
               size="small" :highlight-current-row="true" :header-cell-style="headerCellStyle">
       <el-table-column type="selection" header-align="center" align="center"/>
       <el-table-column fixed="left" :label="langData.tableHeaderOp" width="120" header-align="center" align="center">
         <template #default="scope">
           <el-tooltip :content="langData.serviceTableOpConfigCompare" effect="dark" placement="top">
-            <el-button circle :icon="ZoomIn" type="primary" size="small"
-                       @click="router.push({path:'/config/compareBackup',query:scope.row})"
-                       :disabled="user.roleName!='ADMIN' && user.userName!=scope.row.username"/>
+<!--            <el-button circle :icon="ZoomIn" type="primary" size="small"-->
+<!--                       @click="router.push({path:'/config/compareBackup',query:scope.row})"-->
+<!--                       :disabled="user.roleName!='ADMIN' && user.userName!=scope.row.username"/>-->
+            <el-icon color="#3F9EFF" style="cursor: pointer; margin-left: 10px" :size="14" @click="router.push({path:'/config/compareBackup',query:scope.row})"
+                     :disabled="user.roleName!='ADMIN' && user.userName!=scope.row.username"><ZoomIn/></el-icon>
           </el-tooltip>
           <el-popconfirm :title="langData.backupConfirmTitle" confirm-button-type="warning" @confirm="recovery(scope)">
             <template #reference>
-              <el-button circle :icon="RefreshRight" type="warning" size="small"
-                         :disabled="user.roleName!='ADMIN' && user.userName!=scope.row.username"
-                         :title="langData.backupRecovery"/>
+              <el-icon color="#EEBE77" style="cursor: pointer; margin-left: 10px" :size="14" :disabled="user.roleName!='ADMIN' && user.userName!=scope.row.username"
+                       :title="langData.backupRecovery"><RefreshRight/></el-icon>
             </template>
           </el-popconfirm>
           <el-popconfirm :title="langData.confirmDelete" @confirm="deleteBackup(scope)"
                          icon-color="red"
                          confirm-button-type="danger">
             <template #reference>
-              <el-button circle :icon="Delete" type="danger" size="small"
-                         :disabled="user.roleName!='ADMIN' && user.userName!=scope.row.username"
-                         :title="langData.btnDelete"/>
+              <el-icon @click="" color="red" style="cursor: pointer; margin-left: 10px" :size="14" :disabled="user.roleName!='ADMIN' && user.userName!=scope.row.username"
+                       :title="langData.btnDelete"><Delete/></el-icon>
             </template>
           </el-popconfirm>
         </template>
