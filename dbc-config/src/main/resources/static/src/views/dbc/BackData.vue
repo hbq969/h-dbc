@@ -26,12 +26,11 @@ const queryUserInfo = () => {
       user.userName = res.data.body.userName
       user.roleName = res.data.body.roleName
     } else {
-      let content = res.config.baseURL + res.config.url + ': ' + res.data.errorMessage;
-      msg(content, "warning")
+      msg(res.data.errorMessage, 'warning')
     }
-  }).catch((err: Error) => {
+  }).catch((err: any) => {
     console.log('', err)
-    msg(langData.axiosRequestErr, 'error')
+    msg(err?.response.data.errorMessage, 'error')
   })
 }
 
@@ -67,12 +66,11 @@ const queryProfileList = () => {
     if (res.data.state == 'OK') {
       data.profiles = res.data.body
     } else {
-      let content = res.config.baseURL + res.config.url + ': ' + res.data.errorMessage;
-      msg(content, "warning")
+      msg(res.data.errorMessage, 'warning')
     }
-  }).catch((err: Error) => {
+  }).catch((err: any) => {
     console.log('', err)
-    msg(langData.axiosRequestErr, 'error')
+    msg(err?.response.data.errorMessage, 'error')
   })
 }
 
@@ -100,12 +98,11 @@ const queryBackupList = () => {
       data.total = res.data.body.total
       data.backups = res.data.body.list
     } else {
-      let content = res.config.baseURL + res.config.url + ': ' + res.data.errorMessage;
-      msg(content, "warning")
+      msg(res.data.errorMessage, 'warning')
     }
-  }).catch((err: Error) => {
+  }).catch((err: any) => {
     console.log('', err)
-    msg(langData.axiosRequestErr, 'error')
+    msg(err?.response.data.errorMessage, 'error')
   })
 }
 
@@ -118,12 +115,11 @@ const recovery = (scope) => {
     if (res.data.state == 'OK') {
       msg(res.data.body, 'success')
     } else {
-      let content = res.config.baseURL + res.config.url + ': ' + res.data.errorMessage;
-      msg(content, "warning")
+      msg(res.data.errorMessage, 'warning')
     }
-  }).catch((err: Error) => {
+  }).catch((err: any) => {
     console.log('', err)
-    msg(langData.axiosRequestErr, 'error')
+    msg(err?.response.data.errorMessage, 'error')
   })
 }
 
@@ -137,12 +133,11 @@ const deleteBackup = (scope) => {
       msg(res.data.body, 'success')
       queryBackupList()
     } else {
-      let content = res.config.baseURL + res.config.url + ': ' + res.data.errorMessage;
-      msg(content, "warning")
+      msg(res.data.errorMessage, 'warning')
     }
-  }).catch((err: Error) => {
+  }).catch((err: any) => {
     console.log('', err)
-    msg(langData.axiosRequestErr, 'error')
+    msg(err?.response.data.errorMessage, 'error')
   })
 }
 
@@ -168,12 +163,11 @@ const batchDeleteBackup = () => {
       msg(res.data.body, 'success')
       queryBackupList()
     } else {
-      let content = res.config.baseURL + res.config.url + ': ' + res.data.errorMessage;
-      msg(content, "warning")
+      msg(res.data.errorMessage, 'warning')
     }
-  }).catch((err: Error) => {
+  }).catch((err: any) => {
     console.log('', err)
-    msg(langData.axiosRequestErr, 'error')
+    msg(err?.response.data.errorMessage, 'error')
   })
 }
 
@@ -199,12 +193,11 @@ const batchRecovery = () => {
       msg(res.data.body, 'success')
       queryBackupList()
     } else {
-      let content = res.config.baseURL + res.config.url + ': ' + res.data.errorMessage;
-      msg(content, "warning")
+      msg(res.data.errorMessage, 'warning')
     }
-  }).catch((err: Error) => {
+  }).catch((err: any) => {
     console.log('', err)
-    msg(langData.axiosRequestErr, 'error')
+    msg(err?.response.data.errorMessage, 'error')
   })
 }
 

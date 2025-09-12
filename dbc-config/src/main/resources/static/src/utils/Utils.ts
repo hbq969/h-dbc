@@ -64,9 +64,8 @@ export function downFile(options: any) {
       //   navigator.msSaveBlob(blob, fileName);
       // }
     }
-    msg('导出成功', 'success')
   }).catch((err: any) => {
     console.error(err)
-    msg('导出异常', 'error')
+    msg(err?.response.data.errorMessage, 'error')
   });
 }

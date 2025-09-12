@@ -71,12 +71,11 @@ const queryAllProfileList = () => {
         queryConfigFile(profile2Model,form.profile2)
       }
     } else {
-      let content = res.config.baseURL+res.config.url+': '+res.data.errorMessage;
-      msg(content, "warning")
+      msg(res.data.errorMessage, 'warning')
     }
-  }).catch((err: Error) => {
+  }).catch((err: any) => {
     console.log('',err)
-    msg(langData.axiosRequestErr, 'error')
+    msg(err?.response.data.errorMessage, 'error')
   })
 }
 
@@ -99,12 +98,11 @@ const queryConfigFile = (model: ITextModel, profileName) => {
       }
       model.setValue(file.fileContent)
     } else {
-      let content = res.config.baseURL+res.config.url+': '+res.data.errorMessage;
-      msg(content, "warning")
+      msg(res.data.errorMessage, 'warning')
     }
-  }).catch((err: Error) => {
+  }).catch((err: any) => {
     console.log('', err)
-    msg(langData.axiosRequestErr, 'error')
+    msg(err?.response.data.errorMessage, 'error')
   })
 }
 

@@ -52,12 +52,11 @@ const queryConfigList2 = () => {
     if (res.data.state == 'OK') {
       data.configList = res.data.body
     } else {
-      let content = res.config.baseURL + res.config.url + ': ' + res.data.errorMessage;
-      msg(content, "warning")
+      msg(res.data.errorMessage, 'warning')
     }
-  }).catch((err: Error) => {
+  }).catch((err: any) => {
     console.log('', err)
-    msg(langData.axiosRequestErr, 'error')
+    msg(err?.response.data.errorMessage, 'error')
   })
 }
 
@@ -79,12 +78,11 @@ const queryInitial = () => {
     if (res.data.state == 'OK') {
       dataType.value = res.data.body.dataType || []
     } else {
-      let content = res.config.baseURL + res.config.url + ': ' + res.data.errorMessage;
-      msg(content, "warning")
+      msg(res.data.errorMessage, 'warning')
     }
-  }).catch((err: Error) => {
+  }).catch((err: any) => {
     console.log('', err)
-    msg(langData.axiosRequestErr, 'error')
+    msg(err?.response.data.errorMessage, 'error')
   })
 }
 
@@ -137,9 +135,9 @@ const updateConfig = async (formEl: FormInstance | undefined) => {
           let content = res.config.baseURL + res.config.url + ': ' + res.data.errorMessage;
           msg(content, "warning")
         }
-      }).catch((err: Error) => {
+      }).catch((err: any) => {
         console.log('', err)
-        msg(langData.axiosRequestErr, 'error')
+        msg(err?.response.data.errorMessage, 'error')
       })
     }
   })
@@ -160,12 +158,11 @@ const deleteConfig = (scope) => {
       msg(res.data.body, 'success')
       queryConfigList2()
     } else {
-      let content = res.config.baseURL + res.config.url + ': ' + res.data.errorMessage;
-      msg(content, "warning")
+      msg(res.data.errorMessage, 'warning')
     }
-  }).catch((err: Error) => {
+  }).catch((err: any) => {
     console.log('', err)
-    msg(langData.axiosRequestErr, 'error')
+    msg(err?.response.data.errorMessage, 'error')
   })
 }
 
@@ -231,9 +228,9 @@ const batchUpdateConfig = async (formEl: FormInstance | undefined) => {
           let content = res.config.baseURL + res.config.url + ': ' + res.data.errorMessage;
           msg(content, "warning")
         }
-      }).catch((err: Error) => {
+      }).catch((err: any) => {
         console.log('', err)
-        msg(langData.axiosRequestErr, 'error')
+        msg(err?.response.data.errorMessage, 'error')
       })
     }
   })
@@ -258,12 +255,11 @@ const batchDeleteConfig = () => {
       msg(res.data.body, "success")
       queryConfigList2()
     } else {
-      let content = res.config.baseURL + res.config.url + ': ' + res.data.errorMessage;
-      msg(content, "warning")
+      msg(res.data.errorMessage, 'warning')
     }
-  }).catch((err: Error) => {
+  }).catch((err: any) => {
     console.log('', err)
-    msg(langData.axiosRequestErr, 'error')
+    msg(err?.response.data.errorMessage, 'error')
   })
 }
 

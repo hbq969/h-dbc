@@ -64,13 +64,12 @@ const queryConfigFile = () => {
         initialEditor()
       }
     } else {
-      let content = res.config.baseURL+res.config.url+': '+res.data.errorMessage;
-      msg(content, "warning")
+      msg(res.data.errorMessage, 'warning')
       initialEditor()
     }
-  }).catch((err: Error) => {
+  }).catch((err: any) => {
     console.log('', err)
-    msg(langData.axiosRequestErr, 'error')
+    msg(err?.response.data.errorMessage, 'error')
   })
 }
 
@@ -138,12 +137,11 @@ const saveConfigFile = () => {
       originalModel.setValue(form.fileContent)
       modifiedModel.setValue(form.fileContent)
     } else {
-      let content = res.config.baseURL+res.config.url+': '+res.data.errorMessage;
-      msg(content, "warning")
+      msg(res.data.errorMessage, 'warning')
     }
-  }).catch((err: Error) => {
+  }).catch((err: any) => {
     console.log('',err)
-    msg(langData.axiosRequestErr, 'error')
+    msg(err?.response.data.errorMessage, 'error')
   });
 }
 
@@ -184,8 +182,8 @@ const downFile = (fileSuffix) => {
       //   navigator.msSaveBlob(blob, fileName);
       // }
     }
-  }).catch((err: Error) => {
-    msg(langData.axiosRequestErr, 'error')
+  }).catch((err: any) => {
+    msg(err?.response.data.errorMessage, 'error')
   })
 }
 

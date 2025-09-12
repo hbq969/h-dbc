@@ -80,7 +80,7 @@ export class Instance {
         })
       }
     }).catch((error: any) => {
-      msg('请求异常', 'error')
+      msg(error?.response.data.errorMessage, 'error')
     })
   }
 

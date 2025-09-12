@@ -30,7 +30,7 @@ export default (config: any) => {
     // 增加过度效果
     loadingInstance = ElLoading.service({
       lock: true,
-      text: '加载中...',
+      text: 'loading...',
       fullscreen: true,
       background: 'rgba(0, 0, 0, 0.7)'
     });
