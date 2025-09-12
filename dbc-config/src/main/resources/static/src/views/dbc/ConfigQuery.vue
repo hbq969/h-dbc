@@ -316,18 +316,18 @@ const _ = (window as any).ResizeObserver;
     <el-table :data="data.configList" style="width: 100%" table-layout="fixed" :stripe="true"
               size="small" :highlight-current-row="true" :header-cell-style="headerCellStyle" ref="tableRef">
       <el-table-column type="selection" header-align="center" align="center"/>
-      <el-table-column fixed="left" :label="langData.tableHeaderOp" width="80" header-align="center" align="center">
-        <template #default="scope">
-          <el-icon @click="showConfigEditDialog(scope)" color="#3F9EFF" style="cursor: pointer; margin-left: 10px" :size="14"><EditPen/></el-icon>
-          <el-popconfirm :title="langData.confirmDelete" @confirm="deleteConfig(scope)"
-                         icon-color="red"
-                         confirm-button-type="danger">
-            <template #reference>
-              <el-icon color="red" style="cursor: pointer; margin-left: 10px" :size="14"><Delete/></el-icon>
-            </template>
-          </el-popconfirm>
-        </template>
-      </el-table-column>
+<!--      <el-table-column fixed="left" :label="langData.tableHeaderOp" width="80" header-align="center" align="center">-->
+<!--        <template #default="scope">-->
+<!--          <el-icon @click="showConfigEditDialog(scope)" color="#3F9EFF" style="cursor: pointer; margin-left: 10px" :size="14"><EditPen/></el-icon>-->
+<!--          <el-popconfirm :title="langData.confirmDelete" @confirm="deleteConfig(scope)"-->
+<!--                         icon-color="red"-->
+<!--                         confirm-button-type="danger">-->
+<!--            <template #reference>-->
+<!--              <el-icon color="red" style="cursor: pointer; margin-left: 10px" :size="14"><Delete/></el-icon>-->
+<!--            </template>-->
+<!--          </el-popconfirm>-->
+<!--        </template>-->
+<!--      </el-table-column>-->
       <el-table-column prop="configKey" :label="langData.configListTableConfigKey" :show-overflow-tooltip="true"
                        header-align="center"
                        align="center" width="300"/>
