@@ -48,12 +48,11 @@ const queryAllProfileList = () => {
     if (res.data.state == 'OK') {
       data.profileList = res.data.body
     } else {
-      let content = res.config.baseURL + res.config.url + ': ' + res.data.errorMessage;
-      msg(content, "warning")
+      msg(res.data.errorMessage, 'warning')
     }
-  }).catch((err: Error) => {
+  }).catch((err: any) => {
     console.log('', err)
-    msg(langData.axiosRequestErr, 'error')
+    msg(err?.response.data.errorMessage, 'error')
   })
 }
 
@@ -71,12 +70,11 @@ const deleteConfig = (source) => {
       msg(res.data.body, 'success')
       queryAllProfileList()
     } else {
-      let content = res.config.baseURL + res.config.url + ': ' + res.data.errorMessage;
-      msg(content, "warning")
+      msg(res.data.errorMessage, 'warning')
     }
-  }).catch((err: Error) => {
+  }).catch((err: any) => {
     console.log('', err)
-    msg(langData.axiosRequestErr, 'error')
+    msg(err?.response.data.errorMessage, 'error')
   })
 }
 
@@ -149,13 +147,12 @@ const configImport = () => {
       uploadRef.value!.clearFiles()
       queryAllProfileList()
     } else {
-      let content = res.config.baseURL + res.config.url + ': ' + res.data.errorMessage;
-      msg(content, "warning")
+      msg(res.data.errorMessage, 'warning')
       uploadRef.value!.clearFiles()
     }
-  }).catch((err: Error) => {
+  }).catch((err: any) => {
     console.log('', err)
-    msg(langData.axiosRequestErr, 'error')
+    msg(err?.response.data.errorMessage, 'error')
     uploadRef.value!.clearFiles()
   })
 }
@@ -215,8 +212,8 @@ const downFile = (fileSuffix) => {
       //   navigator.msSaveBlob(blob, fileName);
       // }
     }
-  }).catch((err: Error) => {
-    msg(langData.axiosRequestErr, 'error')
+  }).catch((err: any) => {
+    msg(err?.response.data.errorMessage, 'error')
   })
 }
 
@@ -247,9 +244,9 @@ const downIntegrated = (source, filename) => {
       //   navigator.msSaveBlob(blob, fileName);
       // }
     }
-  }).catch((err: Error) => {
+  }).catch((err: any) => {
     console.log('', err)
-    msg('请求异常', 'error')
+    msg(err?.response.data.errorMessage, 'error')
   })
 }
 
@@ -299,12 +296,11 @@ const backupConfig = (source) => {
     if (res.data.state == 'OK') {
       msg(res.data.body, 'success')
     } else {
-      let content = res.config.baseURL + res.config.url + ': ' + res.data.errorMessage;
-      msg(content, "warning")
+      msg(res.data.errorMessage, 'warning')
     }
-  }).catch((err: Error) => {
+  }).catch((err: any) => {
     console.log('', err)
-    msg(langData.axiosRequestErr, 'error')
+    msg(err?.response.data.errorMessage, 'error')
   })
 }
 

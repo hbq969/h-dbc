@@ -25,12 +25,11 @@ onMounted(() => {
       user.userName = res.data.body.userName
       user.roleName = res.data.body.roleName
     } else {
-      let content = res.config.baseURL+res.config.url+': '+res.data.errorMessage;
-      msg(content, "warning")
+      msg(res.data.errorMessage, 'warning')
     }
-  }).catch((err: Error) => {
+  }).catch((err: any) => {
     console.log('',err)
-    msg(langData.axiosRequestErr, 'error')
+    msg(err?.response.data.errorMessage, 'error')
   })
   queryServiceList()
 });
@@ -61,12 +60,11 @@ const queryServiceList = () => {
       data.total = res.data.body.total
       data.serviceList = res.data.body.list
     } else {
-      let content = res.config.baseURL+res.config.url+': '+res.data.errorMessage;
-      msg(content, "warning")
+      msg(res.data.errorMessage, 'warning')
     }
-  }).catch((err: Error) => {
+  }).catch((err: any) => {
     console.log('',err)
-    msg(langData.axiosRequestErr, 'error')
+    msg(err?.response.data.errorMessage, 'error')
   })
 }
 
@@ -96,12 +94,11 @@ const updateService = async (formEl: FormInstance | undefined) => {
           dialogFormVisible.value = false
           queryServiceList()
         } else {
-          let content = res.config.baseURL+res.config.url+': '+res.data.errorMessage;
-          msg(content, "warning")
+          msg(res.data.errorMessage, 'warning')
         }
-      }).catch((err: Error) => {
+      }).catch((err: any) => {
         console.log('',err)
-        msg(langData.axiosRequestErr, 'error')
+        msg(err?.response.data.errorMessage, 'error')
       })
     }
   })
@@ -138,12 +135,11 @@ const deleteService = (scope) => {
       msg(res.data.body, 'success')
       queryServiceList()
     } else {
-      let content = res.config.baseURL+res.config.url+': '+res.data.errorMessage;
-      msg(content, "warning")
+      msg(res.data.errorMessage, 'warning')
     }
-  }).catch((err: Error) => {
+  }).catch((err: any) => {
     console.log('',err)
-    msg(langData.axiosRequestErr, 'error')
+    msg(err?.response.data.errorMessage, 'error')
   })
 }
 

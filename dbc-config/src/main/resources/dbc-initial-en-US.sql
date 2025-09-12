@@ -15,14 +15,14 @@ insert into h_dict_pairs(dict_name,pair_key,pair_value) values('config,dataType'
 insert into h_dict_pairs(dict_name,pair_key,pair_value) values('config,dataType','java.lang.Byte','Byte');
 insert into h_dict_pairs(dict_name,pair_key,pair_value) values('config,dataType','java.lang.Boolean','Boolean');
 
-delete from h_menus where app='h-dbc' and name in ('Config','Profile','Service','Backup','Encrypt','Guide','OperLog');
-insert into h_menus(app,name,menu_desc,url,parent_key,order_index,menu_level,icon_name,created_at) values('h-dbc','Config','Configuration','inner:${menuPrefixPath}/h-dbc/Config','-',1,1,'Console',1735800456);
-insert into h_menus(app,name,menu_desc,url,parent_key,order_index,menu_level,icon_name,created_at) values('h-dbc','Profile','Profiles','inner:${menuPrefixPath}/h-dbc/dbc-ui/index.html#/profile','Config',0,2,'profile2',1735800456);
-insert into h_menus(app,name,menu_desc,url,parent_key,order_index,menu_level,icon_name,created_at) values('h-dbc','Service','Services','inner:${menuPrefixPath}/h-dbc/dbc-ui/index.html#/service','Config',1,2,'service3',1735800456);
-insert into h_menus(app,name,menu_desc,url,parent_key,order_index,menu_level,icon_name,created_at) values('h-dbc','Backup','Backup','inner:${menuPrefixPath}/h-dbc/dbc-ui/index.html#/back/data','Config',2,2,'recovery5',1735800456);
-insert into h_menus(app,name,menu_desc,url,parent_key,order_index,menu_level,icon_name,created_at) values('h-dbc','Encrypt','Encryption','inner:${menuPrefixPath}/h-dbc/hbq969-common/index.html#/encrypt','Config',3,2,'encrypt2',1735800456);
-insert into h_menus(app,name,menu_desc,url,parent_key,order_index,menu_level,icon_name,created_at) values('h-dbc','Guide','Guide','inner:${menuPrefixPath}/h-dbc/dbc-ui/index.html#/guide','Config',-1,2,'guide',1735800456);
-insert into h_menus(app,name,menu_desc,url,parent_key,order_index,menu_level,icon_name,created_at) values('h-dbc','OperLog','OperationLog','inner:${menuPrefixPath}/h-dbc/hbq969-tabula/index.html#/data?report=true&source=mysql%2C${defaultDataBaseSchema}&dialect=mysql&schema=${defaultDataBaseSchema}&name=log_dbc&desc=%E9%85%8D%E7%BD%AE%E4%B8%AD%E5%BF%83%E6%93%8D%E4%BD%9C%E6%97%A5%E5%BF%97&manage=0&fmtManage=%E5%90%A6&create=null&creator=admin&createTime=1743584250','Config',6,2,'TableManagementIcon',1735800456);
+delete from h_menus where app='h-dbc' and name in ('ConfigManage','Profile','Service','Backup','Encrypt','Guide','OperLog');
+insert into h_menus(app,name,menu_desc,url,parent_key,order_index,menu_level,icon_name,created_at) values('h-dbc','ConfigManage','Configuration','inner:${menuPrefixPath}/h-dbc/Config','-',1,1,'Console',1735800456);
+insert into h_menus(app,name,menu_desc,url,parent_key,order_index,menu_level,icon_name,created_at) values('h-dbc','Profile','Profiles','inner:${menuPrefixPath}/h-dbc/dbc-ui/index.html#/profile','ConfigManage',0,2,'profile2',1735800456);
+insert into h_menus(app,name,menu_desc,url,parent_key,order_index,menu_level,icon_name,created_at) values('h-dbc','Service','Services','inner:${menuPrefixPath}/h-dbc/dbc-ui/index.html#/service','ConfigManage',1,2,'service3',1735800456);
+insert into h_menus(app,name,menu_desc,url,parent_key,order_index,menu_level,icon_name,created_at) values('h-dbc','Backup','Backup','inner:${menuPrefixPath}/h-dbc/dbc-ui/index.html#/back/data','ConfigManage',2,2,'recovery5',1735800456);
+insert into h_menus(app,name,menu_desc,url,parent_key,order_index,menu_level,icon_name,created_at) values('h-dbc','Encrypt','Encryption','inner:${menuPrefixPath}/h-dbc/hbq969-common/index.html#/encrypt','ConfigManage',3,2,'encrypt2',1735800456);
+insert into h_menus(app,name,menu_desc,url,parent_key,order_index,menu_level,icon_name,created_at) values('h-dbc','Guide','Guide','inner:${menuPrefixPath}/h-dbc/dbc-ui/index.html#/guide','ConfigManage',-1,2,'guide',1735800456);
+insert into h_menus(app,name,menu_desc,url,parent_key,order_index,menu_level,icon_name,created_at) values('h-dbc','OperLog','OperationLog','inner:${menuPrefixPath}/h-dbc/hbq969-tabula/index.html#/data?report=true&source=mysql%2C${defaultDataBaseSchema}&dialect=mysql&schema=${defaultDataBaseSchema}&name=log_dbc&desc=%E9%85%8D%E7%BD%AE%E4%B8%AD%E5%BF%83%E6%93%8D%E4%BD%9C%E6%97%A5%E5%BF%97&manage=0&fmtManage=%E5%90%A6&create=null&creator=admin&createTime=1743584250','ConfigManage',6,2,'TableManagementIcon',1735800456);
 
 delete from h_dbc_profiles where profile_name in ('default','dev','test','prod','mysql','oracle');
 insert into h_dbc_profiles(profile_name,profile_desc,created_at) values('default','Default',1739763078);

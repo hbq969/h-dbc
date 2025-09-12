@@ -45,8 +45,8 @@ const test = () => {
     data: form
   }).then((res: any) => {
     alert(res.data)
-  }).catch((err: Error) => {
-    msg('请求异常', 'error')
+  }).catch((err: any) => {
+    msg(err?.response.data.errorMessage, 'error')
   })
 }
 

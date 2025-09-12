@@ -25,12 +25,11 @@ const queryInitial = () => {
     if (res.data.state == 'OK') {
       dataType.value = res.data.body.dataType || []
     } else {
-      let content = res.config.baseURL + res.config.url + ': ' + res.data.errorMessage;
-      msg(content, "warning")
+      msg(res.data.errorMessage, 'warning')
     }
-  }).catch((err: Error) => {
+  }).catch((err: any) => {
     console.log('', err)
-    msg(langData.axiosRequestErr, 'error')
+    msg(err?.response.data.errorMessage, 'error')
   })
 }
 
@@ -77,12 +76,11 @@ const queryConfigList = () => {
       data.total = res.data.body.total
       data.configList = res.data.body.list
     } else {
-      let content = res.config.baseURL + res.config.url + ': ' + res.data.errorMessage;
-      msg(content, "warning")
+      msg(res.data.errorMessage, 'warning')
     }
-  }).catch((err: Error) => {
+  }).catch((err: any) => {
     console.log('', err)
-    msg(langData.axiosRequestErr, 'error')
+    msg(err?.response.data.errorMessage, 'error')
   })
 }
 
@@ -135,9 +133,9 @@ const updateConfig = async (formEl: FormInstance | undefined) => {
           let content = res.config.baseURL + res.config.url + ': ' + res.data.errorMessage;
           msg(content, "warning")
         }
-      }).catch((err: Error) => {
+      }).catch((err: any) => {
         console.log('', err)
-        msg(langData.axiosRequestErr, 'error')
+        msg(err?.response.data.errorMessage, 'error')
       })
     }
   })
@@ -156,12 +154,11 @@ const deleteConfig = (scope) => {
       msg(res.data.body, 'success')
       queryConfigList()
     } else {
-      let content = res.config.baseURL + res.config.url + ': ' + res.data.errorMessage;
-      msg(content, "warning")
+      msg(res.data.errorMessage, 'warning')
     }
-  }).catch((err: Error) => {
+  }).catch((err: any) => {
     console.log('', err)
-    msg(langData.axiosRequestErr, 'error')
+    msg(err?.response.data.errorMessage, 'error')
   })
 }
 
@@ -190,12 +187,11 @@ const deleteMultipleConfig = () => {
       msg(res.data.body, 'success')
       queryConfigList()
     } else {
-      let content = res.config.baseURL + res.config.url + ': ' + res.data.errorMessage;
-      msg(content, "warning")
+      msg(res.data.errorMessage, 'warning')
     }
-  }).catch((err: Error) => {
+  }).catch((err: any) => {
     console.log('', err)
-    msg(langData.axiosRequestErr, 'error')
+    msg(err?.response.data.errorMessage, 'error')
   })
 }
 
@@ -214,12 +210,11 @@ const backupConfig = () => {
     if (res.data.state == 'OK') {
       msg(res.data.body, 'success')
     } else {
-      let content = res.config.baseURL + res.config.url + ': ' + res.data.errorMessage;
-      msg(content, "warning")
+      msg(res.data.errorMessage, 'warning')
     }
-  }).catch((err: Error) => {
+  }).catch((err: any) => {
     console.log('', err)
-    msg(langData.axiosRequestErr, 'error')
+    msg(err?.response.data.errorMessage, 'error')
   })
 }
 

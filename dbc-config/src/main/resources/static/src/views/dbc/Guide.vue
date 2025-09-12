@@ -31,9 +31,9 @@ onMounted(() => {
     method: 'get',
   }).then((res: any) => {
     showContent.value = res.data
-  }).catch((err: Error) => {
+  }).catch((err: any) => {
     console.log('', err)
-    msg('请求异常', 'error')
+    msg(err?.response.data.errorMessage, 'error')
   })
 });
 

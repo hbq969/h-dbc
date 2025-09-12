@@ -31,11 +31,11 @@ export function switchLang(event: any) {
             window.sessionStorage.setItem('h-sm-lang', langKey)
             window.location.reload()
         } else {
-            let content = res.config.baseURL + res.config.url + ': ' + res.data.errorMessage;
-            msg(content, "warning")
+            msg(res.data.errorMessage, 'warning')
         }
-    }).catch((err: Error) => {
+    }).catch((err: any) => {
         console.log('', err)
+        msg(err?.response.data.errorMessage, 'error')
     })
 }
 
@@ -51,12 +51,11 @@ export function queryLangData(map: any, keys: []) {
                 map[key] = pairs[key]
             })
         } else {
-            let content = res.config.baseURL + res.config.url + ': ' + res.data.errorMessage;
-            msg(content, "warning")
+            msg(res.data.errorMessage, 'warning')
         }
-    }).catch((err: Error) => {
+    }).catch((err: any) => {
         console.log('', err)
-        msg('请求异常', 'error')
+        msg(err?.response.data.errorMessage, 'error')
     })
 }
 
@@ -71,10 +70,10 @@ export function queryLang(currentPageLanguage: string, lang: any) {
             lang.value = langKey2Desc(langKey)
             sessionStorage.setItem('h-sm-lang', langKey)
         } else {
-            let content = res.config.baseURL + res.config.url + ': ' + res.data.errorMessage;
-            msg(content, "warning")
+            msg(res.data.errorMessage, 'warning')
         }
-    }).catch((err: Error) => {
+    }).catch((err: any) => {
         console.log('', err)
+        msg(err?.response.data.errorMessage, 'error')
     })
 }

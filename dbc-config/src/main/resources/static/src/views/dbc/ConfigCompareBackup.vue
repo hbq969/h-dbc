@@ -71,12 +71,11 @@ const queryConfigFile = () => {
       profile1Model.setValue(file.currentFileContent)
       profile2Model.setValue(file.backupFileContent)
     } else {
-      let content = res.config.baseURL + res.config.url + ': ' + res.data.errorMessage;
-      msg(content, "warning")
+      msg(res.data.errorMessage, 'warning')
     }
-  }).catch((err: Error) => {
+  }).catch((err: any) => {
     console.log('', err)
-    msg(langData.axiosRequestErr, 'error')
+    msg(err?.response.data.errorMessage, 'error')
   })
 }
 
