@@ -5,7 +5,7 @@
 
   <distributionManagement>
     <repository>
-      <id>thirdparty-release</id>
+      <id>thirdparty-cmss</id>
       <name>Nexus Releases Repository</name>
       <url>http://nexus.for.mac.host.internal:8081/repository/thirdparty-cmss/</url>
     </repository>
