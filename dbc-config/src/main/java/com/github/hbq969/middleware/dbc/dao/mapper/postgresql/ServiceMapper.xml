@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.github.hbq969.middleware.dbc.dao.ServiceDao">
+
+    <update id="createService">
+        CREATE TABLE h_dbc_service
+        (
+            service_id   VARCHAR(50) PRIMARY KEY,
+            service_name VARCHAR(100) UNIQUE NOT NULL,
+            service_desc VARCHAR(255),
+            created_at   NUMERIC(20),
+            updated_at   NUMERIC(20)
+        )
+    </update>
+
+    <update id="createAccService">
+        CREATE TABLE h_dbc_acc_service
+        (
+            app        VARCHAR(100),
+            username   VARCHAR(100),
+            service_id VARCHAR(100),
+            CONSTRAINT pk_dbc_acc_service PRIMARY KEY (app, username, service_id)
+        )
+    </update>
+
+    <update id="createProfiles">
+        CREATE TABLE h_dbc_profiles
+        (
+            profile_name VARCHAR(100) PRIMARY KEY,
+            profile_desc VARCHAR(255),
+            created_at   NUMERIC(20),
+            updated_at   NUMERIC(20)
+        )
+    </update>
+
+    <update id="createAccProfiles">
+        CREATE TABLE h_dbc_acc_profiles
+        (
+            app          VARCHAR(100),
+            username     VARCHAR(100),
+            profile_name VARCHAR(100),
+            CONSTRAINT pk_dbc_acc_profiles PRIMARY KEY (app, profile_name)
+        )
+    </update>
+
+    <update id="createConfig">
+        CREATE TABLE h_dbc_config
+        (
+            app           VARCHAR(100),
+            username      VARCHAR(100),
+            service_id    VARCHAR(100),
+            profile_name  VARCHAR(100),
+            config_key    VARCHAR(500),
+            config_value  TEXT,
+            data_type     VARCHAR(50) DEFAULT 'java.lang.String',
+            created_at    NUMERIC(20),
+            updated_at    NUMERIC(20),
+            CONSTRAINT pk_db_config PRIMARY KEY (app, username, service_id, profile_name, config_key)
+        )
+    </update>
+
+    <update id="createConfigFile">
+        CREATE TABLE h_dbc_config_file
+        (
+            app           VARCHAR(100),
+            username      VARCHAR(100),
+            service_id    VARCHAR(100),
+            profile_name  VARCHAR(100),
+            file_name     VARCHAR(100),
+            file_content  TEXT,
+            created_at    NUMERIC(20),
+            updated_at    NUMERIC(20),
+            CONSTRAINT pk_dbc_config_file PRIMARY KEY (app, username, service_id, profile_name)
+        )
+    </update>
+
+    <update id="createConfigBackup">
+        CREATE TABLE h_dbc_config_bk
+        (
+            id             VARCHAR(50) PRIMARY KEY,
+            app            VARCHAR(100),
+            username       VARCHAR(100),
+            service_id     VARCHAR(100),
+            service_name   VARCHAR(100),
+            service_desc   VARCHAR(255),
+            profile_name   VARCHAR(100),
+            profile_desc   VARCHAR(255),
+            file_name      VARCHAR(100),
+            backup_content TEXT,
+            created_at     NUMERIC(20)
+        )
+    </update>
+
+</mapper>
