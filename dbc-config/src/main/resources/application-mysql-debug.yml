@@ -18,7 +18,6 @@ spring:
     interceptors:
       login:
         enabled: true
-        dialect: mysql
 
 
 mybatis:

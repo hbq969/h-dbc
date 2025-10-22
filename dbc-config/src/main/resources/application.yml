@@ -57,7 +57,6 @@ spring:
       login:
         enabled: true
         cookie-max-age-sec: 1800
-        dialect: embedded
         include-urls:
           - "/**"
         exclude-urls:
