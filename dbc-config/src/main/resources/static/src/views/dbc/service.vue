@@ -208,7 +208,7 @@ const _ = (window as any).ResizeObserver;
         </template>
       </el-table-column>
       <el-table-column prop="username" :label="langData.tableHeaderCreator" :show-overflow-tooltip="true" header-align="center"
-                       align="center" v-if="user.roleName=='ADMIN'"/>
+                       align="center"/>
       <el-table-column prop="serviceId" label="服务ID" :show-overflow-tooltip="true" header-align="center"
                        align="center"/>
       <el-table-column prop="serviceName" label="服务名称" :show-overflow-tooltip="true" header-align="center"
