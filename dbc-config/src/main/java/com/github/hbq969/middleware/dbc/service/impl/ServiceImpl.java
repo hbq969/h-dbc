@@ -2,8 +2,8 @@ package com.github.hbq969.middleware.dbc.service.impl;
 
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.lang.UUID;
+import cn.hutool.core.util.StrUtil;
 import com.github.hbq969.code.common.initial.AbstractScriptInitialAware;
-import com.github.hbq969.code.common.initial.ScriptInitialAware;
 import com.github.hbq969.code.common.spring.context.SpringContext;
 import com.github.hbq969.code.common.spring.i18n.LangInfo;
 import com.github.hbq969.code.common.spring.i18n.LanguageEvent;
@@ -22,6 +22,7 @@ import com.github.hbq969.middleware.dbc.service.Service;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.collect.ImmutableMap;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -123,7 +124,8 @@ public class ServiceImpl extends AbstractScriptInitialAware implements Service {
     public void scriptInitial0() {
         String lang = com.github.hbq969.code.sm.login.utils.I18nUtils.getFullLanguage(context);
         String filename = String.join("", "dbc-initial", "-", lang, ".sql");
-        Map map = ImmutableMap.of("defaultDataBaseSchema", getDefaultDatabaseName(context.getBean(JdbcTemplate.class)),
+        DataSourceInfo dsi = getDefaultDatabaseName(context.getBean(JdbcTemplate.class));
+        Map map = ImmutableMap.of("defaultDataBaseSchema", dsi.getSchema(), "defaultDataBaseSource", dsi.getSource(),
                 "menuPrefixPath", context.getProperty("dbc.menu.prefix-path", ""));
         com.github.hbq969.code.common.utils.InitScriptUtils.initial(context, filename, StandardCharsets.UTF_8,
                 (sql) -> StrUtils.replacePlaceHolders(sql, map, "dbc"),
@@ -192,19 +194,29 @@ public class ServiceImpl extends AbstractScriptInitialAware implements Service {
         }
     }
 
-    private String getDefaultDatabaseName(JdbcTemplate jt) {
+    private DataSourceInfo getDefaultDatabaseName(JdbcTemplate jt) {
         Assert.notNull(jt, "缺少默认的jdbc数据源");
         Connection c = null;
+        DataSourceInfo dsi = new DataSourceInfo();
         try {
             c = jt.getDataSource().getConnection();
             DatabaseMetaData metaData = c.getMetaData();
             String dcn = metaData.getDriverName().toLowerCase();
-            if (dcn.contains("mysql")) {
-                return extractDatabaseName(metaData.getURL());
-            } else if (dcn.contains("oracle")) {
-                return metaData.getUserName();
-            } else if (dcn.contains("h2")) {
-                return "dbc";
+            if (StrUtil.containsIgnoreCase(dcn, "mysql")) {
+                String schema = extractDatabaseName(metaData.getURL());
+                dsi.setSource("mysql");
+                dsi.setSchema(schema);
+            } else if (StrUtil.containsIgnoreCase(dcn, "oracle")) {
+                String schema = metaData.getUserName();
+                dsi.setSource("oracle");
+                dsi.setSchema(schema);
+            } else if (StrUtil.containsIgnoreCase(dcn, "h2")) {
+                dsi.setSource("h2");
+                dsi.setSchema("dbc");
+            } else if (StrUtil.containsIgnoreCase(dcn, "postgresql")) {
+                String schema = extractDatabaseName(metaData.getURL());
+                dsi.setSource("postgresql");
+                dsi.setSchema(schema);
             } else {
                 throw new UnsupportedOperationException(String.format("不支持的缺省数据源: %s", dcn));
             }
@@ -219,12 +231,18 @@ public class ServiceImpl extends AbstractScriptInitialAware implements Service {
                 }
             }
         }
+        return dsi;
     }
 
     public static String extractDatabaseName(String jdbcUrl) {
         try {
-            // 去掉 jdbc:mysql:// 前缀
-            String urlWithoutPrefix = jdbcUrl.substring("jdbc:mysql://".length());
+            String urlWithoutPrefix;
+            if (StrUtil.startWithIgnoreCase(jdbcUrl, "jdbc:mysql"))
+                urlWithoutPrefix = jdbcUrl.substring("jdbc:mysql://".length());
+            else if (StrUtil.startWithIgnoreCase(jdbcUrl, "jdbc:postgresql"))
+                urlWithoutPrefix = jdbcUrl.substring("jdbc:postgresql://".length());
+            else
+                throw new UnsupportedOperationException(String.format("不支持的数据源: %s", jdbcUrl));
             // 解析 URL
             URL url = new URL("http://" + urlWithoutPrefix);
             // 获取路径部分
@@ -240,4 +258,11 @@ public class ServiceImpl extends AbstractScriptInitialAware implements Service {
             return null;
         }
     }
+
+    @Data
+    public static class DataSourceInfo {
+        private String source;
+        private String schema;
+    }
 }
+

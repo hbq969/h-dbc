@@ -6,31 +6,30 @@ spring:
       base-packages: com.github.hbq969
       default-lookup-key: hikari
     hikari:
-      jdbc-url: jdbc:oracle:thin:@docker.for.mac.host.internal:1521:XE
-      driver-class-name: oracle.jdbc.OracleDriver
-      username: dbc
-      password: ENC(PQWxMysuG2mMhw2IpXF9BudyHe2cS5hL3nPx6tJBvYJLl9dZ2eSkBhU6ed7FDgQZ)
+      jdbc-url: jdbc:postgresql://docker.for.mac.host.internal:5432/dbc
+      driver-class-name: org.postgresql.Driver
+      username: admin
+      password: 123456
       maximum-pool-size: 10
-      minimum-idle: 5
+      minimum-idle: 2
       max-lifetime: 1800000
-      connection-test-query: SELECT 1 FROM DUAL
+      connection-test-query: SELECT 1
   mvc:
     interceptors:
       login:
         enabled: true
-        init-script-file: sm-initial-gbk.sql
-        init-script-file-charset: gbk
+
 
 mybatis:
   mapper-locations:
     - classpath*:mappers/*.xml
     - classpath*:**/mapper/common/*Mapper.xml
-    - classpath*:**/mapper/oracle/*Mapper.xml
-  config-location: classpath:jpaConfig-oracle.xml
+    - classpath*:**/mapper/postgresql/*Mapper.xml
+  config-location: classpath:jpaConfig-postgresql.xml
 
 operlog:
   enabled: true
-  policy: oracle
+  policy: postgresql
   use-default-collect-policy: true
   table-name: log_dbc
   thread-num: 1

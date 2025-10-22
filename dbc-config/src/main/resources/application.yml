@@ -19,8 +19,8 @@ server:
 mybatis:
   mapper-locations:
     - classpath*:mappers/*.xml
-    - classpath*:com/github/**/mapper/common/*Mapper.xml
-    - classpath*:com/github/**/mapper/embedded/*Mapper.xml
+    - classpath*:**/mapper/common/*Mapper.xml
+    - classpath*:**/mapper/embedded/*Mapper.xml
   config-location: classpath:jpaConfig-embedded.xml
 mybatis-plus:
   mapper-locations: ${mybatis.mapper-locations}
@@ -57,7 +57,6 @@ spring:
       login:
         enabled: true
         cookie-max-age-sec: 1800
-        dialect: embedded
         include-urls:
           - "/**"
         exclude-urls:
@@ -81,11 +80,6 @@ spring:
         auth:
           base:
             enabled: true
-        login-fail-timeout-mills: 120000
-        login-fail-times: 3
-        multi-user-login: false
-        account-expire-notify-days: 7
-        complex-pass: true
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     dynamic:
@@ -120,13 +114,10 @@ swagger:
   api-info:
     title: web应用Restful API
     description: web应用Restful API
-    termsOfService: http://127.0.0.1:${server.port}
+    termsOfServiceUrl: http://127.0.0.1:${server.port}
     version: v1.0
-    contact:
-      email: hbq969@gmail.com
-    license:
-      name: Apache License, Version 2.0
-      url: https://apache.org/licenses/LICENSE-2.0.txt
+    license: Apache LICENSE-2.0
+    licenseUrl: https://apache.org/licenses/LICENSE-2.0.txt
 
 dict:
   enabled: true

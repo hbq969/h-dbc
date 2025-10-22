@@ -18,7 +18,6 @@ spring:
     interceptors:
       login:
         enabled: true
-        dialect: mysql
 
 
 mybatis:
@@ -39,6 +38,6 @@ operlog:
   queue-capacity: 5000
 
 tabula:
-  enabled: false
+  enabled: true
   tables:
     - log_dbc
