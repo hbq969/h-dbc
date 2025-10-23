@@ -7,10 +7,7 @@ import com.github.hbq969.code.common.initial.AbstractScriptInitialAware;
 import com.github.hbq969.code.common.spring.context.SpringContext;
 import com.github.hbq969.code.common.spring.i18n.LangInfo;
 import com.github.hbq969.code.common.spring.i18n.LanguageEvent;
-import com.github.hbq969.code.common.utils.FormatTime;
-import com.github.hbq969.code.common.utils.GsonUtils;
-import com.github.hbq969.code.common.utils.I18nUtils;
-import com.github.hbq969.code.common.utils.StrUtils;
+import com.github.hbq969.code.common.utils.*;
 import com.github.hbq969.code.dict.service.api.impl.MapDictHelperImpl;
 import com.github.hbq969.code.sm.login.service.LoginService;
 import com.github.hbq969.middleware.dbc.dao.ProfileDao;
@@ -142,56 +139,13 @@ public class ServiceImpl extends AbstractScriptInitialAware implements Service {
 
     @Override
     public void tableCreate0() {
-        log.debug("h-dbc 初始化创建所有的表。");
-        try {
-            serviceDao.createService();
-        } catch (Exception e) {
-            if (log.isDebugEnabled()) {
-                log.debug("表h_dbc_service已存在");
-            }
-        }
-        try {
-            serviceDao.createAccService();
-        } catch (Exception e) {
-            if (log.isDebugEnabled()) {
-                log.debug("表h_dbc_acc_service已存在");
-            }
-        }
-        try {
-            serviceDao.createProfiles();
-        } catch (Exception e) {
-            if (log.isDebugEnabled()) {
-                log.debug("表h_dbc_profiles已存在");
-            }
-        }
-        try {
-            serviceDao.createAccProfiles();
-        } catch (Exception e) {
-            if (log.isDebugEnabled()) {
-                log.debug("表h_dbc_acc_profiles已存在");
-            }
-        }
-        try {
-            serviceDao.createConfig();
-        } catch (Exception e) {
-            if (log.isDebugEnabled()) {
-                log.debug("表h_dbc_config已存在");
-            }
-        }
-        try {
-            serviceDao.createConfigFile();
-        } catch (Exception e) {
-            if (log.isDebugEnabled()) {
-                log.debug("表h_dbc_config_file已存在");
-            }
-        }
-        try {
-            serviceDao.createConfigBackup();
-        } catch (Exception e) {
-            if (log.isDebugEnabled()) {
-                log.debug("表h_dbc_config_bk已存在");
-            }
-        }
+        ThrowUtils.call("表h_dbc_service创建成功。", "表h_dbc_service已存在", () -> serviceDao.createService());
+        ThrowUtils.call("表h_dbc_acc_service创建成功", "表h_dbc_acc_service已存在", () -> serviceDao.createAccService());
+        ThrowUtils.call("表h_dbc_profiles创建成功", "表h_dbc_profiles已存在", () -> serviceDao.createProfiles());
+        ThrowUtils.call("表h_dbc_acc_profiles创建成功", "表h_dbc_acc_profiles已存在", () -> serviceDao.createAccProfiles());
+        ThrowUtils.call("表h_dbc_config创建成功", "表h_dbc_config已存在", () -> serviceDao.createConfig());
+        ThrowUtils.call("表h_dbc_config_file创建成功", "表h_dbc_config_file已存在", () -> serviceDao.createConfigFile());
+        ThrowUtils.call("表h_dbc_config_bk创建成功", "表h_dbc_config_bk已存在", () -> serviceDao.createConfigBackup());
     }
 
     private DataSourceInfo getDefaultDatabaseName(JdbcTemplate jt) {
@@ -211,12 +165,11 @@ public class ServiceImpl extends AbstractScriptInitialAware implements Service {
                 dsi.setSource("oracle");
                 dsi.setSchema(schema);
             } else if (StrUtil.containsIgnoreCase(dcn, "h2")) {
-                dsi.setSource("h2");
-                dsi.setSchema("dbc");
+                dsi.setSource("embedded");
+                dsi.setSchema("public");
             } else if (StrUtil.containsIgnoreCase(dcn, "postgresql")) {
-                String schema = extractDatabaseName(metaData.getURL());
                 dsi.setSource("postgresql");
-                dsi.setSchema(schema);
+                dsi.setSchema("public");
             } else {
                 throw new UnsupportedOperationException(String.format("不支持的缺省数据源: %s", dcn));
             }
