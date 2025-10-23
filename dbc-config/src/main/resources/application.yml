@@ -87,10 +87,10 @@ spring:
       base-packages: com.github.hbq969
       default-lookup-key: hikari
     hikari:
-      jdbc-url: jdbc:h2:file:${user.dir}/.h2/dbc;DB_CLOSE_DELAY=-1;AUTO_SERVER=TRUE
+      jdbc-url: jdbc:h2:file:${user.dir}/.h2/db;DB_CLOSE_DELAY=-1;AUTO_SERVER=TRUE
       driver-class-name: org.h2.Driver
-      username: h-dbc
-      password: ENC(PQWxMysuG2mMhw2IpXF9BudyHe2cS5hL3nPx6tJBvYJLl9dZ2eSkBhU6ed7FDgQZ)
+      username: foo
+      password: bar
       maximum-pool-size: 20
       minimum-idle: 5
       max-lifetime: 1800000
@@ -110,14 +110,12 @@ knife4j:
     password: ENC(PQWxMysuG2mMhw2IpXF9BudyHe2cS5hL3nPx6tJBvYJLl9dZ2eSkBhU6ed7FDgQZ)
 
 swagger:
+  enabled: true
   base-package: com
   api-info:
-    title: web应用Restful API
-    description: web应用Restful API
-    termsOfServiceUrl: http://127.0.0.1:${server.port}
-    version: v1.0
-    license: Apache LICENSE-2.0
-    licenseUrl: https://apache.org/licenses/LICENSE-2.0.txt
+    title: api-gateway dashboard api接口
+    description: 网关维护管理接口
+    version: 1.0
 
 dict:
   enabled: true
@@ -152,7 +150,16 @@ dbc:
     prefix-path: ""
 
 operlog:
-  enabled: false
+  enabled: true
+  policy: embedded
+  use-default-collect-policy: true
+  table-name: log_dbc
+  thread-num: 1
+  batch-timeout-mills: 10000
+  batch-size: 50
+  queue-capacity: 5000
 
 tabula:
-  enabled: false
+  enabled: true
+  tables:
+    - log_dbc
