@@ -53,6 +53,10 @@ spring:
             locations: classpath:/static/hbq969-sm/
           - handlers: /dbc-ui/**
             locations: classpath:/static/dbc-ui/
+          - handlers: /**
+            locations:
+              - classpath:/static/
+              - classpath:/
         enabled: true
       login:
         enabled: true
