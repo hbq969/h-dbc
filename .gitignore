@@ -6,5 +6,7 @@ dbc-config/src/main/resources/static/node_modules
 dbc-config/src/main/resources/static/dbc-ui
 dbc-config/src/main/resources/application-dev.yml
 dbc-config/src/main/resources/application-test.yml
+dbc-config/src/main/resources/application-test.yml
+dbc-config/src/main/resources/application-prod.yml
 .h2/
 .DS_Store/
