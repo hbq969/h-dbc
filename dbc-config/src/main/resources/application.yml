@@ -18,9 +18,10 @@ server:
 
 mybatis:
   mapper-locations:
-    - classpath*:mappers/*.xml
-    - classpath*:**/mapper/common/*Mapper.xml
-    - classpath*:**/mapper/embedded/*Mapper.xml
+    - classpath*:com/github/hbq969/code/**/mapper/common/*Mapper.xml
+    - classpath*:com/github/hbq969/code/**/mapper/embedded/*Mapper.xml
+    - classpath*:com/github/hbq969/middleware/**/mapper/common/*Mapper.xml
+    - classpath*:com/github/hbq969/middleware/**/mapper/embedded/*Mapper.xml
   config-location: classpath:jpaConfig-embedded.xml
 mybatis-plus:
   mapper-locations: ${mybatis.mapper-locations}

@@ -22,9 +22,10 @@ spring:
 
 mybatis:
   mapper-locations:
-    - classpath*:mappers/*.xml
-    - classpath*:**/mapper/common/*Mapper.xml
-    - classpath*:**/mapper/mysql/*Mapper.xml
+    - classpath*:com/github/hbq969/code/**/mapper/common/*Mapper.xml
+    - classpath*:com/github/hbq969/code/**/mapper/mysql/*Mapper.xml
+    - classpath*:com/github/hbq969/middleware/**/mapper/common/*Mapper.xml
+    - classpath*:com/github/hbq969/middleware/**/mapper/mysql/*Mapper.xml
   config-location: classpath:jpaConfig-mysql.xml
 
 operlog:
@@ -41,3 +42,7 @@ tabula:
   enabled: true
   tables:
     - log_dbc
+
+server:
+  ssl:
+    enabled: false
