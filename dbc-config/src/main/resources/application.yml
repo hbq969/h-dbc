@@ -84,6 +84,8 @@ spring:
         auth:
           base:
             enabled: true
+        logo-svg: <svg t="1763634394409" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="13920" width="32" height="32"><path d="M571.79375 708.875A112.5 112.5 0 1 0 708.875 571.79375V335.7125a56.25 56.25 0 1 0-56.25 0v236.08125c-10.35 2.64375-20.1375 6.75-29.1375 12.09375l-232.3125-232.3125a84.375 84.375 0 1 0-39.6 39.6l232.3125 232.3125c-5.34375 9-9.45 18.7875-12.09375 29.1375H335.7125a56.25 56.25 0 1 0 0 56.25h236.08125zM512 962A450 450 0 1 1 512 62a450 450 0 0 1 0 900z" fill="#2DD08C" p-id="13921"></path></svg>
+        copyright: ""
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     dynamic:
