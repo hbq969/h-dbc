@@ -4,12 +4,12 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.lang.Assert;
 import com.github.hbq969.code.common.spring.context.SpringContext;
 import com.github.hbq969.code.common.spring.yaml.TypePair;
-import com.github.hbq969.code.common.utils.SubList;
 import com.github.hbq969.code.common.utils.*;
 import com.github.hbq969.code.dict.service.api.impl.MapDictHelperImpl;
 import com.github.hbq969.code.sm.login.session.UserContext;
 import com.github.hbq969.middleware.dbc.dao.BackupDao;
 import com.github.hbq969.middleware.dbc.dao.ConfigDao;
+import com.github.hbq969.middleware.dbc.dao.ProfileDao;
 import com.github.hbq969.middleware.dbc.dao.ServiceDao;
 import com.github.hbq969.middleware.dbc.dao.entity.*;
 import com.github.hbq969.middleware.dbc.model.AccountServiceProfile;
@@ -35,6 +35,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -54,6 +55,9 @@ public class ConfigServiceImpl implements ConfigService {
 
     @Autowired
     private ConfigDao configDao;
+
+    @Resource
+    private ProfileDao profileDao;
 
     @Autowired
     private SpringContext context;
@@ -217,15 +221,17 @@ public class ConfigServiceImpl implements ConfigService {
             log.error(String.format("读取导入文件 %s 异常", file.getOriginalFilename()), e);
             throw new RuntimeException(e);
         }
+        profileDao.deleteProfileAllConfigOnAdmin(asp.getProfileName());
+        profileDao.deleteProfileConfigFileOnAdmin(asp.getProfileName());
         batchConfigs(asp, cover, pairs);
     }
 
     private void batchConfigs(AccountServiceProfile asp, String cover, List<TypePair> pairs) {
         DigitSplit.defaultStep(200).split(pairs).forEach(data -> {
             batchSaveConfig(asp, data, sqlSave);
-            if (StringUtils.equals("Y", cover)) {
-                batchUpdateConfig(asp, data, sqlUpdate);
-            }
+//            if (StringUtils.equals("Y", cover)) {
+//                batchUpdateConfig(asp, data, sqlUpdate);
+//            }
         });
     }
 
@@ -478,7 +484,7 @@ public class ConfigServiceImpl implements ConfigService {
                 } catch (DataAccessException ex) {
                 }
             }
-            log.info("单挑保存配置项成功 {}", c.intValue());
+            log.info("单条保存配置项成功 {}", c.intValue());
         }
     }
 }
