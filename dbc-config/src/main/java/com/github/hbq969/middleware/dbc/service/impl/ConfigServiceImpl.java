@@ -221,17 +221,14 @@ public class ConfigServiceImpl implements ConfigService {
             log.error(String.format("读取导入文件 %s 异常", file.getOriginalFilename()), e);
             throw new RuntimeException(e);
         }
-        profileDao.deleteProfileAllConfigOnAdmin(asp.getProfileName());
-        profileDao.deleteProfileConfigFileOnAdmin(asp.getProfileName());
+        profileDao.deleteProfileConfig(asp);
+        profileDao.deleteProfileConfileFile2(asp);
         batchConfigs(asp, cover, pairs);
     }
 
     private void batchConfigs(AccountServiceProfile asp, String cover, List<TypePair> pairs) {
         DigitSplit.defaultStep(200).split(pairs).forEach(data -> {
             batchSaveConfig(asp, data, sqlSave);
-//            if (StringUtils.equals("Y", cover)) {
-//                batchUpdateConfig(asp, data, sqlUpdate);
-//            }
         });
     }
 
