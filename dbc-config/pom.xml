@@ -56,6 +56,11 @@
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
     </dependency>
+    <dependency>
+      <groupId>com.github.hbq969</groupId>
+      <artifactId>h-tabula</artifactId>
+      <version>${common.version}</version>
+    </dependency>
   </dependencies>
 
   <build>

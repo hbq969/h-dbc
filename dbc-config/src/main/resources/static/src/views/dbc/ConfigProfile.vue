@@ -103,7 +103,7 @@ const dialogTitle2 = ref(langData.configProfileImport)
 const importForm = reactive({
   file: null,
   cover: 'N',
-  backup: 'N',
+  backup: 'Y',
   serviceId: '',
   username: '',
   profileName: ''
@@ -468,17 +468,17 @@ const _ = (window as any).ResizeObserver;
           </el-upload>
         </div>
         <br/>
-        <el-form-item :label="langData.configProfileIfCover" prop="cover" label-width="80">
-          <el-switch
-              v-model="importForm.cover"
-              inline-prompt
-              :active-text="langData.switchYes"
-              :inactive-text="langData.switchNo"
-              active-value="Y"
-              inactive-value="N"
-              @change="importForm.cover=='Y'?importForm.backup='Y':importForm.backup='N'"
-          />
-        </el-form-item>
+<!--        <el-form-item :label="langData.configProfileIfCover" prop="cover" label-width="80">-->
+<!--          <el-switch-->
+<!--              v-model="importForm.cover"-->
+<!--              inline-prompt-->
+<!--              :active-text="langData.switchYes"-->
+<!--              :inactive-text="langData.switchNo"-->
+<!--              active-value="Y"-->
+<!--              inactive-value="N"-->
+<!--              @change="importForm.cover=='Y'?importForm.backup='Y':importForm.backup='N'"-->
+<!--          />-->
+<!--        </el-form-item>-->
         <el-form-item :label="langData.configProfileIfBackup" prop="backup" label-width="80">
           <el-switch
               v-model="importForm.backup"

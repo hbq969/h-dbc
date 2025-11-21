@@ -12,6 +12,9 @@ import com.github.hbq969.middleware.dbc.view.request.DeleteConfigMultiple;
 import com.github.hbq969.middleware.dbc.view.request.DownFile;
 import com.github.pagehelper.PageInfo;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -34,7 +37,8 @@ public interface ConfigService {
 
     PageInfo<ConfigEntity> queryConfigList(AccountServiceProfile asp, ConfigEntity q, int pageNum, int pageSize);
 
-    void configImport(AccountServiceProfile asp, MultipartFile file, String cover,String backup);
+    @Transactional(rollbackFor = Exception.class)
+    void configImport(AccountServiceProfile asp, MultipartFile file, String cover, String backup);
 
     ConfigFileEntity queryConfigFile(AccountServiceProfile asp);
 
@@ -42,7 +46,7 @@ public interface ConfigService {
 
     void downFile(HttpServletResponse response, DownFile downFile);
 
-   void downBootstrapFile(HttpServletResponse response, Map map);
+    void downBootstrapFile(HttpServletResponse response, Map map);
 
     List<ServiceConfigEntity> queryAllProfilesThisConfig(Map map);
 
