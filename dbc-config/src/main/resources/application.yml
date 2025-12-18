@@ -49,8 +49,8 @@ spring:
             locations: classpath:/static/hbq969-dict/
           - handlers: /hbq969-tabula/**
             locations: classpath:/static/hbq969-tabula/
-          - handlers: /hbq969-sm/**
-            locations: classpath:/static/hbq969-sm/
+          - handlers: /${spring.mvc.interceptors.login.ui-output-dir}/**
+            locations: classpath:/static/${spring.mvc.interceptors.login.ui-output-dir}/
           - handlers: /dbc-ui/**
             locations: classpath:/static/dbc-ui/
           - handlers: /**
@@ -72,11 +72,11 @@ spring:
           - "/**/*.ico"
           - "/**/error"
           - "/common/health"
-          - "/hbq969-sm/index.html"
-          - "/hbq969-sm/**/login"
-          - "/hbq969-sm/i18n/lang"
-          - "/hbq969-sm/i18n/lang/data"
-          - "/hbq969-sm/**/getPublicKey"
+          - "/${spring.mvc.interceptors.login.ui-output-dir}/index.html"
+          - "/${spring.mvc.interceptors.login.ui-output-dir}/**/login"
+          - "/${spring.mvc.interceptors.login.ui-output-dir}/i18n/lang"
+          - "/${spring.mvc.interceptors.login.ui-output-dir}/i18n/lang/data"
+          - "/${spring.mvc.interceptors.login.ui-output-dir}/**/getPublicKey"
         session-key: h-dbc-sid
         sm-initial-script:
           language: zh-CN
