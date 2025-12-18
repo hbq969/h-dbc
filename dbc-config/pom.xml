@@ -116,6 +116,7 @@
           <include>i18n/*.*</include>
           <include>*.*</include>
           <include>static/dbc-ui/</include>
+          <include>static/ui/</include>
           <include>certs/*.*</include>
         </includes>
       </resource>
